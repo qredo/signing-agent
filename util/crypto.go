@@ -46,6 +46,16 @@ func BLSSign(seed, payload []byte) ([]byte, error) {
 	return signature, nil
 }
 
+func BLSVerify(seed, msg, sig []byte) error {
+
+	blsPublic, _, err := crypto.BLSKeys(crypto.NewRand(seed), nil)
+	if err != nil {
+		return errors.New("generate BLS key")
+	}
+
+	return crypto.BLSVerify(msg, blsPublic, sig)
+}
+
 func ZKPToken(zkpID, zkpToken []byte, pin int) ([]byte, error) {
 
 	rng, err := CreateAMCLRng()

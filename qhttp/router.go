@@ -104,12 +104,11 @@ func (r *Router) setHandlers() (http.Handler, error) {
 		{"/client", http.MethodPost, r.handler.ClientRegister},
 		{"/client/{ref}", http.MethodPut, r.handler.ClientRegisterFinish},
 		{"/client", http.MethodGet, r.handler.ClientsList},
-		//{"/coreclient/{client_id}/actions", http.MethodGet, h.pendingActionsHandler},
-		//{"/coreclient/{client_id}/action/{action_id}", http.MethodGet, h.actionDetailsHandler},
-		//{"/coreclient/{client_id}/action/{action_id}", http.MethodDelete, s.partnerCoreClientActionRejectHandler},
-		//{"/coreclient/{client_id}/wallets", http.MethodGet, s.partnerCoreClientConnectedWalletsHandler},
-		//{"/coreclient/{client_id}/sweep", http.MethodPost, s.partnerNewSweepHandler},
-		//{"/coreclient/{client_id}/sweep/{tx_id}", http.MethodGet, s.partnerGetSweepHandler},
+		{"/client/{client_id}/action/{action_id}", http.MethodPut, r.handler.ActionApprove},
+		{"/action/{client_id}/action/{action_id}", http.MethodDelete, r.handler.ActionReject},
+
+		{"/client/{client_id}/sign", http.MethodPost, r.handler.Sign},
+		{"/verify", http.MethodPost, r.handler.Verify},
 	}
 
 	router := mux.NewRouter().PathPrefix(pathPrefix).Subrouter()

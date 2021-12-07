@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"github.com/btcsuite/btcd/btcec"
+	"gitlab.qredo.com/qredo-server/qredo-core/qapi/partner"
 
-	"gitlab.qredo.com/qredo-server/qredo-core/qapi/coreclient"
+	"github.com/btcsuite/btcd/btcec"
 
 	"github.com/pkg/errors"
 
@@ -110,16 +110,16 @@ func (h *Handler) ClientRegisterFinish(_ *defs.RequestContext, _ http.ResponseWr
 		return nil, errors.Wrap(err, "get zkp token")
 	}
 
-	confirmRequest := coreclient.RegisterFinishRequest{
+	confirmRequest := partner.RegisterFinishRequest{
 		IDDocSignatureHex: hex.EncodeToString(idDocSignature),
 	}
 
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 
-	finishResp := &coreclient.RegisterFinishResponse{}
+	finishResp := &partner.RegisterFinishResponse{}
 
-	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoServerURL, pending.ID), confirmRequest, finishResp, header); err != nil {
+	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoServerURL), confirmRequest, finishResp, header); err != nil {
 		return nil, qerr.Wrap(err)
 	}
 
