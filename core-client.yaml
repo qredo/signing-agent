@@ -1,4 +1,5 @@
 base_url: http://127.0.0.1:8007
+qredo_server_url: http://127.0.0.1:8001
 http:
   addr: 127.0.0.1:8007
   cors_allow_origins:
@@ -6,8 +7,9 @@ http:
   proxy_forwarded_header: ""
   cookie_same_site: lax
   cookie_secure: true
-  log_all_requests: false
+  log_all_requests: true
 logging:
   format: text
   level: debug
 store_file: ccstore.db
+pin: 0

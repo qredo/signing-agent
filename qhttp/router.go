@@ -105,7 +105,7 @@ func (r *Router) setHandlers() (http.Handler, error) {
 		{"/client/{ref}", http.MethodPut, r.handler.ClientRegisterFinish},
 		{"/client", http.MethodGet, r.handler.ClientsList},
 		{"/client/{client_id}/action/{action_id}", http.MethodPut, r.handler.ActionApprove},
-		{"/action/{client_id}/action/{action_id}", http.MethodDelete, r.handler.ActionReject},
+		{"/client/{client_id}/action/{action_id}", http.MethodDelete, r.handler.ActionReject},
 
 		{"/client/{client_id}/sign", http.MethodPost, r.handler.Sign},
 		{"/verify", http.MethodPost, r.handler.Verify},

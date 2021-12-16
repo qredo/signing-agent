@@ -37,7 +37,7 @@ func (h *Handler) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWriter,
 
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
-	messagesResp := &partner.ServiceActionMessagesResponse{}
+	messagesResp := &partner.CoreClientServiceActionMessagesResponse{}
 	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.QredoServerURL, actionID), nil, messagesResp, header); err != nil {
 		return nil, qerr.Wrap(err)
 	}
@@ -54,7 +54,7 @@ func (h *Handler) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWriter,
 			return nil, qerr.Wrap(err)
 		}
 
-		signature, err := util.BLSSign(msg, client.BLSSeed)
+		signature, err := util.BLSSign(client.BLSSeed, msg)
 		if err != nil {
 			return nil, qerr.Wrap(err)
 		}
@@ -66,12 +66,12 @@ func (h *Handler) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWriter,
 		return nil, errors.Wrap(err, "get zkp token")
 	}
 
-	req := &partner.ServiceActionApproveRequest{
+	req := &partner.CoreClientServiceActionApproveRequest{
 		Signatures: signatures,
 	}
 	header = http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
-	if err = h.htc.Request(http.MethodGet, util.URLActionApprove(h.cfg.QredoServerURL, actionID), req, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.QredoServerURL, actionID), req, nil, header); err != nil {
 		return nil, qerr.Wrap(err)
 	}
 
@@ -101,7 +101,7 @@ func (h *Handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 
-	if err = h.htc.Request(http.MethodGet, util.URLActionReject(h.cfg.QredoServerURL, actionID), nil, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.QredoServerURL, actionID), nil, nil, header); err != nil {
 		return nil, qerr.Wrap(err)
 	}
 

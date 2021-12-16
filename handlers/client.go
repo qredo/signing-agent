@@ -110,14 +110,14 @@ func (h *Handler) ClientRegisterFinish(_ *defs.RequestContext, _ http.ResponseWr
 		return nil, errors.Wrap(err, "get zkp token")
 	}
 
-	confirmRequest := partner.RegisterFinishRequest{
+	confirmRequest := partner.CoreClientServiceRegisterFinishRequest{
 		IDDocSignatureHex: hex.EncodeToString(idDocSignature),
 	}
 
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 
-	finishResp := &partner.RegisterFinishResponse{}
+	finishResp := &partner.CoreClientServiceRegisterFinishResponse{}
 
 	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoServerURL), confirmRequest, finishResp, header); err != nil {
 		return nil, qerr.Wrap(err)

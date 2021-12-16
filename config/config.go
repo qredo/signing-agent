@@ -39,7 +39,7 @@ func (c *Config) Default() {
 	c.Logging.Default()
 	c.StoreFile = "ccstore.db"
 	c.PIN = 0
-	c.QredoServerURL = "http://127.0.0.1:8002"
+	c.QredoServerURL = "http://127.0.0.1:8001"
 }
 
 // ParseConfigFile parses yaml config
