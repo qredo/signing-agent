@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"gitlab.qredo.com/qredo-server/qredo-core/qapi/partner"
+	"gitlab.qredo.com/qredo-server/qredo-core/api/partner"
 
 	"github.com/btcsuite/btcd/btcec"
 
@@ -22,7 +22,7 @@ import (
 	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 
 	"github.com/qredo/assets/libs/crypto"
-	"gitlab.qredo.com/qredo-server/qredo-core/qcommon"
+	"gitlab.qredo.com/qredo-server/qredo-core/common"
 
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
@@ -36,7 +36,7 @@ func (h *Handler) ClientRegister(_ *defs.RequestContext, _ http.ResponseWriter, 
 
 	client := &Client{Name: req.Name}
 
-	client.BLSSeed, err = qcommon.RandomBytes(48)
+	client.BLSSeed, err = common.RandomBytes(48)
 	if err != nil {
 		return nil, qerr.Wrap(err)
 	}

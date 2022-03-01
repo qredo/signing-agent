@@ -15,11 +15,11 @@ dev_docker_build() {
 
   # this fixes go-ethereum build issues caused by Go not vendoring .c files
   # libsecp=`ls -d1 $GOPATH/pkg/mod/github.com/ethereum/go-ethereum*/crypto/secp256k1/libsecp256k1 |tail -1`
-  hidapi=`ls -d1 $GOPATH/pkg/mod/github.com/karalabe/usb* | tail -1`
+#  hidapi=`ls -d1 $GOPATH/pkg/mod/github.com/karalabe/usb* | tail -1`
   # cp -rf $libsecp vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1
   # chmod -R 755 vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1
-  cp -rf $hidapi/* vendor/github.com/karalabe/usb
-  chmod -R 755 vendor/github.com/karalabe/usb
+#  cp -rf $hidapi/* vendor/github.com/karalabe/usb
+#  chmod -R 755 vendor/github.com/karalabe/usb
   ################################################
 
   docker build --build-arg BUILD_DATE="$BUILD_DATE" --build-arg BUILD_COMMIT="$GIT_COMMIT" --build-arg BUILD_VERSION="$VERSION" -t "$SERVICE_NAME:dev" -f dockerfiles/Dockerfile .

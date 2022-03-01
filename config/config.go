@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/qredo-server/qredo-core/qconfig"
+	"gitlab.qredo.com/qredo-server/qredo-core/config"
 	"gopkg.in/yaml.v2"
 )
 
@@ -19,12 +19,12 @@ type httpSettings struct {
 
 // Config is the service configuration
 type Config struct {
-	BaseURL        string          `yaml:"base_url"`
-	QredoServerURL string          `yaml:"qredo_server_url"`
-	HTTP           httpSettings    `yaml:"http"`
-	Logging        qconfig.Logging `yaml:"logging"`
-	StoreFile      string          `yaml:"store_file"`
-	PIN            int             `yaml:"pin"`
+	BaseURL        string         `yaml:"base_url"`
+	QredoServerURL string         `yaml:"qredo_server_url"`
+	HTTP           httpSettings   `yaml:"http"`
+	Logging        config.Logging `yaml:"logging"`
+	StoreFile      string         `yaml:"store_file"`
+	PIN            int            `yaml:"pin"`
 }
 
 // Default creates configuration with default values

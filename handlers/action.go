@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 
-	"gitlab.qredo.com/qredo-server/qredo-core/qapi/partner"
+	"gitlab.qredo.com/qredo-server/qredo-core/api/partner"
 
 	"github.com/gorilla/mux"
 	"gitlab.qredo.com/qredo-server/core-client/util"

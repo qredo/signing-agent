@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
-
 	qhandlers "gitlab.qredo.com/qredo-server/core-client/handlers"
 
 	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
@@ -15,8 +13,9 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"gitlab.qredo.com/qredo-server/core-client/config"
-	"gitlab.qredo.com/qredo-server/qredo-core/qdefs"
-	"gitlab.qredo.com/qredo-server/qredo-core/qnet"
+	cdefs "gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/qredo-server/qredo-core/common"
+	"gitlab.qredo.com/qredo-server/qredo-core/defs"
 	"go.uber.org/zap"
 )
 
@@ -39,11 +38,11 @@ const (
 	scopeWebsocket            = "websocket"
 )
 
-type appHandlerFunc func(ctx *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
+type appHandlerFunc func(ctx *cdefs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
 
 func (a appHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	ctx := &defs.RequestContext{}
+	ctx := &cdefs.RequestContext{}
 
 	resp, err := a(ctx, w, r)
 
@@ -61,7 +60,7 @@ func (a appHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	qnet.FormatJSONResp(w, r, resp, err)
+	common.FormatJSONResp(w, r, resp, err)
 }
 
 type route struct {
@@ -116,7 +115,7 @@ func (r *Router) setHandlers() (http.Handler, error) {
 
 		middle := r.middleware.notProtectedMiddleware
 
-		if route.method == qdefs.MethodWebsocket {
+		if route.method == defs.MethodWebsocket {
 			router.Handle(route.path, r.middleware.sessionMiddleware(middle(route.handler)))
 		} else {
 			router.Handle(route.path, r.middleware.sessionMiddleware(middle(route.handler))).Methods(route.method)

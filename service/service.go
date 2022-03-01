@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"path/filepath"
 
-	"gitlab.qredo.com/qredo-server/core-client/qhttp"
+	"gitlab.qredo.com/qredo-server/qredo-core/log"
 
-	"gitlab.qredo.com/qredo-server/qredo-core/qlog"
+	"gitlab.qredo.com/qredo-server/core-client/qhttp"
 
 	"go.uber.org/zap"
 
@@ -87,7 +87,7 @@ func (s *coreClientService) commandsRegister() {
 				if err != nil {
 					return err
 				}
-				s.log = qlog.GetLogger(&s.config.Logging)
+				s.log = log.GetLogger(&s.config.Logging)
 				return s.run()
 			},
 		},
