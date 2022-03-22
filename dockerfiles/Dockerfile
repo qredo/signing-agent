@@ -65,8 +65,8 @@ RUN CGO_ENABLED=1 \
                                                             -X 'gitlab.qredo.com/qredo-server/core-client/service.commit=$BUILD_COMMIT' \
                                                             -X 'gitlab.qredo.com/qredo-server/core-client/service.version=$BUILD_VERSION' \
                                                             -X 'gitlab.qredo.com/qredo-server/qredo-core/qerr.InstanceName=core-client'" \
-      -o $GOPATH/bin/core-client \
-      gitlab.qredo.com/qredo-server/core-client
+      -o $GOPATH/bin/lib-client \
+      gitlab.qredo.com/qredo-server/lib-client
 
 
 FROM alpine as certs

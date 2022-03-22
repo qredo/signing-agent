@@ -3,6 +3,7 @@ package util
 import (
 	"crypto/rand"
 	"encoding/json"
+	"io"
 
 	"github.com/pkg/errors"
 	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
@@ -14,16 +15,22 @@ const (
 	amclRandomSeedSize = 48
 )
 
-func randomBytes(size int) ([]byte, error) {
+func RandomBytes(size int) ([]byte, error) {
 	b := make([]byte, size)
-	_, err := rand.Read(b)
+	n, err := io.ReadAtLeast(rand.Reader, b, size)
+	if err != nil {
+		return nil, err
+	}
+	if n != size {
+		return nil, errors.Errorf("read %v random bytes, expected %v", n, size)
+	}
 
 	return b, err
 }
 
 // CreateAMCLRng creates a new AMCL RNG with a random seed
 func CreateAMCLRng() (*crypto.Rand, error) {
-	b, err := randomBytes(amclRandomSeedSize)
+	b, err := RandomBytes(amclRandomSeedSize)
 	if err != nil {
 		return nil, err
 	}

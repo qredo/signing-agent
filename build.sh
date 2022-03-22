@@ -28,17 +28,15 @@ dev_docker_build() {
 
 
 
-
 dev_local_build() {
 
   go build \
       -tags debug \
-      -ldflags "-X 'gitlab.qredo.com/qredo-server/$SERVICE_NAME/service.buildDate=$BUILD_DATE' \
-                -X 'gitlab.qredo.com/qredo-server/$SERVICE_NAME/service.commit=$GIT_COMMIT' \
-                -X 'gitlab.qredo.com/qredo-server/$SERVICE_NAME/service.version=$VERSION' \
-                -X 'gitlab.qredo.com/qredo-server/qredo-core/qerr.InstanceName=$SERVICE_NAME'" \
+      -ldflags "-X 'main.buildDate=$BUILD_DATE' \
+                -X 'main.commit=$GIT_COMMIT' \
+                -X 'main.version=$VERSION'" \
       -o out/$SERVICE_NAME \
-      gitlab.qredo.com/qredo-server/$SERVICE_NAME
+      gitlab.qredo.com/qredo-server/$SERVICE_NAME/cmd/service
 }
 
 

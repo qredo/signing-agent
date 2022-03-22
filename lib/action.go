@@ -1,13 +1,13 @@
-package handlers
+package lib
 
 import (
 	"encoding/hex"
 	"net/http"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 
 	"gitlab.qredo.com/qredo-server/qredo-core/api/partner"
+	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 
 	"github.com/gorilla/mux"
 	"gitlab.qredo.com/qredo-server/core-client/util"
@@ -15,7 +15,7 @@ import (
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
 
-func (h *Handler) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (h *coreClient) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
 		return nil, qerr.BadRequest().WithReason("actionID")
@@ -78,7 +78,7 @@ func (h *Handler) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWriter,
 	return nil, nil
 }
 
-func (h *Handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (h *coreClient) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
 		return nil, qerr.BadRequest().WithReason("actionID")

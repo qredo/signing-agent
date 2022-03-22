@@ -1,4 +1,4 @@
-package handlers
+package lib
 
 import (
 	"crypto/sha256"
@@ -6,12 +6,11 @@ import (
 	"net/http"
 
 	"gitlab.qredo.com/qredo-server/qredo-core/api/partner"
+	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 
 	"github.com/btcsuite/btcd/btcec"
 
 	"github.com/pkg/errors"
-
-	"github.com/gorilla/mux"
 
 	"github.com/google/uuid"
 
@@ -19,24 +18,17 @@ import (
 
 	"gitlab.qredo.com/qredo-server/core-client/api"
 
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
-
 	"github.com/qredo/assets/libs/crypto"
-	"gitlab.qredo.com/qredo-server/qredo-core/common"
-
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
 
-func (h *Handler) ClientRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	req := &api.ClientRegisterRequest{}
-	err := util.DecodeRequest(req, r)
-	if err != nil {
-		return nil, err
-	}
+func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
 
-	client := &Client{Name: req.Name}
+	var err error
 
-	client.BLSSeed, err = common.RandomBytes(48)
+	client := &Client{Name: name}
+
+	client.BLSSeed, err = util.RandomBytes(48)
 	if err != nil {
 		return nil, qerr.Wrap(err)
 	}
@@ -65,13 +57,7 @@ func (h *Handler) ClientRegister(_ *defs.RequestContext, _ http.ResponseWriter, 
 
 }
 
-func (h *Handler) ClientRegisterFinish(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	ref := mux.Vars(r)["ref"]
-	req := &api.ClientRegisterFinishRequest{}
-	err := util.DecodeRequest(req, r)
-	if err != nil {
-		return nil, err
-	}
+func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (interface{}, error) {
 
 	pending := h.store.GetPending(ref)
 	if pending == nil {
@@ -137,6 +123,6 @@ func (h *Handler) ClientRegisterFinish(_ *defs.RequestContext, _ http.ResponseWr
 		FeedURL: finishResp.Feed,
 	}, nil
 }
-func (h *Handler) ClientsList(s *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (h *coreClient) ClientsList(s *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	return nil, nil
 }

@@ -1,4 +1,4 @@
-package handlers
+package lib
 
 import (
 	"encoding/hex"
@@ -15,7 +15,7 @@ import (
 )
 
 // Sign signs a payload
-func (h *Handler) Sign(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (h *coreClient) Sign(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	req := &api.SignRequest{}
 	err := util.DecodeRequest(req, r)
 	if err != nil {
@@ -38,12 +38,12 @@ func (h *Handler) Sign(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.
 
 	client := h.store.GetClient(clientID)
 	if client == nil {
-		return nil, qerr.NotFound().WithReason("core_client_seed").Wrap(err).WithMessage("get core client seed from secrets store %s", clientID)
+		return nil, qerr.NotFound().WithReason("core_client_seed").Wrap(err).WithMessage("get lib client seed from secrets store %s", clientID)
 	}
 
 	signature, err := util.BLSSign(client.BLSSeed, msg)
 	if err != nil {
-		return nil, qerr.Internal().Wrap(err).WithMessage("sign message for core client %s", clientID)
+		return nil, qerr.Internal().Wrap(err).WithMessage("sign message for lib client %s", clientID)
 	}
 
 	return &api.SignResponse{
@@ -53,7 +53,7 @@ func (h *Handler) Sign(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.
 }
 
 // PartnerCompanySign -
-func (h *Handler) Verify(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (h *coreClient) Verify(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	req := &api.VerifyRequest{}
 	err := util.DecodeRequest(req, r)
 	if err != nil {

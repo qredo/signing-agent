@@ -2,7 +2,9 @@ package api
 
 import "errors"
 
+// swagger:parameters clientRegisterInit
 type ClientRegisterRequest struct {
+	// in:body
 	Name string `json:"name"`
 }
 
@@ -14,18 +16,28 @@ func (r *ClientRegisterRequest) Validate() error {
 	return nil
 }
 
+// swagger:model clientRegisterResponse
 type ClientRegisterResponse struct {
+	// in:body
 	BLSPublicKey string `json:"bls_public_key"`
-	ECPublicKey  string `json:"ec_public_key"`
-	RefID        string `json:"ref_id"`
+	// in:body
+	ECPublicKey string `json:"ec_public_key"`
+	// in:body
+	RefID string `json:"ref_id"`
 }
 
+// swagger:parameters clientRegisterFinish
 type ClientRegisterFinishRequest struct {
-	ID           string `json:"id"`
-	AccountCode  string `json:"account_code"`
-	ClientID     string `json:"client_id"`
+	// in:body
+	ID string `json:"id"`
+	// in:body
+	AccountCode string `json:"account_code"`
+	// in:body
+	ClientID string `json:"client_id"`
+	// in:body
 	ClientSecret string `json:"client_secret"`
-	IDDoc        string `json:"id_doc"`
+	// in:body
+	IDDoc string `json:"id_doc"`
 }
 
 func (r *ClientRegisterFinishRequest) Validate() error {
@@ -48,6 +60,7 @@ func (r *ClientRegisterFinishRequest) Validate() error {
 	return nil
 }
 
+// swagger:model clientRegisterFinishResponse
 type ClientRegisterFinishResponse struct {
 	FeedURL string `json:"feed_url"`
 }

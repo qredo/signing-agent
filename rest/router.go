@@ -1,12 +1,10 @@
-package qhttp
+package rest
 
 import (
 	"net/http"
 	"strings"
 
-	qhandlers "gitlab.qredo.com/qredo-server/core-client/handlers"
-
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
+	qhandlers "gitlab.qredo.com/qredo-server/core-client/lib"
 
 	"github.com/gorilla/context"
 
@@ -16,6 +14,7 @@ import (
 	cdefs "gitlab.qredo.com/qredo-server/core-client/defs"
 	"gitlab.qredo.com/qredo-server/qredo-core/common"
 	"gitlab.qredo.com/qredo-server/qredo-core/defs"
+	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 	"go.uber.org/zap"
 )
 
