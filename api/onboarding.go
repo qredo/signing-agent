@@ -1,19 +1,9 @@
 package api
 
-import "errors"
-
 // swagger:parameters clientRegisterInit
 type ClientRegisterRequest struct {
 	// in:body
 	Name string `json:"name"`
-}
-
-func (r *ClientRegisterRequest) Validate() error {
-	if r.Name == "" {
-		return errors.New("name")
-	}
-
-	return nil
 }
 
 // swagger:model clientRegisterResponse
@@ -38,26 +28,6 @@ type ClientRegisterFinishRequest struct {
 	ClientSecret string `json:"client_secret"`
 	// in:body
 	IDDoc string `json:"id_doc"`
-}
-
-func (r *ClientRegisterFinishRequest) Validate() error {
-	if r.ID == "" {
-		return errors.New("id")
-	}
-	if r.AccountCode == "" {
-		return errors.New("account_code")
-	}
-	if r.ClientID == "" {
-		return errors.New("client_id")
-	}
-	if r.ClientSecret == "" {
-		return errors.New("client_secret")
-	}
-	if r.IDDoc == "" {
-		return errors.New("id_doc")
-	}
-
-	return nil
 }
 
 // swagger:model clientRegisterFinishResponse

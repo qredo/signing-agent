@@ -1,4 +1,4 @@
-package rest
+package util
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ type Client struct {
 	log *zap.SugaredLogger
 }
 
-func NewClient(log *zap.SugaredLogger) *Client {
+func NewHTTPClient(log *zap.SugaredLogger) *Client {
 	return &Client{log}
 }
 

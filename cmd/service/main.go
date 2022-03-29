@@ -28,13 +28,18 @@ var opts struct {
 }
 
 type InitConfig struct {
-	FileName string `short:"f" long:"file-name" description:"output file name"`
+	FileName string `short:"f" long:"file-name" description:"output file name" default:"cc.yaml"`
 }
 
 func (x *InitConfig) Execute([]string) error {
 	var cfg config.Config
 	cfg.Default()
-	return cfg.Save(x.FileName)
+	if err := cfg.Save(x.FileName); err != nil {
+		return err
+	}
+
+	os.Exit(0)
+	return nil
 }
 
 func main() {

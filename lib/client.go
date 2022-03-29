@@ -57,15 +57,16 @@ func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, e
 
 }
 
-func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (interface{}, error) {
+func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error) {
 
 	pending := h.store.GetPending(ref)
 	if pending == nil {
-		return nil, qerr.NotFound().Wrap(err).WithMessage("pending client not found").WithDetails("ref_id")
+		return nil, qerr.NotFound().WithMessage("pending client not found").WithDetails("ref_id")
 	}
 	pending.ID = req.ID
 	pending.AccountCode = req.AccountCode
 
+	var err error
 	pending.ZKPID, err = hex.DecodeString(req.ClientID)
 	if err != nil {
 		return nil, qerr.Wrap(err).WithMessage("invalid client id in response")
@@ -123,6 +124,6 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 		FeedURL: finishResp.Feed,
 	}, nil
 }
-func (h *coreClient) ClientsList(s *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	return nil, nil
+func (h *coreClient) ClientsList() (interface{}, error) {
+	return "not implemented", nil
 }

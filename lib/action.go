@@ -9,41 +9,31 @@ import (
 	"gitlab.qredo.com/qredo-server/qredo-core/api/partner"
 	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 
-	"github.com/gorilla/mux"
 	"gitlab.qredo.com/qredo-server/core-client/util"
 
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
 
-func (h *coreClient) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	actionID := mux.Vars(r)["action_id"]
-	if actionID == "" {
-		return nil, qerr.BadRequest().WithReason("actionID")
-	}
-	clientID := mux.Vars(r)["client_id"]
-	if clientID == "" {
-		return nil, qerr.BadRequest().WithReason("clientID")
-	}
-
+func (h *coreClient) ActionApprove(clientID, actionID string) error {
 	client := h.store.GetClient(clientID)
 	if client == nil {
-		return nil, qerr.NotFound().WithReason("client_id")
+		return qerr.NotFound().WithReason("client_id")
 	}
 
 	zkpToken, err := util.ZKPToken(client.ZKPID, client.ZKPToken, h.cfg.PIN)
 	if err != nil {
-		return nil, errors.Wrap(err, "get zkp token")
+		return errors.Wrap(err, "get zkp token")
 	}
 
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 	messagesResp := &partner.CoreClientServiceActionMessagesResponse{}
 	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.QredoServerURL, actionID), nil, messagesResp, header); err != nil {
-		return nil, qerr.Wrap(err)
+		return qerr.Wrap(err)
 	}
 
 	if messagesResp.Messages == nil {
-		return nil, qerr.NotFound().WithDetails("messages")
+		return qerr.NotFound().WithDetails("messages")
 	}
 
 	signatures := make([]string, len(messagesResp.Messages))
@@ -51,19 +41,19 @@ func (h *coreClient) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWrit
 	for i, m := range messagesResp.Messages {
 		msg, err := hex.DecodeString(m)
 		if err != nil || len(msg) == 0 {
-			return nil, qerr.Wrap(err)
+			return qerr.Wrap(err)
 		}
 
 		signature, err := util.BLSSign(client.BLSSeed, msg)
 		if err != nil {
-			return nil, qerr.Wrap(err)
+			return qerr.Wrap(err)
 		}
 		signatures[i] = hex.EncodeToString(signature)
 	}
 
 	zkpToken, err = util.ZKPToken(client.ZKPID, client.ZKPToken, h.cfg.PIN)
 	if err != nil {
-		return nil, errors.Wrap(err, "get zkp token")
+		return errors.Wrap(err, "get zkp token")
 	}
 
 	req := &partner.CoreClientServiceActionApproveRequest{
@@ -72,38 +62,29 @@ func (h *coreClient) ActionApprove(ctx *defs.RequestContext, _ http.ResponseWrit
 	header = http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.QredoServerURL, actionID), req, nil, header); err != nil {
-		return nil, qerr.Wrap(err)
+		return qerr.Wrap(err)
 	}
 
-	return nil, nil
+	return nil
 }
 
-func (h *coreClient) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	actionID := mux.Vars(r)["action_id"]
-	if actionID == "" {
-		return nil, qerr.BadRequest().WithReason("actionID")
-	}
-	clientID := mux.Vars(r)["client_id"]
-	if clientID == "" {
-		return nil, qerr.BadRequest().WithReason("clientID")
-	}
-
+func (h *coreClient) ActionReject(clientID, actionID string) error {
 	client := h.store.GetClient(clientID)
 	if client == nil {
-		return nil, qerr.NotFound().WithReason("client_id")
+		return qerr.NotFound().WithReason("client_id")
 	}
 
 	zkpToken, err := util.ZKPToken(client.ZKPID, client.ZKPToken, h.cfg.PIN)
 	if err != nil {
-		return nil, errors.Wrap(err, "get zkp token")
+		return errors.Wrap(err, "get zkp token")
 	}
 
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 
 	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.QredoServerURL, actionID), nil, nil, header); err != nil {
-		return nil, qerr.Wrap(err)
+		return qerr.Wrap(err)
 	}
 
-	return nil, nil
+	return nil
 }

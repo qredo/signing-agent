@@ -4,12 +4,13 @@ import (
 	"io"
 	"net/http"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
+	"github.com/go-playground/validator/v10"
+
 	"gitlab.qredo.com/qredo-server/qredo-core/common"
 	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 )
 
-func DecodeRequest(req api.Validator, hr *http.Request) error {
+func DecodeRequest(req interface{}, hr *http.Request) error {
 	switch hr.Method {
 	case http.MethodPost, http.MethodPut, http.MethodPatch:
 		if err := common.DecodeJSON(hr, req); err != nil {
@@ -19,7 +20,8 @@ func DecodeRequest(req api.Validator, hr *http.Request) error {
 		}
 	}
 
-	if err := req.Validate(); err != nil {
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
 		return qerr.New(qerr.ErrBadRequest).WithDetails("field", err.Error())
 	}
 

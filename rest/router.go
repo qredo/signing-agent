@@ -4,44 +4,31 @@ import (
 	"net/http"
 	"strings"
 
-	qhandlers "gitlab.qredo.com/qredo-server/core-client/lib"
+	"github.com/pkg/errors"
+	"gitlab.qredo.com/qredo-server/core-client/util"
+
+	"gitlab.qredo.com/qredo-server/core-client/lib"
 
 	"github.com/gorilla/context"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"gitlab.qredo.com/qredo-server/core-client/config"
-	cdefs "gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/qredo-server/core-client/defs"
 	"gitlab.qredo.com/qredo-server/qredo-core/common"
-	"gitlab.qredo.com/qredo-server/qredo-core/defs"
 	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 	"go.uber.org/zap"
 )
 
 var (
-	pathPrefix    = "/api/v1"
-	authHeader    = "x-token"
-	mfaAuthHeader = "x-zkp-token"
+	pathPrefix = "/api/v1"
 )
 
-const (
-	scopeNone                 = ""
-	scopeRegister             = "register"
-	scopeLogin                = "login"
-	scopeLogged               = "logged"
-	scopeMobile               = "mobile"
-	scopeForgottenCredentials = "forgotten-pwd"
-	scopeResetCredentials     = "reset-pwd"
-	scopeResetMobile          = "reset-mobile"
-	scopeSwitchAccount        = "switch-account"
-	scopeWebsocket            = "websocket"
-)
-
-type appHandlerFunc func(ctx *cdefs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
+type appHandlerFunc func(ctx *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
 
 func (a appHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	ctx := &cdefs.RequestContext{}
+	ctx := &defs.RequestContext{}
 
 	resp, err := a(ctx, w, r)
 
@@ -72,7 +59,7 @@ type Router struct {
 	log        *zap.SugaredLogger
 	config     *config.Config
 	router     http.Handler
-	handler    *qhandlers.Handler
+	handler    *handler
 	middleware *Middleware
 }
 
@@ -85,7 +72,19 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config) (*Router, error) 
 	}
 
 	var err error
-	rt.handler, err = qhandlers.New(rt.log, config)
+	store := util.NewFileStore(config.StoreFile)
+	if err := store.Init(); err != nil {
+		return nil, errors.Wrap(err, "failed to create default file store")
+	}
+
+	core, err := lib.New(log, config, store)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to init core")
+	}
+
+	rt.handler = &handler{
+		core: core,
+	}
 	if err != nil {
 		return nil, err
 	}

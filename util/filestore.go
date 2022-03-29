@@ -9,13 +9,20 @@ import (
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
 
+func NewFileStore(fileName string) *FileStore {
+	return &FileStore{
+		fileName: fileName,
+		data:     map[string][]byte{},
+	}
+}
+
 type FileStore struct {
 	sync.RWMutex
 	fileName string
 	data     map[string][]byte
 }
 
-func (s *FileStore) init() error {
+func (s *FileStore) Init() error {
 	s.Lock()
 	defer s.Unlock()
 
