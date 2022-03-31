@@ -1,33 +1,22 @@
 package api
 
-// swagger:parameters clientRegisterInit
 type ClientRegisterRequest struct {
-	// in:body
 	Name string `json:"name"`
 }
 
 // swagger:model clientRegisterResponse
 type ClientRegisterResponse struct {
-	// in:body
 	BLSPublicKey string `json:"bls_public_key"`
-	// in:body
-	ECPublicKey string `json:"ec_public_key"`
-	// in:body
-	RefID string `json:"ref_id"`
+	ECPublicKey  string `json:"ec_public_key"`
+	RefID        string `json:"ref_id"`
 }
 
-// swagger:parameters clientRegisterFinish
 type ClientRegisterFinishRequest struct {
-	// in:body
-	ID string `json:"id"`
-	// in:body
-	AccountCode string `json:"account_code"`
-	// in:body
-	ClientID string `json:"client_id"`
-	// in:body
+	ID           string `json:"id"`
+	AccountCode  string `json:"account_code"`
+	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
-	// in:body
-	IDDoc string `json:"id_doc"`
+	IDDoc        string `json:"id_doc"`
 }
 
 // swagger:model clientRegisterFinishResponse

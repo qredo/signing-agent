@@ -53,14 +53,6 @@ func (h *handler) ClientRegisterFinish(_ *defs.RequestContext, _ http.ResponseWr
 	return h.core.ClientRegisterFinish(req, ref)
 }
 
-// ClientsList
-//
-// swagger:route GET /client browser clientsList
-//
-// List registered clients
-//
-// Responses:
-//      200: clientListResponse
 func (h *handler) ClientsList(_ *defs.RequestContext, _ http.ResponseWriter, _ *http.Request) (interface{}, error) {
 	return h.core.ClientsList()
 }
@@ -71,8 +63,6 @@ func (h *handler) ClientsList(_ *defs.RequestContext, _ http.ResponseWriter, _ *
 //
 // Approve action
 //
-// Responses:
-//      200
 func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
@@ -92,8 +82,6 @@ func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r
 //
 // Reject action
 //
-// Responses:
-//      200
 func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
@@ -114,7 +102,7 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 // Sign a payload
 //
 // Responses:
-//      200: SignResponse
+//      200: signResponse
 func (h *handler) Sign(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	req := &api.SignRequest{}
 	err := util.DecodeRequest(req, r)
@@ -136,8 +124,6 @@ func (h *handler) Sign(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Re
 //
 // Verify a signature
 //
-// Responses:
-//      200
 func (h *handler) Verify(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	req := &api.VerifyRequest{}
 	err := util.DecodeRequest(req, r)
