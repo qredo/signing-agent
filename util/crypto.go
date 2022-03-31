@@ -6,8 +6,6 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
-
 	"github.com/qredo/assets/libs/crypto"
 )
 
@@ -42,7 +40,7 @@ func BLSSign(seed, payload []byte) ([]byte, error) {
 
 	_, blsSecret, err := crypto.BLSKeys(crypto.NewRand(seed), nil)
 	if err != nil {
-		return nil, qerr.Wrap(err).WithMessage("generate BLS key")
+		return nil, errors.Wrap(err, "generate BLS key")
 	}
 
 	signature, err := crypto.BLSSign(payload, blsSecret)
@@ -67,7 +65,7 @@ func ZKPToken(zkpID, zkpToken []byte, pin int) ([]byte, error) {
 
 	rng, err := CreateAMCLRng()
 	if err != nil {
-		return nil, qerr.Wrap(err)
+		return nil, err
 	}
 	zkpOnePass, err := crypto.ClientOnePass(zkpID, pin, rng, zkpToken, nil)
 	if err != nil {

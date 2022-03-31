@@ -22,46 +22,21 @@ func startText() {
 	fmt.Printf("Core Client service v%v (%v) build date: %v\n\n", version, commit, buildDate)
 }
 
-var opts struct {
-	ConfigFile string `short:"f" long:"config-file" description:"location of configuration file" default:"lib-client.yaml"`
-	Version    func() `short:"v" long:"version" description:"print service version"`
-}
+type versionCmd struct{}
 
-type InitConfig struct {
-	FileName string `short:"f" long:"file-name" description:"output file name" default:"cc.yaml"`
-}
-
-func (x *InitConfig) Execute([]string) error {
-	var cfg config.Config
-	cfg.Default()
-	if err := cfg.Save(x.FileName); err != nil {
-		return err
-	}
-
-	os.Exit(0)
+func (c *versionCmd) Execute([]string) error {
 	return nil
 }
 
-func main() {
-	startText()
+type startCmd struct {
+	ConfigFile string `short:"c" long:"config" description:"path to configuration file" default:"cc.yaml"`
+}
+
+func (c *startCmd) Execute([]string) error {
 	var cfg config.Config
 	cfg.Default()
 
-	// version already printed, so just exit silently. more to add if necessary
-	opts.Version = func() {
-		os.Exit(0)
-	}
-
-	parser := flags.NewParser(&opts, flags.None)
-	_, _ = parser.AddCommand("init", "init config", "write default config", &InitConfig{})
-
-	_, err := parser.Parse()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	err = cfg.Load(opts.ConfigFile)
+	err := cfg.Load(c.ConfigFile)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		os.Exit(1)
@@ -81,6 +56,38 @@ func main() {
 	}
 	if err != nil {
 		fmt.Printf("%v\n", err)
+		os.Exit(1)
+	}
+
+	return nil
+}
+
+type initCmd struct {
+	FileName string `short:"f" long:"file-name" description:"output file name" default:"cc.yaml"`
+}
+
+func (c *initCmd) Execute([]string) error {
+	var cfg config.Config
+	cfg.Default()
+	if err := cfg.Save(c.FileName); err != nil {
+		return err
+	}
+
+	fmt.Printf("written file %s\n\n", c.FileName)
+	return nil
+}
+
+func main() {
+	startText()
+
+	var parser = flags.NewParser(nil, flags.Default)
+
+	_, _ = parser.AddCommand("init", "init config", "write default config", &initCmd{})
+	_, _ = parser.AddCommand("start", "start service", "", &startCmd{})
+	_, _ = parser.AddCommand("version", "print version", "print service version and quit", &versionCmd{})
+
+	_, err := parser.Parse()
+	if err != nil {
 		os.Exit(1)
 	}
 }

@@ -3,8 +3,6 @@ package rest
 import (
 	"net/http"
 
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
-
 	"github.com/gorilla/mux"
 
 	"gitlab.qredo.com/qredo-server/core-client/api"
@@ -78,11 +76,11 @@ func (h *handler) ClientsList(_ *defs.RequestContext, _ http.ResponseWriter, _ *
 func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
-		return nil, qerr.BadRequest().WithReason("actionID")
+		return nil, defs.ErrBadRequest().WithDetail("actionID")
 	}
 	clientID := mux.Vars(r)["client_id"]
 	if clientID == "" {
-		return nil, qerr.BadRequest().WithReason("clientID")
+		return nil, defs.ErrBadRequest().WithDetail("clientID")
 	}
 
 	return nil, h.core.ActionApprove(clientID, actionID)
@@ -99,11 +97,11 @@ func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r
 func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
-		return nil, qerr.BadRequest().WithReason("actionID")
+		return nil, defs.ErrBadRequest().WithDetail("actionID")
 	}
 	clientID := mux.Vars(r)["client_id"]
 	if clientID == "" {
-		return nil, qerr.BadRequest().WithReason("clientID")
+		return nil, defs.ErrBadRequest().WithDetail("clientID")
 	}
 
 	return nil, h.core.ActionReject(clientID, actionID)
@@ -126,7 +124,7 @@ func (h *handler) Sign(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Re
 
 	clientID := mux.Vars(r)["client_id"]
 	if clientID == "" {
-		return nil, qerr.BadRequest().WithReason("clientID")
+		return nil, defs.ErrBadRequest().WithDetail("clientID")
 	}
 
 	return h.core.Sign(clientID, req.MessageHashHex)

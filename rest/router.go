@@ -1,6 +1,8 @@
 package rest
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -15,8 +17,6 @@ import (
 	"github.com/gorilla/mux"
 	"gitlab.qredo.com/qredo-server/core-client/config"
 	"gitlab.qredo.com/qredo-server/core-client/defs"
-	"gitlab.qredo.com/qredo-server/qredo-core/common"
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
 	"go.uber.org/zap"
 )
 
@@ -35,18 +35,18 @@ func (a appHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.ToLower(r.Header.Get("connection")) == "upgrade" &&
 		strings.ToLower(r.Header.Get("upgrade")) == "websocket" {
 		if err != nil {
-			var qErr *qerr.QErr
-			if e, ok := err.(*qerr.QErr); ok {
-				qErr = e
-			} else {
-				qErr = qerr.Internal().Wrap(err).WithMessage("unknown error")
+			var apiErr *defs.APIError
+
+			if !errors.As(err, &apiErr) {
+				apiErr = defs.ErrInternal().Wrap(err)
 			}
-			context.Set(r, "error", qErr)
+
+			context.Set(r, "error", apiErr)
 		}
 		return
 	}
 
-	common.FormatJSONResp(w, r, resp, err)
+	FormatJSONResp(w, r, resp, err)
 }
 
 type route struct {
@@ -169,4 +169,43 @@ func (r *Router) printRoutes(router *mux.Router) {
 	}); err != nil {
 		panic(err)
 	}
+}
+
+// WriteHTTPError writes the error response as JSON
+func WriteHTTPError(w http.ResponseWriter, r *http.Request, err error) {
+	var apiErr *defs.APIError
+
+	if !errors.As(err, &apiErr) {
+		apiErr = defs.ErrInternal().Wrap(err)
+	}
+	context.Set(r, "error", apiErr)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(apiErr.Code())
+	_, _ = fmt.Fprintln(w, apiErr.JSON())
+}
+
+// FormatJSONResp encodes response as JSON and handle errors
+func FormatJSONResp(w http.ResponseWriter, r *http.Request, v interface{}, err error) {
+	if err != nil {
+		WriteHTTPError(w, r, err)
+		return
+	}
+
+	if v == nil {
+		v = &struct {
+			Code int
+			Msg  string
+		}{
+			Code: http.StatusOK,
+			Msg:  http.StatusText(http.StatusOK),
+		}
+	}
+
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		WriteHTTPError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 }

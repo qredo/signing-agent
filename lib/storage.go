@@ -39,7 +39,7 @@ type Client struct {
 func (s *Storage) AddPending(ref string, c *Client) error {
 	c.Pending = true
 	_, err := s.kv.Get(ref)
-	if err != nil && err != defs.ErrNotFound {
+	if err != nil && err != defs.KVErrNotFound {
 		return err
 	}
 
@@ -58,7 +58,7 @@ func (s *Storage) AddPending(ref string, c *Client) error {
 func (s *Storage) RemovePending(ref string) error {
 	d, err := s.kv.Get(ref)
 	if err != nil {
-		if err != defs.ErrNotFound {
+		if err != defs.KVErrNotFound {
 			return nil
 		}
 		return err
@@ -80,7 +80,7 @@ func (s *Storage) RemovePending(ref string) error {
 func (s *Storage) GetPending(ref string) *Client {
 	d, err := s.kv.Get(ref)
 	if err != nil {
-		if err != defs.ErrNotFound {
+		if err != defs.KVErrNotFound {
 			return nil
 		}
 		return nil
@@ -96,15 +96,16 @@ func (s *Storage) GetPending(ref string) *Client {
 		return nil
 	}
 
-	return nil
+	return c
 }
 
 func (s *Storage) AddClient(id string, c *Client) error {
 	_, err := s.kv.Get(id)
-	if err != nil && err != defs.ErrNotFound {
+	if err != nil && err != defs.KVErrNotFound {
 		return err
 	}
 
+	c.Pending = false
 	data, err := json.Marshal(c)
 	if err != nil {
 		return err
@@ -120,7 +121,7 @@ func (s *Storage) AddClient(id string, c *Client) error {
 func (s *Storage) RemoveClient(id string) error {
 	d, err := s.kv.Get(id)
 	if err != nil {
-		if err != defs.ErrNotFound {
+		if err != defs.KVErrNotFound {
 			return nil
 		}
 		return err
@@ -142,7 +143,7 @@ func (s *Storage) RemoveClient(id string) error {
 func (s *Storage) GetClient(id string) *Client {
 	d, err := s.kv.Get(id)
 	if err != nil {
-		if err != defs.ErrNotFound {
+		if err != defs.KVErrNotFound {
 			return nil
 		}
 		return nil
@@ -158,5 +159,5 @@ func (s *Storage) GetClient(id string) *Client {
 		return nil
 	}
 
-	return nil
+	return c
 }

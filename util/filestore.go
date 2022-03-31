@@ -34,7 +34,7 @@ func (s *FileStore) Init() error {
 		return err
 	}
 
-	if err := json.Unmarshal(b, s); err != nil {
+	if err := json.Unmarshal(b, &s.data); err != nil {
 		return err
 	}
 
@@ -44,7 +44,7 @@ func (s *FileStore) Init() error {
 // caller must handle concurrency
 func (s *FileStore) save() error {
 
-	b, err := json.Marshal(s)
+	b, err := json.Marshal(s.data)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (s *FileStore) Get(key string) ([]byte, error) {
 		return data, nil
 	}
 
-	return nil, defs.ErrNotFound
+	return nil, defs.KVErrNotFound
 }
 
 func (s *FileStore) Set(key string, data []byte) error {

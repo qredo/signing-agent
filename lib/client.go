@@ -5,9 +5,6 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"gitlab.qredo.com/qredo-server/qredo-core/api/partner"
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
-
 	"github.com/btcsuite/btcd/btcec"
 
 	"github.com/pkg/errors"
@@ -30,7 +27,7 @@ func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, e
 
 	client.BLSSeed, err = util.RandomBytes(48)
 	if err != nil {
-		return nil, qerr.Wrap(err)
+		return nil, err
 	}
 
 	// EC Public key
@@ -41,12 +38,12 @@ func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, e
 	refID := uuid.New().String()
 
 	if err = h.store.AddPending(refID, client); err != nil {
-		return nil, qerr.Wrap(err)
+		return nil, err
 	}
 
 	blsPublic, _, err := crypto.BLSKeys(crypto.NewRand(client.BLSSeed), nil)
 	if err != nil {
-		return nil, qerr.Wrap(err).WithMessage("generate BLS key")
+		return nil, errors.Wrap(err, "generate BLS key")
 	}
 
 	return &api.ClientRegisterResponse{
@@ -61,7 +58,7 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 
 	pending := h.store.GetPending(ref)
 	if pending == nil {
-		return nil, qerr.NotFound().WithMessage("pending client not found").WithDetails("ref_id")
+		return nil, defs.ErrNotFound().WithDetail("ref_id").Wrap(errors.New("pending client not found"))
 	}
 	pending.ID = req.ID
 	pending.AccountCode = req.AccountCode
@@ -69,27 +66,27 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 	var err error
 	pending.ZKPID, err = hex.DecodeString(req.ClientID)
 	if err != nil {
-		return nil, qerr.Wrap(err).WithMessage("invalid client id in response")
+		return nil, errors.Wrap(err, "invalid client id in response")
 	}
 	cs, err := hex.DecodeString(req.ClientSecret)
 	if err != nil {
-		return nil, qerr.Wrap(err).WithMessage("invalid client id in response")
+		return nil, errors.Wrap(err, "invalid client id in response")
 	}
 
 	// ZKP Token
 	pending.ZKPToken, err = crypto.ExtractPIN(pending.ZKPID, h.cfg.PIN, cs)
 	if err != nil {
-		return nil, qerr.Wrap(err).WithMessage("extract pin")
+		return nil, errors.Wrap(err, "extract pin")
 	}
 
 	idDocRaw, err := hex.DecodeString(req.IDDoc)
 	if err != nil {
-		return nil, qerr.Wrap(err).WithMessage("invalid id document in response")
+		return nil, errors.Wrap(err, "invalid id document in response")
 	}
 
 	idDocSignature, err := util.BLSSign(pending.BLSSeed, idDocRaw)
 	if err != nil {
-		return nil, qerr.Wrap(err).WithMessage("idDoc sign")
+		return nil, errors.Wrap(err, "idDoc sign")
 	}
 
 	zkpToken, err := util.ZKPToken(pending.ZKPID, pending.ZKPToken, h.cfg.PIN)
@@ -97,27 +94,27 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 		return nil, errors.Wrap(err, "get zkp token")
 	}
 
-	confirmRequest := partner.CoreClientServiceRegisterFinishRequest{
+	confirmRequest := api.CoreClientServiceRegisterFinishRequest{
 		IDDocSignatureHex: hex.EncodeToString(idDocSignature),
 	}
 
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 
-	finishResp := &partner.CoreClientServiceRegisterFinishResponse{}
+	finishResp := &api.CoreClientServiceRegisterFinishResponse{}
 
 	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoServerURL), confirmRequest, finishResp, header); err != nil {
-		return nil, qerr.Wrap(err)
+		return nil, err
 	}
 
 	err = h.store.RemovePending(ref)
 	if err != nil {
-		return nil, qerr.Wrap(err)
+		return nil, err
 	}
 
 	err = h.store.AddClient(pending.ID, pending)
 	if err != nil {
-		return nil, qerr.Wrap(err)
+		return nil, err
 	}
 
 	return &api.ClientRegisterFinishResponse{

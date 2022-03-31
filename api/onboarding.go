@@ -34,3 +34,12 @@ type ClientRegisterFinishRequest struct {
 type ClientRegisterFinishResponse struct {
 	FeedURL string `json:"feed_url"`
 }
+
+type CoreClientServiceRegisterFinishRequest struct {
+	ClientID          string `json:"client_id,omitempty"`
+	IDDocSignatureHex string `json:"idDocSignatureHex"`
+}
+
+type CoreClientServiceRegisterFinishResponse struct {
+	Feed string `json:"feed"`
+}
