@@ -1,4 +1,4 @@
-package client
+package util
 
 import (
 	"bytes"
@@ -6,25 +6,19 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
-
-	"go.uber.org/zap"
 
 	"github.com/pkg/errors"
 )
 
 type Client struct {
-	log *zap.SugaredLogger
 }
 
-func NewClient(log *zap.SugaredLogger) *Client {
-	return &Client{log}
+func NewHTTPClient() *Client {
+	return &Client{}
 }
 
 func (c *Client) Request(method string, url string, reqData interface{}, respData interface{}, headers http.Header) error {
-	c.log.Infof("%s %s", method, url)
-
 	client := &http.Client{
 		Timeout: time.Second * 100000,
 	}
@@ -56,7 +50,6 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOK {
 		if b, err := ioutil.ReadAll(resp.Body); err == nil && len(b) > 0 {
-			c.log.Error(strings.TrimSpace(string(b)))
 		}
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
 	}
@@ -76,7 +69,6 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 			return errors.Wrap(err, "read response body")
 		}
 		if err := json.Unmarshal(b, respData); err != nil {
-			c.log.Errorf("RESP: %v", string(b))
 			return errors.Wrap(err, "decode response as JSON")
 		}
 	}
@@ -116,7 +108,6 @@ func (c *Client) RequestNoLog(method string, url string, reqData interface{}, re
 	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOK {
 		if b, err := ioutil.ReadAll(resp.Body); err == nil && len(b) > 0 {
-			c.log.Error(strings.TrimSpace(string(b)))
 		}
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
 	}
@@ -136,7 +127,6 @@ func (c *Client) RequestNoLog(method string, url string, reqData interface{}, re
 			return errors.Wrap(err, "read response body")
 		}
 		if err := json.Unmarshal(b, respData); err != nil {
-			c.log.Errorf("RESP: %v", string(b))
 			return errors.Wrap(err, "decode response as JSON")
 		}
 	}

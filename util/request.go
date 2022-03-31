@@ -1,26 +1,41 @@
 package util
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
-	"gitlab.qredo.com/qredo-server/qredo-core/common"
-	"gitlab.qredo.com/qredo-server/qredo-core/qerr"
+	"gitlab.qredo.com/qredo-server/core-client/defs"
+
+	"github.com/go-playground/validator/v10"
 )
 
-func DecodeRequest(req api.Validator, hr *http.Request) error {
+func DecodeRequest(req interface{}, hr *http.Request) error {
 	switch hr.Method {
 	case http.MethodPost, http.MethodPut, http.MethodPatch:
-		if err := common.DecodeJSON(hr, req); err != nil {
+		if err := DecodeJSON(hr, req); err != nil {
 			if err != io.EOF {
-				return qerr.New(qerr.ErrBadRequest).WithMessage("invalid json").Wrap(err)
+				return defs.ErrBadRequest().WithDetail("invalid json").Wrap(err)
 			}
 		}
 	}
 
-	if err := req.Validate(); err != nil {
-		return qerr.New(qerr.ErrBadRequest).WithDetails("field", err.Error())
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		return defs.ErrBadRequest().WithDetail(err.Error())
+	}
+
+	return nil
+}
+
+// DecodeJSON decodes request JSON body
+// returns ServerError on failure
+func DecodeJSON(r *http.Request, v interface{}) error {
+	jd := json.NewDecoder(r.Body)
+
+	defer r.Body.Close()
+	if err := jd.Decode(v); err != nil {
+		return err
 	}
 
 	return nil

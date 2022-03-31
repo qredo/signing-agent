@@ -5,3 +5,5 @@ const AuthHeader = "x-api-zkp"
 type RequestContext struct {
 	TraceID string
 }
+
+const MethodWebsocket = "WEBSOCKET"

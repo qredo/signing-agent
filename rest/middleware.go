@@ -1,4 +1,4 @@
-package qhttp
+package rest
 
 import (
 	"bufio"
