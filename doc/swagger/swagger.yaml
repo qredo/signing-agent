@@ -68,20 +68,17 @@ paths:
           schema:
             $ref: '#/definitions/clientRegisterResponse'
       tags:
-      - browser
       - clientRegister
   /client/{client_id}/action/{action_id}:
     delete:
       description: Reject action
       operationId: actionReject
       tags:
-      - browser
       - actions
     put:
       description: Approve action
       operationId: actionApprove
       tags:
-      - browser
       - actions
   /client/{client_id}/sign:
     post:
@@ -98,7 +95,6 @@ paths:
           schema:
             $ref: '#/definitions/signResponse'
       tags:
-      - browser
       - payloads
   /client{ref}:
     post:
@@ -115,7 +111,6 @@ paths:
           schema:
             $ref: '#/definitions/clientRegisterFinishResponse'
       tags:
-      - browser
       - clientRegister
   /verify:
     post:
@@ -127,6 +122,5 @@ paths:
         schema:
           $ref: '#/definitions/VerifyRequest'
       tags:
-      - browser
       - payloads
 swagger: "2.0"

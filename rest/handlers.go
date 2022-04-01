@@ -18,7 +18,7 @@ type handler struct {
 
 // ClientRegister
 //
-// swagger:route POST /client browser clientRegister clientRegisterInit
+// swagger:route POST /client clientRegister clientRegisterInit
 //
 // Initiate client registration procedure
 //
@@ -36,7 +36,7 @@ func (h *handler) ClientRegister(_ *defs.RequestContext, _ http.ResponseWriter, 
 
 // ClientRegisterFinish
 //
-// swagger:route POST /client{ref}  browser clientRegister clientRegisterFinish
+// swagger:route POST /client{ref}  clientRegister clientRegisterFinish
 //
 // Finish client registration procedure
 //
@@ -59,7 +59,7 @@ func (h *handler) ClientsList(_ *defs.RequestContext, _ http.ResponseWriter, _ *
 
 // ActionApprove
 //
-// swagger:route PUT /client/{client_id}/action/{action_id} browser actions actionApprove
+// swagger:route PUT /client/{client_id}/action/{action_id}  actions actionApprove
 //
 // Approve action
 //
@@ -78,7 +78,7 @@ func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r
 
 // ActionReject
 //
-// swagger:route DELETE /client/{client_id}/action/{action_id} browser actions actionReject
+// swagger:route DELETE /client/{client_id}/action/{action_id}  actions actionReject
 //
 // Reject action
 //
@@ -97,7 +97,7 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 
 // Sign
 //
-// swagger:route POST /client/{client_id}/sign browser payloads payloadSign
+// swagger:route POST /client/{client_id}/sign  payloads payloadSign
 //
 // Sign a payload
 //
@@ -120,7 +120,7 @@ func (h *handler) Sign(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Re
 
 // Verify
 //
-// swagger:route POST /verify browser payloads signatureVerify
+// swagger:route POST /verify  payloads signatureVerify
 //
 // Verify a signature
 //
