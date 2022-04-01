@@ -7,6 +7,7 @@ import (
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
 
+// KVStore is an interface to a simple key-value store used by the core lib
 type KVStore interface {
 	// Get returns the data for given key. If key is not found, return nil, defs.KVErrNotFound
 	Get(key string) ([]byte, error)
