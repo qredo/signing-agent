@@ -1,0 +1,132 @@
+definitions:
+  ClientRegisterFinishRequest:
+    properties:
+      account_code:
+        type: string
+      client_id:
+        type: string
+      client_secret:
+        type: string
+      id:
+        type: string
+      id_doc:
+        type: string
+    type: object
+  ClientRegisterRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  SignRequest:
+    properties:
+      message_hash_hex:
+        type: string
+    type: object
+  VerifyRequest:
+    properties:
+      message_hash_hex:
+        type: string
+      signature_hex:
+        type: string
+      signer_id:
+        type: string
+    type: object
+  clientRegisterFinishResponse:
+    properties:
+      feed_url:
+        type: string
+    type: object
+  clientRegisterResponse:
+    properties:
+      bls_public_key:
+        type: string
+      ec_public_key:
+        type: string
+      ref_id:
+        type: string
+    type: object
+  signResponse:
+    properties:
+      signature_hex:
+        type: string
+      signer_id:
+        type: string
+    type: object
+paths:
+  /client:
+    post:
+      description: Initiate client registration procedure
+      operationId: clientRegisterInit
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/ClientRegisterRequest'
+      responses:
+        "200":
+          description: clientRegisterResponse
+          schema:
+            $ref: '#/definitions/clientRegisterResponse'
+      tags:
+      - browser
+      - clientRegister
+  /client/{client_id}/action/{action_id}:
+    delete:
+      description: Reject action
+      operationId: actionReject
+      tags:
+      - browser
+      - actions
+    put:
+      description: Approve action
+      operationId: actionApprove
+      tags:
+      - browser
+      - actions
+  /client/{client_id}/sign:
+    post:
+      description: Sign a payload
+      operationId: payloadSign
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/SignRequest'
+      responses:
+        "200":
+          description: signResponse
+          schema:
+            $ref: '#/definitions/signResponse'
+      tags:
+      - browser
+      - payloads
+  /client{ref}:
+    post:
+      description: Finish client registration procedure
+      operationId: clientRegisterFinish
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/ClientRegisterFinishRequest'
+      responses:
+        "200":
+          description: clientRegisterFinishResponse
+          schema:
+            $ref: '#/definitions/clientRegisterFinishResponse'
+      tags:
+      - browser
+      - clientRegister
+  /verify:
+    post:
+      description: Verify a signature
+      operationId: signatureVerify
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/VerifyRequest'
+      tags:
+      - browser
+      - payloads
+swagger: "2.0"
