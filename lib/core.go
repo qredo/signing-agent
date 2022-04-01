@@ -4,7 +4,6 @@ import (
 	"gitlab.qredo.com/qredo-server/core-client/api"
 	"gitlab.qredo.com/qredo-server/core-client/config"
 	"gitlab.qredo.com/qredo-server/core-client/util"
-	"go.uber.org/zap"
 )
 
 type CoreClient interface {
@@ -33,7 +32,7 @@ type coreClient struct {
 	htc   *util.Client
 }
 
-func New(log *zap.SugaredLogger, cfg *config.Config, kv KVStore) (*coreClient, error) {
+func New(cfg *config.Config, kv KVStore) (*coreClient, error) {
 
 	return &coreClient{
 		cfg:   cfg,
