@@ -8,7 +8,7 @@ import (
 )
 
 type KVStore interface {
-	// Get returns the data for given key. If key is not found, return nil, defs.ErrNotFound
+	// Get returns the data for given key. If key is not found, return nil, defs.KVErrNotFound
 	Get(key string) ([]byte, error)
 	Set(key string, data []byte) error
 	Del(key string) error
