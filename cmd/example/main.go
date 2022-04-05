@@ -51,13 +51,13 @@ et2Kxa+8d8UuDiJ2PVBIffKrkR9tfTfXdW7Cdh/GNvDSsXdZe4sVzWk=
 -----END RSA PRIVATE KEY-----`
 const qredoURL = "https://qa-api.qredo.net"
 
-type QredoRegisterInitRequest struct {
+type qredoRegisterInitRequest struct {
 	Name         string `json:"name"`
 	BLSPublicKey string `json:"blsPublicKey"`
 	ECPublicKey  string `json:"ecPublicKey"`
 }
 
-type QredoRegisterInitResponse struct {
+type qredoRegisterInitResponse struct {
 	ID           string `json:"id"`
 	ClientID     string `json:"clientID"`
 	ClientSecret string `json:"clientSecret"`
@@ -95,7 +95,7 @@ func main() {
 	}
 
 	// send EC and BLS keys to Qredo Partner API, initializing the new core client in the backend
-	qredoReq := &QredoRegisterInitRequest{
+	qredoReq := &qredoRegisterInitRequest{
 		Name:         "core-client-test",
 		BLSPublicKey: regInitResponse.BLSPublicKey,
 		ECPublicKey:  regInitResponse.ECPublicKey,
@@ -115,7 +115,7 @@ func main() {
 	header.Add("x-api-key", partnerAPIKey)
 	header.Add("x-sign", signature)
 	header.Add("x-timestamp", req.timestamp)
-	qredoResponse := &QredoRegisterInitResponse{}
+	qredoResponse := &qredoRegisterInitResponse{}
 	httpClient := util.NewHTTPClient()
 	err = httpClient.Request(req.method, req.url, qredoReq, qredoResponse, header)
 	if err != nil {
