@@ -77,7 +77,7 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config) (*Router, error) 
 		return nil, errors.Wrap(err, "failed to create default file store")
 	}
 
-	core, err := lib.New(config, store)
+	core, err := lib.New(&config.Base, store)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to init core")
 	}
@@ -141,7 +141,7 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 	if r.config.HTTP.ProxyForwardedHeader != "" {
 		r.log.Info("Use Proxy forwarded-for header: %s", r.config.HTTP.ProxyForwardedHeader)
 	}
-	r.log.Infof("Starting listener on %v for API url %v", r.config.HTTP.Addr, r.config.BaseURL)
+	r.log.Infof("Starting listener on %v for API url %v", r.config.HTTP.Addr, r.config.Base.URL)
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
 }

@@ -28,11 +28,11 @@ type CoreClient interface {
 
 type coreClient struct {
 	store *Storage
-	cfg   *config.Config
+	cfg   *config.Base
 	htc   *util.Client
 }
 
-func New(cfg *config.Config, kv KVStore) (*coreClient, error) {
+func New(cfg *config.Base, kv KVStore) (*coreClient, error) {
 
 	return &coreClient{
 		cfg:   cfg,

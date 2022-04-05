@@ -103,7 +103,7 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 
 	finishResp := &api.CoreClientServiceRegisterFinishResponse{}
 
-	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoServerURL), confirmRequest, finishResp, header); err != nil {
+	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoURL), confirmRequest, finishResp, header); err != nil {
 		return nil, err
 	}
 

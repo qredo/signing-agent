@@ -27,7 +27,7 @@ func (h *coreClient) ActionApprove(clientID, actionID string) error {
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 	messagesResp := &api.CoreClientServiceActionMessagesResponse{}
-	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.QredoServerURL, actionID), nil, messagesResp, header); err != nil {
+	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.QredoURL, actionID), nil, messagesResp, header); err != nil {
 		return err
 	}
 
@@ -60,7 +60,7 @@ func (h *coreClient) ActionApprove(clientID, actionID string) error {
 	}
 	header = http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
-	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.QredoServerURL, actionID), req, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.QredoURL, actionID), req, nil, header); err != nil {
 		return err
 	}
 
@@ -81,7 +81,7 @@ func (h *coreClient) ActionReject(clientID, actionID string) error {
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
 
-	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.QredoServerURL, actionID), nil, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.QredoURL, actionID), nil, nil, header); err != nil {
 		return err
 	}
 

@@ -18,12 +18,16 @@ type httpSettings struct {
 
 // Config is the service configuration
 type Config struct {
-	BaseURL        string       `yaml:"base_url"`
-	QredoServerURL string       `yaml:"qredo_server_url"`
-	HTTP           httpSettings `yaml:"http"`
-	Logging        Logging      `yaml:"logging"`
-	StoreFile      string       `yaml:"store_file"`
-	PIN            int          `yaml:"pin"`
+	Base      Base         `yaml:"base"`
+	HTTP      httpSettings `yaml:"http"`
+	Logging   Logging      `yaml:"logging"`
+	StoreFile string       `yaml:"store_file"`
+}
+
+type Base struct {
+	URL      string `yaml:"url"`
+	PIN      int    `yaml:"int"`
+	QredoURL string `yaml:"qredo_url"`
 }
 
 type Logging struct {
@@ -39,12 +43,12 @@ func (c *Config) Default() {
 		CookieSameSiteMode: "lax",
 		CookieSecure:       true,
 	}
-	c.BaseURL = "http://127.0.0.1:8007"
+	c.Base.URL = "http://127.0.0.1:8007"
+	c.Base.PIN = 0
+	c.Base.QredoURL = "http://127.0.0.1:8001"
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
 	c.StoreFile = "ccstore.db"
-	c.PIN = 0
-	c.QredoServerURL = "http://127.0.0.1:8001"
 }
 
 // ParseConfigFile parses yaml config
