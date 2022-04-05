@@ -21,34 +21,8 @@ import (
 )
 
 // Fill in you partner api key and public key pem here
-const partnerAPIKey = "eyJrZXlfaWQiOiJJTnRNNmMwZnFScGJ2ZyIsImtleSI6IkVwSVQxTEFXbTF5TDJhandrUGlmdmprbEMxWktXdHVBLWlVWmJ2RXVUcVUiLCJsYXN0X3VwZGF0ZSI6MCwic2FuZGJveCI6ZmFsc2V9"
-const rsaPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
-MIIEpQIBAAKCAQEA6wER0onSSoNdFYkqcjrYVdRqsT+s2BAcqQXBKKKaADrlbO8F
-0qXTjZ4jTqOA9b+BUQhL/fa9fGkBOK+ssGD/f31uH3bdV+8HdHrjzaES3tc0Hv8X
-BXoFhO+cEz6xsxWruYxLHEiIY8PxfrNXTPuN128ZTHr6AuxW13xr61P1/CjVjtD5
-mZ6ocLuMMPFNzCrn9fWzCEr9YKZhLth7cpgeshX8tyCRBxU0pBUrwO+V6tbAYQu5
-WcVuUWbnUnH8GsOyIOrKK3+0N3Z02Oqio4J2n/+N0QlewdAoIULhHphWuSCd3m4x
-co/f/6IdT51+ozlv30Ku4nk1nvXyp7MVcRknXQIDAQABAoIBAQDb3WVSSBWSFzMI
-igtHUhzCuHiVmpBYmUJnNHYSUYapfnDVqQ8WlITH81LvKPPnd6NCL/QBCE8hzZAR
-+/IiFq4UFkLodyoBMiYUaUEmSnPAPzGJanmcaxws0oyASOCyPy0p7ML9FDNeu5z+
-QEYGRTfgfhX6QvgTshBRjRve0O/MWJDgOrIWOsPRn9Jgye3GZATEBcnjp+/lgFJn
-/LSSwlEuZNUQIYoVKmaHEbrfLlfzljdAdUe5bE/nIfPE0gKT4tWmKvTOIWWxF0Z4
-EyWq8t/2p7Uz/R7KTFRKWgh+VTPu8HmDjWBiUKJVGAF9oBV75SaGqkjG8ZGRJ9T1
-EAAhwAP1AoGBAPoxaVAvwKqF0mSeDOjA0X+Cn6NDaMgN7LFWMeuqhAmunYCceo7a
-YYcUNRAkRQpxRty/brLLV4M+Ii7HDfCuqEPxgWpj5Nv7c/OoMBKCQQzH6eTqemn/
-9iSliWfnVlXIKgHmsJ+W+c7QlWMB/8bJGgJr0CyRTrpWvWMG/619abPvAoGBAPB1
-aONQoySMe459LQYA+Y7lLqG6B2gbpDsrjVqWi3eGBP93o6pTh2KNpACi+mcPNAyA
-2UKIpppiXhKnXYRl5I3VOcGsoen4/pG+T2Ec7pUyXZCixwq82nuiHA3Kpo+yoXFC
-iOihpKtMaHUwaaDfPje0c4A6gHEbv+giHC9iON1zAoGBAJFER0WLtG5OLQ7GxfAO
-pJVInrAI37noe9mrlmijJO8KN+EI+hAftCjeDsFEjeG2S9K4Q+oELtfBJ8/JO8rX
-XlO00dOYFLW1lmmO6fqVLnfhS2jizBjnyV8VzmZJ59L+2YUpELxYyMrQSSynaH9f
-HH7zYne+FtwSqPvqgGGXQ9x5AoGBAIWZ5o4uVobPGzNfL23fiskvY0pubwEUIprR
-pvdHH/Rn3U0H70KKqHVEl3PXGeO7GcM8r/n8rPyoXPZmUVpntqZra2zFeyzhsKfP
-opElnxX8Zuoe1xKLPaVlu8qZ5xN+P58LRcBjV3fpuzwpivbcMtiGhYogdw7hSS40
-DY7yNwArAoGAVtikxccT7cY48UtQpp350jPcnym2iTpLzKmBrmwfBwbLPOwKjDrv
-iCyzO+LiehYThb1qpiv6sE5Io+qXfDpI8/X+PhRnD2OQJ/Usj1DjVV3uQPe/jHUh
-et2Kxa+8d8UuDiJ2PVBIffKrkR9tfTfXdW7Cdh/GNvDSsXdZe4sVzWk=
------END RSA PRIVATE KEY-----`
+const partnerAPIKey = ""
+const rsaPrivateKey = ``
 const qredoURL = "https://qa-api.qredo.net"
 
 type QredoRegisterInitRequest struct {
