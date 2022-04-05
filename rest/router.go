@@ -72,8 +72,8 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config) (*Router, error) 
 	}
 
 	var err error
-	store := util.NewFileStore(config.StoreFile)
-	if err := store.Init(); err != nil {
+	store, err := util.NewFileStore(config.StoreFile)
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to create default file store")
 	}
 
