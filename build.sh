@@ -17,7 +17,7 @@ dev_docker_build() {
 
 
 dev_local_build() {
-
+  go mod tidy
   go build \
       -tags debug \
       -ldflags "-X 'main.buildDate=$BUILD_DATE' \
