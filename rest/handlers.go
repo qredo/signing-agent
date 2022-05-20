@@ -36,7 +36,7 @@ func (h *handler) ClientRegister(_ *defs.RequestContext, _ http.ResponseWriter, 
 
 // ClientRegisterFinish
 //
-// swagger:route POST /client{ref}  clientRegister clientRegisterFinish
+// swagger:route POST /client/{ref}  clientRegister clientRegisterFinish
 //
 // Finish client registration procedure
 //
