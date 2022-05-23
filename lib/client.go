@@ -15,7 +15,7 @@ import (
 
 	"gitlab.qredo.com/qredo-server/core-client/api"
 
-	"github.com/qredo/assets/libs/crypto"
+	"gitlab.qredo.com/qredo-server/core-client/crypto"
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
 

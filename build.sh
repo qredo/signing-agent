@@ -10,7 +10,7 @@ rm -rf vendor
 
 dev_docker_build() {
 
-  docker build --build-arg BUILD_DATE="$BUILD_DATE" --build-arg BUILD_COMMIT="$GIT_COMMIT" --build-arg BUILD_VERSION="$VERSION" -t "$SERVICE_NAME:dev" -f dockerfiles/Dockerfile .
+  docker build --build-arg BUILD_DATE="$BUILD_DATE" --build-arg BUILD_COMMIT="$GIT_COMMIT" --build-arg BUILD_VERSION="$VERSION" -t core-client:dev -f dockerfiles/Dockerfile .
   rm -rf vendor
 }
 

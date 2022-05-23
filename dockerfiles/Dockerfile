@@ -63,8 +63,7 @@ RUN CGO_ENABLED=1 \
       -tags debug \
       -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/qredo-server/core-client/service.buildDate=$BUILD_DATE' \
                                                             -X 'gitlab.qredo.com/qredo-server/core-client/service.commit=$BUILD_COMMIT' \
-                                                            -X 'gitlab.qredo.com/qredo-server/core-client/service.version=$BUILD_VERSION' \
-                                                            -X 'gitlab.qredo.com/qredo-server/qredo-core/qerr.InstanceName=core-client'" \
+                                                            -X 'gitlab.qredo.com/qredo-server/core-client/service.version=$BUILD_VERSION'" \
       -o $GOPATH/bin/lib-client \
       gitlab.qredo.com/qredo-server/lib-client
 
