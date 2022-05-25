@@ -18,7 +18,23 @@ As mentioned above, the Core Client is a standalone component of the Qredo ecosy
 
 **Question** (from Leszek): We are not pointing here auth headers (diagram below). We do not do it consciously?
 
-![Screenshot 2022-05-20 at 11.18.25.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/cdf03828-9924-437e-aec5-dc4da80ac962/Screenshot_2022-05-20_at_11.18.25.png)
+```mermaid
+sequenceDiagram
+  autonumber
+  PartnerAPP->>core-client-service:POST /client {"name":"..."}
+  core-client-service->>core-client-service: Generate BLS and EC Keys
+  core-client-service->>PartnerAPP: {BLSPublic, ECPublic, RefID}
+  PartnerAPP->>QredoBE: POST /p/coreclient/init Body: {BLS & EC Public keys}
+  QredoBE->>QredoBE: Create New MFA ID, New IDDoc
+  QredoBE->>PartnerAPP:{ClientSecret, ClientID, unsigned IDDoc, AccountCode}
+  PartnerAPP->>core-client-service: PUT /client/{RefID} {ClientSercert, ID, unsigned IDDoc, AccountCode}
+  core-client-service->>core-client-service: Store ClientSercert, ID, AccountCode
+  core-client-service->>core-client-service: Sign IDDoc
+  core-client-service->>QredoBE: POST /p/coreclient/finish { IDdoc Signature }
+  QredoBE->>QredoBE: Save IDDoc in qredochain
+  QredoBE->>core-client-service: {feedURL} 
+  core-client-service->>PartnerAPP: {feedURL}
+ ```
 
 1. The *PartnerApp* triggers the registration process by providing its client name to the *core-client-service*.
 2. *core-client-service* generates BLS and EC keys. 
