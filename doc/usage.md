@@ -64,8 +64,6 @@ All the data above is currently stored on premises in a file by the core-client-
 
 ## API
 
-Click to expand each section.
-
 ### POST /client
 
 Request:
@@ -141,54 +139,54 @@ Request:
 
 ### Data Models
 
-```json
-**ClientRegisterFinishRequest** {
-	account_code	string
-	client_id	string
-	client_secret	string
-	id	string
-	id_doc	string
+```Go
+ClientRegisterFinishRequest {
+    account_code    string
+    client_id   string
+    client_secret   string
+    id  string
+    id_doc  string
 }
 ```
 
-```json
-**ClientRegisterRequest** {
-	name	string
+```Go
+ClientRegisterRequest {
+    name    string
 }
 ```
 
-```json
-**SignRequest** {
-	message_hash_hex	string
+```Go
+SignRequest {
+    message_hash_hex    string
 }
 ```
 
-```json
-**VerifyRequest** {
-	message_hash_hex	string
-	signature_hex	string
-	signer_id	string
+```Go
+VerifyRequest {
+    message_hash_hex    string
+    signature_hex   string
+    signer_id   string
 }
 ```
 
-```json
-**clientRegisterFinishResponse** {
-	feed_url	string
+```Go
+clientRegisterFinishResponse {
+    feed_url    string
 }
 ```
 
-```json
-**clientRegisterResponse** {
-	bls_public_key	string
-	ec_public_key	string
-	ref_id	string
+```Go
+clientRegisterResponse {
+    bls_public_key  string
+    ec_public_key   string
+    ref_id  string
 }
 ```
 
-```json
-**signResponse** {
-	signature_hex	string
-	signer_id	string
+```Go
+signResponse {
+    signature_hex   string
+    signer_id   string
 }
 ```
 
@@ -284,4 +282,3 @@ sequenceDiagram
   PartnerAPP->>PartnerAPP: sign payload
   PartnerAPP->>QredoBE: PUT /coreclient/action/{action_id} send signed payload to BE
   end
-```
