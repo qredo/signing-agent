@@ -64,8 +64,8 @@ RUN CGO_ENABLED=1 \
       -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/qredo-server/core-client/service.buildDate=$BUILD_DATE' \
                                                             -X 'gitlab.qredo.com/qredo-server/core-client/service.commit=$BUILD_COMMIT' \
                                                             -X 'gitlab.qredo.com/qredo-server/core-client/service.version=$BUILD_VERSION'" \
-      -o $GOPATH/bin/lib-client \
-      gitlab.qredo.com/qredo-server/lib-client
+      -o core-client \
+      gitlab.qredo.com/qredo-server/core-client/cmd/service
 
 
 FROM alpine as certs
@@ -73,6 +73,6 @@ RUN apk add -U --no-cache ca-certificates
 
 FROM scratch
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /go/bin/core-client /
+COPY --from=go_builder /src/gitlab.qredo.com/qredo-server/core-client/core-client /
 
 ENTRYPOINT ["/core-client", "--config", "/config/core-client.yaml", "start"]
