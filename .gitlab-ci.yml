@@ -1,0 +1,7 @@
+stages:
+  - internal_secret_detection
+
+include:
+  - project: 'devops/gitlab-ci-templates'
+    ref: master
+    file: .gitlab-ci.yml
