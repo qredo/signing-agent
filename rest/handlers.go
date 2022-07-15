@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -132,4 +133,34 @@ func (h *handler) Verify(_ *defs.RequestContext, _ http.ResponseWriter, r *http.
 	}
 
 	return nil, h.core.Verify(req)
+}
+
+// ClientFeed
+//
+// Get Core Client Feed (via websocket) from Qredo Backend
+//
+func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	fmt.Printf("Handler for ClientFeed endpoint")
+	coreClientID := mux.Vars(r)["client_id"] // also called AccoundID
+	if coreClientID == "" {
+		return nil, defs.ErrBadRequest().WithDetail("coreClientID")
+	}
+	req := &request{}
+
+	genWSQredoCoreClientFeedURL(coreClientID, req)
+	genTimestamp(req)
+	err := loadRSAKey(req)
+	if err != nil {
+		return nil, err
+	}
+	err = loadAPIKey(req)
+	if err != nil {
+		return nil, err
+	}
+	err = signRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	webSocketHandler(req, wsCoreClient, w, r)
+	return nil, nil
 }

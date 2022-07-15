@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"strings"
@@ -21,7 +22,11 @@ import (
 )
 
 var (
-	pathPrefix = "/api/v1"
+	pathPrefix             = "/api/v1"
+	flagQredoAPIDomain     = flag.String("qredo-api-domain", "play-api.qredo.network", "Qredo API Domain e.g. play-api.qredo.network")
+	flagQredoAPIBasePath   = flag.String("qredo-api-base-path", "/api/v1/p", "Qredo API Base Path e.g. /api/v1/p")
+	flagPrivatePEMFilePath = flag.String("pem-file", "private.pem", "Private key pem file")
+	flagAPIKeyFilePath     = flag.String("key-file", "apikey", "API key file")
 )
 
 type appHandlerFunc func(ctx *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
@@ -106,6 +111,8 @@ func (r *Router) setHandlers() (http.Handler, error) {
 
 		{"/client/{client_id}/sign", http.MethodPost, r.handler.Sign},
 		{"/verify", http.MethodPost, r.handler.Verify},
+
+		{"/client/{client_id}/feed", defs.MethodWebsocket, r.handler.ClientFeed},
 	}
 
 	router := mux.NewRouter().PathPrefix(pathPrefix).Subrouter()
