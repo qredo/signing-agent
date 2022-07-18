@@ -57,18 +57,13 @@ func genTimestamp(req *request) {
 }
 
 func genWSQredoCoreClientFeedURL(coreClientID string, req *request) {
-	// Create new Builder.
 	builder := strings.Builder{}
-
-	// Write a string.
 	builder.WriteString("wss://")
 	builder.WriteString(*flagQredoAPIDomain)
 	builder.WriteString(*flagQredoAPIBasePath)
 	builder.WriteString("/coreclient/")
 	builder.WriteString(coreClientID)
 	builder.WriteString("/feed")
-
-	// Convert Builder to String.
 	req.uri = builder.String()
 }
 
@@ -88,7 +83,7 @@ func webSocketHandler(h *handler, req *request, wsType int, w http.ResponseWrite
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
-		fmt.Println("cannot connect to Core Client websocket feed at Qredo Backend:", err)
+		fmt.Println("cannot connect to Core Client websocket feed at Qredo Backend: ", err)
 		return
 	}
 	defer wsQredoBackedConn.Close()
@@ -103,7 +98,7 @@ func webSocketHandler(h *handler, req *request, wsType int, w http.ResponseWrite
 	}
 	wsPartnerAppConn, err := wsPartnerAppUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println("cannot set websocket Partner App Connection:", err)
+		fmt.Println("cannot set websocket Partner App Connection: ", err)
 		return
 	}
 	defer wsPartnerAppConn.Close()
@@ -113,7 +108,7 @@ func webSocketHandler(h *handler, req *request, wsType int, w http.ResponseWrite
 		for {
 			var v Parser = &ActionInfo{}
 			if err := wsQredoBackedConn.ReadJSON(v); err != nil {
-				fmt.Println("error when reading from websocket:", err)
+				fmt.Println("error when reading from websocket: ", err)
 				return
 			}
 			fmt.Printf("\nincoming message:\n%v\n", v.Parse())
@@ -122,7 +117,7 @@ func webSocketHandler(h *handler, req *request, wsType int, w http.ResponseWrite
 			var action ActionInfo
 			err = json.Unmarshal([]byte(v.Parse()), &action)
 			if action.ExpireTime > time.Now().Unix() {
-				go approveActionWithRetry(h, action, wsPartnerAppConn, 1, 5)
+				go approveActionWithRetry(h, action, wsPartnerAppConn, 5, 5)
 			}
 
 		}
