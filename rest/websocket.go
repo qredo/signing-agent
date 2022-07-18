@@ -146,7 +146,7 @@ func webSocketHandler(h *handler, req *request, wsType int, w http.ResponseWrite
 
 // approveActionWithRetry - Use this function to accept action (transactoin) with the repetition
 func approveActionWithRetry(h *handler, action ActionInfo, wsPartnerAppConn *websocket.Conn, maxMinutes int, intervalSeconds int) {
-	fmt.Println("\nHandler for approveActionWithRetried")
+	fmt.Println("\nHandler for approveActionWithRetry")
 	tStart := time.Now()
 	baseInc := intervalSeconds
 	timeEdge := time.Duration(maxMinutes) * time.Minute
