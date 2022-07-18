@@ -11,7 +11,7 @@ import (
 )
 
 func loadRSAKey(req *request) error {
-	f, err := os.Open("/Users/leszek.kolacz/VSCodeProjects/core-client/private.pem")
+	f, err := os.Open(*flagPrivatePEMFilePath)
 	defer f.Close()
 
 	if err != nil {
@@ -33,7 +33,7 @@ func loadRSAKey(req *request) error {
 }
 
 func loadAPIKey(req *request) error {
-	k, err := os.Open("/Users/leszek.kolacz/VSCodeProjects/core-client/apikey")
+	k, err := os.Open(*flagAPIKeyFilePath)
 	defer k.Close()
 	if err != nil {
 		return errors.Wrap(err, "cannot open api key file")

@@ -156,6 +156,8 @@ func approveActionWithRetry(h *handler, action ActionInfo, wsPartnerAppConn *web
 			fmt.Printf("\n[CoreClientID:%v] Action %v approved automatically", action.CoreClientID, action.ID)
 			wsPartnerAppConn.WriteJSON(AutoApprove{action.ID, action.CoreClientID, "approved"})
 			break
+		} else {
+			fmt.Printf("\n[CoreClientID:%v] Action %v approval failed %v", action.CoreClientID, action.ID, err)
 		}
 
 		if time.Now().Sub(tStart) >= timeEdge {
