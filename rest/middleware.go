@@ -27,8 +27,6 @@ func NewMiddleware(log *zap.SugaredLogger, proxyForwardedHeader string, logAllRe
 	return mw
 }
 
-type middlewareFunc func(next appHandlerFunc) appHandlerFunc
-
 type Middleware struct {
 	log                  *zap.SugaredLogger
 	proxyForwardedHeader string
