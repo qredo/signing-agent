@@ -73,6 +73,8 @@ RUN apk add -U --no-cache ca-certificates
 
 FROM scratch
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /src/gitlab.qredo.com/qredo-server/core-client/core-client /
+COPY --from=go_builder /src/gitlab.qredo.com/qredo-server/core-client /core-client
 
-ENTRYPOINT ["/core-client", "--config", "/config/core-client.yaml", "start"]
+WORKDIR /core-client
+EXPOSE 8007
+CMD ["./core-client", "start", "-c", "core-client.yaml"]

@@ -1,7 +1,7 @@
-base_url: http://127.0.0.1:8007
-qredo_server_url: http://127.0.0.1:8001
+base_url: http://0.0.0.0:8007
+qredo_server_url: https://play-api.qredo.network
 http:
-  addr: 127.0.0.1:8007
+  addr: 0.0.0.0:8007
   cors_allow_origins:
   - '*'
   proxy_forwarded_header: ""
