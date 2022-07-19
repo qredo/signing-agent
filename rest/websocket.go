@@ -19,7 +19,6 @@ const (
 )
 
 type request struct {
-	method    string
 	uri       string
 	body      []byte
 	apiKey    string
@@ -160,13 +159,13 @@ func approveActionWithRetry(h *handler, action ActionInfo, wsPartnerAppConn *web
 			fmt.Printf("\n[CoreClientID:%v] Action %v approval failed %v", action.CoreClientID, action.ID, err)
 		}
 
-		if time.Now().Sub(tStart) >= timeEdge {
+		if time.Since(tStart) >= timeEdge {
 			// Action Approval should be skiped after maxMinutes is achieved (e.g. 5 minutes)
 			fmt.Printf("\nAuto action approve failed [CoreClientID:%v][actionID:%v] ", action.CoreClientID, action.ID)
 			break
 		}
 
-		fmt.Printf("\nAuto action approve is going to be repeted [CoreClientID:%v][actionID:%v] ", action.CoreClientID, action.ID)
+		fmt.Printf("\nAuto approve action is repeated [CoreClientID:%v][actionID:%v] ", action.CoreClientID, action.ID)
 		time.Sleep(time.Duration(baseInc) * time.Second)
 		baseInc += intervalSeconds
 	}
