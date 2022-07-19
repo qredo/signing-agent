@@ -27,8 +27,6 @@ func NewMiddleware(log *zap.SugaredLogger, proxyForwardedHeader string, logAllRe
 	return mw
 }
 
-type middlewareFunc func(next appHandlerFunc) appHandlerFunc
-
 type Middleware struct {
 	log                  *zap.SugaredLogger
 	proxyForwardedHeader string
@@ -114,7 +112,7 @@ func (m *Middleware) loggingMiddleware(next http.Handler) http.Handler {
 
 		// TODO: Make requests method logging configurable
 		if m.logAllRequests || r.Method != http.MethodGet || errI != nil {
-			m.log.Infof("REQ %s %v %v %v - [%v]", traceID, lw.statusCode, r.Method, r.RequestURI, time.Now().Sub(startTime))
+			m.log.Infof("REQ %s %v %v %v - [%v]", traceID, lw.statusCode, r.Method, r.RequestURI, time.Since(startTime))
 		}
 	})
 }

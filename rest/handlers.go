@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"gitlab.qredo.com/qredo-server/core-client/api"
+	"gitlab.qredo.com/qredo-server/core-client/rest/version"
 	"gitlab.qredo.com/qredo-server/core-client/util"
 
 	"gitlab.qredo.com/qredo-server/core-client/defs"
@@ -15,6 +16,26 @@ import (
 
 type handler struct {
 	core lib.CoreClient
+}
+
+//basic healthcheck response
+type HealthcheckAlive struct {
+	APIVersion    string `json:"api_version"`
+	SchemaVersion string `json:"schema_version"`
+}
+
+// HealthCheck
+//
+// swagger:route GET /healthcheck
+//
+// Check if application is working.
+//
+func (h *handler) HealthCheck(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+	response := HealthcheckAlive{
+		APIVersion:    version.APIVersion,
+		SchemaVersion: version.SchemaVersion,
+	}
+	return response, nil
 }
 
 // ClientRegister

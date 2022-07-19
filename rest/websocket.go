@@ -19,7 +19,6 @@ const (
 )
 
 type request struct {
-	method    string
 	uri       string
 	body      []byte
 	apiKey    string
@@ -112,14 +111,15 @@ func webSocketHandler(h *handler, req *request, wsType int, w http.ResponseWrite
 				return
 			}
 			fmt.Printf("\nincoming message:\n%v\n", v.Parse())
-			wsPartnerAppConn.WriteJSON(v)
-
+			err = wsPartnerAppConn.WriteJSON(v)
+			if err != nil {
+				fmt.Println("websocket wsPartnerAppConn WriteJSON contain error: ", err)
+			}
 			var action ActionInfo
 			err = json.Unmarshal([]byte(v.Parse()), &action)
 			if action.ExpireTime > time.Now().Unix() {
 				go approveActionWithRetry(h, action, wsPartnerAppConn, 5, 5)
 			}
-
 		}
 	}()
 
@@ -154,19 +154,22 @@ func approveActionWithRetry(h *handler, action ActionInfo, wsPartnerAppConn *web
 		err := h.core.ActionApprove(action.CoreClientID, action.ID)
 		if err == nil {
 			fmt.Printf("\n[CoreClientID:%v] Action %v approved automatically", action.CoreClientID, action.ID)
-			wsPartnerAppConn.WriteJSON(AutoApprove{action.ID, action.CoreClientID, "approved"})
+			err = wsPartnerAppConn.WriteJSON(AutoApprove{action.ID, action.CoreClientID, "approved"})
+			if err != nil {
+				fmt.Println("websocket wsPartnerAppConn WriteJSON contain error: ", err)
+			}
 			break
 		} else {
 			fmt.Printf("\n[CoreClientID:%v] Action %v approval failed %v", action.CoreClientID, action.ID, err)
 		}
 
-		if time.Now().Sub(tStart) >= timeEdge {
+		if time.Since(tStart) >= timeEdge {
 			// Action Approval should be skiped after maxMinutes is achieved (e.g. 5 minutes)
 			fmt.Printf("\nAuto action approve failed [CoreClientID:%v][actionID:%v] ", action.CoreClientID, action.ID)
 			break
 		}
 
-		fmt.Printf("\nAuto action approve is going to be repeted [CoreClientID:%v][actionID:%v] ", action.CoreClientID, action.ID)
+		fmt.Printf("\nAuto approve action is repeated [CoreClientID:%v][actionID:%v] ", action.CoreClientID, action.ID)
 		time.Sleep(time.Duration(baseInc) * time.Second)
 		baseInc += intervalSeconds
 	}
