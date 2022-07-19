@@ -19,7 +19,7 @@ func loadRSAKey(req *request) error {
 	defer func() {
 		err = f.Close()
 		if err != nil {
-			fmt.Println("cannot close open RSA key file: ", err)
+			fmt.Println("unable to close open file RSA key: ", err)
 		}
 	}()
 
@@ -46,7 +46,7 @@ func loadAPIKey(req *request) error {
 	defer func() {
 		err = k.Close()
 		if err != nil {
-			fmt.Println("cannot close open apikey file: ", err)
+			fmt.Println("unable to close open file apikey: ", err)
 		}
 	}()
 
