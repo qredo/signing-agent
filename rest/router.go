@@ -102,6 +102,7 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config) (*Router, error) 
 func (r *Router) setHandlers() (http.Handler, error) {
 
 	routes := []route{
+		{"/healthcheck", http.MethodGet, r.handler.HealthCheck},
 
 		{"/client", http.MethodPost, r.handler.ClientRegister},
 		{"/client/{ref}", http.MethodPut, r.handler.ClientRegisterFinish},
