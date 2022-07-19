@@ -18,7 +18,6 @@
 package crypto
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -46,7 +45,7 @@ func TestEncrypt(t *testing.T) {
 	}
 
 	if plainText != testString {
-		t.Fatal(fmt.Sprintf("Failed to decrypt string, expects %s got %s", testString, plainText))
+		t.Fatalf("Failed to decrypt string, expects %s got %s", testString, plainText)
 	}
 }
 
@@ -58,7 +57,7 @@ func TestDecrypt(t *testing.T) {
 	}
 
 	if plainText != testString {
-		t.Fatal(fmt.Sprintf("Failed to decrypt string, expects %s got %s", testString, plainText))
+		t.Fatalf("Failed to decrypt string, expects %s got %s", testString, plainText)
 	}
 
 }

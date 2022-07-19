@@ -13,11 +13,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const (
-	wsRaw = iota
-	wsCoreClient
-)
-
 type request struct {
 	uri       string
 	body      []byte
@@ -66,7 +61,7 @@ func genWSQredoCoreClientFeedURL(coreClientID string, req *request) {
 	req.uri = builder.String()
 }
 
-func webSocketHandler(h *handler, req *request, wsType int, w http.ResponseWriter, r *http.Request) {
+func webSocketHandler(h *handler, req *request, w http.ResponseWriter, r *http.Request) {
 	// TODO: change fmt to logger
 	url := req.uri
 

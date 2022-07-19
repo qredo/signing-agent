@@ -56,12 +56,11 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
 	}
 
-	switch respData.(type) {
+	switch respData := respData.(type) {
 	case nil:
 		return nil
 	case *[]byte:
-		b := respData.(*[]byte)
-		*b, err = ioutil.ReadAll(resp.Body)
+		_, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Wrap(err, "read response body")
 		}
@@ -115,12 +114,11 @@ func (c *Client) RequestNoLog(method string, url string, reqData interface{}, re
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
 	}
 
-	switch respData.(type) {
+	switch respData := respData.(type) {
 	case nil:
 		return nil
 	case *[]byte:
-		b := respData.(*[]byte)
-		*b, err = ioutil.ReadAll(resp.Body)
+		_, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Wrap(err, "read response body")
 		}

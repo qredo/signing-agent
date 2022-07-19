@@ -62,7 +62,10 @@ func Secp256k1Encrypt(message, publicKey string) (C, V, T string, err error) {
 	}
 
 	seed := make([]byte, 32)
-	rand.Read(seed)
+	_, err = rand.Read(seed)
+	if err != nil {
+		return
+	}
 	rng := NewRand(seed)
 
 	mOctet := CreateOctet([]byte(message))
