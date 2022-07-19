@@ -19,7 +19,7 @@ var (
 )
 
 func startText() {
-	fmt.Printf("Core Client service v%v (%v) build date: %v\n\n", version, commit, buildDate)
+	fmt.Printf("Core Client service %v (%v) build date: %v\n\n", version, commit, buildDate)
 }
 
 type versionCmd struct{}

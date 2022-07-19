@@ -45,7 +45,7 @@ func (c *Config) Default() {
 	}
 	c.Base.URL = "http://127.0.0.1:8007"
 	c.Base.PIN = 0
-	c.Base.QredoURL = "http://127.0.0.1:8001"
+	c.Base.QredoURL = "https://play-api.qredo.network"
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
 	c.StoreFile = "ccstore.db"
