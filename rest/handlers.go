@@ -182,6 +182,6 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 	if err != nil {
 		return nil, err
 	}
-	webSocketHandler(h, req, wsCoreClient, w, r)
+	webSocketHandler(h, req, w, r)
 	return nil, nil
 }
