@@ -155,7 +155,7 @@ func approveActionWithRetry(h *handler, action ActionInfo, wsPartnerAppConn *web
 			}
 			break
 		} else {
-			fmt.Printf("\n[CoreClientID:%v] Action %v approval failed %v", action.CoreClientID, action.ID, err)
+			fmt.Printf("\n[CoreClientID:%v] Action %v approval failed, error msg: %v", action.CoreClientID, action.ID, err)
 		}
 
 		if time.Since(tStart) >= timeEdge {

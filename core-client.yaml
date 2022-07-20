@@ -11,5 +11,5 @@ http:
 logging:
   format: text
   level: debug
-store_file: ccstore.db
+store_file: /volume/ccstore.db
 pin: 0
