@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -25,9 +26,16 @@ var (
 	pathPrefix             = "/api/v1"
 	flagQredoAPIDomain     = flag.String("qredo-api-domain", "play-api.qredo.network", "Qredo API Domain e.g. play-api.qredo.network")
 	flagQredoAPIBasePath   = flag.String("qredo-api-base-path", "/api/v1/p", "Qredo API Base Path e.g. /api/v1/p")
-	flagPrivatePEMFilePath = flag.String("pem-file", "private.pem", "Private key pem file")
-	flagAPIKeyFilePath     = flag.String("key-file", "apikey", "API key file")
+	flagPrivatePEMFilePath = flag.String("pem-file", LookupEnvOrDefaultVal("PrivatePEMFilePath", "private.pem"), "Private key pem file")
+	flagAPIKeyFilePath     = flag.String("key-file", LookupEnvOrDefaultVal("APIKeyFilePath", "apikey"), "API key file")
 )
+
+func LookupEnvOrDefaultVal(key string, defVal string) string {
+	if val, ok := os.LookupEnv(key); ok {
+		return val
+	}
+	return defVal
+}
 
 type appHandlerFunc func(ctx *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
 
