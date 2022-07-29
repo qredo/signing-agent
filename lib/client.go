@@ -3,6 +3,7 @@ package lib
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"net/http"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -16,7 +17,7 @@ import (
 	"gitlab.qredo.com/qredo-server/core-client/api"
 
 	"gitlab.qredo.com/qredo-server/core-client/crypto"
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	defs "gitlab.qredo.com/qredo-server/core-client/defs"
 )
 
 func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
@@ -121,6 +122,38 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 		FeedURL: finishResp.Feed,
 	}, nil
 }
+
 func (h *coreClient) ClientsList() (interface{}, error) {
 	return "not implemented", nil
+}
+
+func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {
+	reqDataBody, err := json.Marshal(reqData)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: h.htc.Request transform struct to []byte .. but not create signature .. should handled once
+	// SOLUTION: we can switch by header context x-api-key vs "x-api-zkp" (AuthHeader = AuthHeaderKEY or AuthHeaderZKP)
+	req := &Request{Body: reqDataBody}
+	GenTimestamp(req)
+	// build here at h.cfg path to flag *flagPrivatePEMFilePath
+	err = LoadRSAKey(req, "/volume/private.pem")
+	if err != nil {
+		return nil, err
+	}
+	err = LoadAPIKey(req, "/volume/apikey")
+	if err != nil {
+		return nil, err
+	}
+	err = SignRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	headers := GetHttpHeaders(req)
+
+	var respData *api.QredoRegisterInitResponse = &api.QredoRegisterInitResponse{}
+	if err = h.htc.Request(http.MethodPost, util.URLClientInit(h.cfg.QredoURL), reqData, respData, headers); err != nil {
+		return nil, err
+	}
+	return respData, nil
 }

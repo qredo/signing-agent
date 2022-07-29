@@ -32,3 +32,24 @@ type CoreClientServiceRegisterFinishRequest struct {
 type CoreClientServiceRegisterFinishResponse struct {
 	Feed string `json:"feed"`
 }
+
+type QredoRegisterInitRequest struct {
+	Name         string `json:"name"`
+	BLSPublicKey string `json:"blsPublicKey"`
+	ECPublicKey  string `json:"ecPublicKey"`
+}
+
+type QredoRegisterInitResponse struct {
+	ID           string `json:"id"`
+	ClientID     string `json:"clientID"`
+	ClientSecret string `json:"clientSecret"`
+	AccountCode  string `json:"accountCode"`
+	IDDocument   string `json:"idDoc"`
+	Timestamp    int64  `json:"timestamp"`
+}
+
+type ClientFullRegisterResponse struct {
+	ClientRegisterResponse
+	QredoRegisterInitResponse
+	ClientRegisterFinishResponse
+}

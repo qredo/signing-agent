@@ -166,22 +166,71 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 	if coreClientID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("coreClientID")
 	}
-	req := &request{}
+	req := &lib.Request{}
 
 	genWSQredoCoreClientFeedURL(coreClientID, req)
-	genTimestamp(req)
-	err := loadRSAKey(req)
+	lib.GenTimestamp(req)
+	err := lib.LoadRSAKey(req, *flagPrivatePEMFilePath)
 	if err != nil {
 		return nil, err
 	}
-	err = loadAPIKey(req)
+	err = lib.LoadAPIKey(req, *flagAPIKeyFilePath)
 	if err != nil {
 		return nil, err
 	}
-	err = signRequest(req)
+	err = lib.SignRequest(req)
 	if err != nil {
 		return nil, err
 	}
 	webSocketHandler(h, req, w, r)
 	return nil, nil
+}
+
+// ClientFullRegister
+//
+// swagger:route POST /client/register  clientFullRegister ClientFullRegister
+//
+// Finish client registration procedure (3 steps in one)
+//
+// Responses:
+//      200: ClientRegisterFinishResponse
+func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+	fmt.Printf("Handler for ClientFullRegister endpoint")
+	response := api.ClientFullRegisterResponse{}
+	req := &api.ClientRegisterRequest{}
+	err := util.DecodeRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+	first_results, err := h.core.ClientRegister(req.Name) // we get bls, ec publicks keys
+	if err != nil {
+		return nil, err
+	}
+
+	response.ClientRegisterResponse = *first_results
+	reqData := &api.QredoRegisterInitRequest{
+		Name:         req.Name,
+		BLSPublicKey: first_results.BLSPublicKey,
+		ECPublicKey:  first_results.ECPublicKey,
+	}
+	second_results, err := h.core.ClientInit(reqData, first_results.RefID)
+	if err != nil {
+		return response, err
+	}
+
+	response.QredoRegisterInitResponse = *second_results
+	reqData2 := &api.ClientRegisterFinishRequest{
+		ID:           second_results.ID,
+		AccountCode:  second_results.AccountCode,
+		ClientID:     second_results.ClientID,
+		ClientSecret: second_results.ClientSecret,
+		IDDoc:        second_results.IDDocument,
+	}
+	finish_response, err := h.core.ClientRegisterFinish(reqData2, first_results.RefID)
+	if err != nil {
+		return response, err
+	}
+	response.ClientRegisterFinishResponse = *finish_response
+
+	return response, nil
 }

@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+func URLClientInit(baseURL string) string {
+	return fmt.Sprintf("%s/api/v1/p/coreclient/init", baseURL)
+}
+
 func URLRegisterConfirm(baseURL string) string {
 	return fmt.Sprintf("%s/api/v1/p/coreclient/finish", baseURL)
 }

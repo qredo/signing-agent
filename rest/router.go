@@ -112,6 +112,7 @@ func (r *Router) setHandlers() (http.Handler, error) {
 	routes := []route{
 		{"/healthcheck", http.MethodGet, r.handler.HealthCheck},
 
+		{"/register", http.MethodPost, r.handler.ClientFullRegister},
 		{"/client", http.MethodPost, r.handler.ClientRegister},
 		{"/client/{ref}", http.MethodPut, r.handler.ClientRegisterFinish},
 		{"/client", http.MethodGet, r.handler.ClientsList},
