@@ -207,7 +207,7 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		return nil, err
 	}
 
-	response.ClientRegisterResponse = *first_results
+	response.RefID = first_results.RefID
 	reqData := &api.QredoRegisterInitRequest{
 		Name:         req.Name,
 		BLSPublicKey: first_results.BLSPublicKey,
@@ -218,7 +218,7 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		return response, err
 	}
 
-	response.QredoRegisterInitResponse = *second_results
+	response.AccountCode = second_results.AccountCode
 	reqData2 := &api.ClientRegisterFinishRequest{
 		ID:           second_results.ID,
 		AccountCode:  second_results.AccountCode,
@@ -226,11 +226,10 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		ClientSecret: second_results.ClientSecret,
 		IDDoc:        second_results.IDDocument,
 	}
-	finish_response, err := h.core.ClientRegisterFinish(reqData2, first_results.RefID)
+	_, err = h.core.ClientRegisterFinish(reqData2, first_results.RefID)
 	if err != nil {
 		return response, err
 	}
-	response.ClientRegisterFinishResponse = *finish_response
 
 	return response, nil
 }
