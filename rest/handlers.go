@@ -190,7 +190,7 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 //
 // swagger:route POST /client/register  clientFullRegister ClientFullRegister
 //
-// Finish client registration procedure (3 steps in one)
+// Client registration process (3 steps in one)
 //
 // Responses:
 //      200: ClientRegisterFinishResponse
@@ -202,31 +202,31 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 	if err != nil {
 		return nil, err
 	}
-	first_results, err := h.core.ClientRegister(req.Name) // we get bls, ec publicks keys
+	registerResults, err := h.core.ClientRegister(req.Name) // we get bls, ec publicks keys
 	if err != nil {
 		return nil, err
 	}
 
-	response.RefID = first_results.RefID
-	reqData := &api.QredoRegisterInitRequest{
+	reqDataInit := &api.QredoRegisterInitRequest{
 		Name:         req.Name,
-		BLSPublicKey: first_results.BLSPublicKey,
-		ECPublicKey:  first_results.ECPublicKey,
+		BLSPublicKey: registerResults.BLSPublicKey,
+		ECPublicKey:  registerResults.ECPublicKey,
 	}
-	second_results, err := h.core.ClientInit(reqData, first_results.RefID)
+	initResults, err := h.core.ClientInit(reqDataInit, registerResults.RefID)
 	if err != nil {
 		return response, err
 	}
 
-	response.AccountCode = second_results.AccountCode
-	reqData2 := &api.ClientRegisterFinishRequest{
-		ID:           second_results.ID,
-		AccountCode:  second_results.AccountCode,
-		ClientID:     second_results.ClientID,
-		ClientSecret: second_results.ClientSecret,
-		IDDoc:        second_results.IDDocument,
+	response.AgentID = initResults.AccountCode
+	response.IDDocument = initResults.IDDocument
+	reqDataFinish := &api.ClientRegisterFinishRequest{
+		ID:           initResults.ID,
+		AccountCode:  initResults.AccountCode,
+		ClientID:     initResults.ClientID,
+		ClientSecret: initResults.ClientSecret,
+		IDDoc:        initResults.IDDocument,
 	}
-	_, err = h.core.ClientRegisterFinish(reqData2, first_results.RefID)
+	_, err = h.core.ClientRegisterFinish(reqDataFinish, registerResults.RefID)
 	if err != nil {
 		return response, err
 	}

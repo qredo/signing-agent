@@ -136,12 +136,11 @@ func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref strin
 	// SOLUTION: we can switch by header context x-api-key vs "x-api-zkp" (AuthHeader = AuthHeaderKEY or AuthHeaderZKP)
 	req := &Request{Body: reqDataBody}
 	GenTimestamp(req)
-	// build here at h.cfg path to flag *flagPrivatePEMFilePath
-	err = LoadRSAKey(req, "/volume/private.pem")
+	err = LoadRSAKey(req, h.cfg.PrivatePEMFilePath)
 	if err != nil {
 		return nil, err
 	}
-	err = LoadAPIKey(req, "/volume/apikey")
+	err = LoadAPIKey(req, h.cfg.APIKeyFilePath)
 	if err != nil {
 		return nil, err
 	}

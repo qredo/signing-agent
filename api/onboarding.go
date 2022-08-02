@@ -49,6 +49,6 @@ type QredoRegisterInitResponse struct {
 }
 
 type ClientFullRegisterResponse struct {
-	RefID       string `json:"ref_id"`
-	AccountCode string `json:"accountCode"`
+	AgentID    string `json:"agentID"`
+	IDDocument string `json:"idDoc"`
 }

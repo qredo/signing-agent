@@ -25,9 +25,11 @@ type Config struct {
 }
 
 type Base struct {
-	URL      string `yaml:"url"`
-	PIN      int    `yaml:"int"`
-	QredoURL string `yaml:"qredo_url"`
+	URL                string `yaml:"url"`
+	PIN                int    `yaml:"int"`
+	QredoURL           string `yaml:"qredo_url"`
+	PrivatePEMFilePath string `yaml:"private_key_path"`
+	APIKeyFilePath     string `yaml:"api_key_path"`
 }
 
 type Logging struct {
@@ -49,6 +51,8 @@ func (c *Config) Default() {
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
 	c.StoreFile = "ccstore.db"
+	c.Base.PrivatePEMFilePath = "private.pem"
+	c.Base.APIKeyFilePath = "apikey"
 }
 
 // ParseConfigFile parses yaml config
