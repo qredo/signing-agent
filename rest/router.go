@@ -23,6 +23,7 @@ import (
 )
 
 var (
+	hostREST               = "localhost"
 	pathPrefix             = "/api/v1"
 	flagQredoAPIDomain     = flag.String("qredo-api-domain", "play-api.qredo.network", "Qredo API Domain e.g. play-api.qredo.network")
 	flagQredoAPIBasePath   = flag.String("qredo-api-base-path", "/api/v1/p", "Qredo API Base Path e.g. /api/v1/p")
@@ -159,6 +160,8 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 		r.log.Info("Use Proxy forwarded-for header: %s", r.config.HTTP.ProxyForwardedHeader)
 	}
 	r.log.Infof("Starting listener on %v for API url %v", r.config.HTTP.Addr, r.config.Base.URL)
+	// set host from config for rest module
+	hostREST = r.config.HTTP.Addr
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
 }

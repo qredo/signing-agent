@@ -218,7 +218,6 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 	}
 
 	response.AgentID = initResults.AccountCode
-	response.IDDocument = initResults.IDDocument
 	reqDataFinish := &api.ClientRegisterFinishRequest{
 		ID:           initResults.ID,
 		AccountCode:  initResults.AccountCode,
@@ -230,6 +229,8 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 	if err != nil {
 		return response, err
 	}
+
+	response.FeedURL = fmt.Sprintf("ws://%s/api/v1/client/%s/feed", hostREST, initResults.AccountCode)
 
 	return response, nil
 }
