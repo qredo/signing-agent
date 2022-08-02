@@ -132,8 +132,6 @@ func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref strin
 	if err != nil {
 		return nil, err
 	}
-	// TODO: h.htc.Request transform struct to []byte .. but not create signature .. should handled once
-	// SOLUTION: we can switch by header context x-api-key vs "x-api-zkp" (AuthHeader = AuthHeaderKEY or AuthHeaderZKP)
 	req := &Request{Body: reqDataBody}
 	GenTimestamp(req)
 	err = LoadRSAKey(req, h.cfg.PrivatePEMFilePath)
