@@ -2,10 +2,8 @@ package rest
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -23,20 +21,8 @@ import (
 )
 
 var (
-	hostREST               = "localhost"
-	pathPrefix             = "/api/v1"
-	flagQredoAPIDomain     = flag.String("qredo-api-domain", "play-api.qredo.network", "Qredo API Domain e.g. play-api.qredo.network")
-	flagQredoAPIBasePath   = flag.String("qredo-api-base-path", "/api/v1/p", "Qredo API Base Path e.g. /api/v1/p")
-	flagPrivatePEMFilePath = flag.String("pem-file", LookupEnvOrDefaultVal("PrivatePEMFilePath", "private.pem"), "Private key pem file")
-	flagAPIKeyFilePath     = flag.String("key-file", LookupEnvOrDefaultVal("APIKeyFilePath", "apikey"), "API key file")
+	pathPrefix = "/api/v1"
 )
-
-func LookupEnvOrDefaultVal(key string, defVal string) string {
-	if val, ok := os.LookupEnv(key); ok {
-		return val
-	}
-	return defVal
-}
 
 type appHandlerFunc func(ctx *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
 
@@ -98,6 +84,8 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config) (*Router, error) 
 
 	rt.handler = &handler{
 		core: core,
+		cfg:  *config,
+		log:  log,
 	}
 	if err != nil {
 		return nil, err
@@ -160,8 +148,8 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 		r.log.Info("Use Proxy forwarded-for header: %s", r.config.HTTP.ProxyForwardedHeader)
 	}
 	r.log.Infof("Starting listener on %v for API url %v", r.config.HTTP.Addr, r.config.Base.URL)
-	// set host from config for rest module
-	hostREST = r.config.HTTP.Addr
+
+	r.handler.AutoApproval()
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
 }

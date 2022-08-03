@@ -3,10 +3,13 @@ package rest
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 
 	"gitlab.qredo.com/qredo-server/core-client/api"
+	"gitlab.qredo.com/qredo-server/core-client/config"
 	"gitlab.qredo.com/qredo-server/core-client/rest/version"
 	"gitlab.qredo.com/qredo-server/core-client/util"
 
@@ -16,6 +19,8 @@ import (
 
 type handler struct {
 	core lib.CoreClient
+	cfg  config.Config
+	log  *zap.SugaredLogger
 }
 
 //basic healthcheck response
@@ -156,25 +161,69 @@ func (h *handler) Verify(_ *defs.RequestContext, _ http.ResponseWriter, r *http.
 	return nil, h.core.Verify(req)
 }
 
+// AutoApprovalFunction
+//
+func (h *handler) AutoApproval() {
+	h.log.Debug("Handler for AutoApproval background job")
+
+	var clientID string
+
+	for {
+		fStore, err := util.NewFileStore(h.cfg.StoreFile)
+		if err != nil {
+			h.log.Errorf("File Storage path doesn't work properly: %s", err)
+			panic(err)
+		}
+		store := lib.NewStore(fStore)
+		clientID = store.GetAgentID()
+		if clientID == "" {
+			h.log.Infof("AgentID has been not found. The system is going to check register again in next %v sec", h.cfg.Base.RetrySleepGetAgentID)
+			time.Sleep(time.Duration(h.cfg.Base.RetrySleepGetAgentID) * time.Second)
+		} else {
+			h.log.Infof("AgentID %s has been found.", clientID)
+			break
+		}
+	}
+	req := &lib.Request{}
+	genWSQredoCoreClientFeedURL(h, clientID, req)
+	lib.GenTimestamp(req)
+
+	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
+	if err != nil {
+		return
+	}
+	err = lib.LoadAPIKey(req, h.cfg.Base.APIKeyFilePath)
+	if err != nil {
+		return
+	}
+	err = lib.SignRequest(req)
+	if err != nil {
+		return
+	}
+	go webSocketHandler(h, req)
+
+	return
+}
+
 // ClientFeed
 //
 // Get Core Client Feed (via websocket) from Qredo Backend
 //
 func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	fmt.Printf("Handler for ClientFeed endpoint")
-	coreClientID := mux.Vars(r)["client_id"] // also called AccoundID
+	h.log.Debug("Handler for ClientFeed endpoint")
+	coreClientID := mux.Vars(r)["client_id"] // also called AccoundID or AgentID
 	if coreClientID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("coreClientID")
 	}
 	req := &lib.Request{}
 
-	genWSQredoCoreClientFeedURL(coreClientID, req)
+	genWSQredoCoreClientFeedURL(h, coreClientID, req)
 	lib.GenTimestamp(req)
-	err := lib.LoadRSAKey(req, *flagPrivatePEMFilePath)
+	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
 	if err != nil {
 		return nil, err
 	}
-	err = lib.LoadAPIKey(req, *flagAPIKeyFilePath)
+	err = lib.LoadAPIKey(req, h.cfg.Base.APIKeyFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +231,7 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 	if err != nil {
 		return nil, err
 	}
-	webSocketHandler(h, req, w, r)
+	webSocketFeedHandler(h, req, w, r)
 	return nil, nil
 }
 
@@ -195,7 +244,7 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 // Responses:
 //      200: ClientRegisterFinishResponse
 func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	fmt.Printf("Handler for ClientFullRegister endpoint")
+	h.log.Debug("Handler for ClientFullRegister endpoint")
 	response := api.ClientFullRegisterResponse{}
 	req := &api.ClientRegisterRequest{}
 	err := util.DecodeRequest(req, r)
@@ -230,7 +279,7 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		return response, err
 	}
 
-	response.FeedURL = fmt.Sprintf("ws://%s/api/v1/client/%s/feed", hostREST, initResults.AccountCode)
+	response.FeedURL = fmt.Sprintf("ws://%s%s/client/%s/feed", h.cfg.HTTP.Addr, pathPrefix, initResults.AccountCode)
 
 	return response, nil
 }
