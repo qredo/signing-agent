@@ -1,9 +1,7 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -168,16 +166,12 @@ func (h *handler) AutoApproval() {
 
 	var clientID string
 
-	for {
-		clientID = h.core.GetAgentID()
-		if clientID == "" {
-			h.log.Infof("AgentID has been not found. The system is going to check register again in next %v sec", h.cfg.Base.RetrySleepGetAgentID)
-			time.Sleep(time.Duration(h.cfg.Base.RetrySleepGetAgentID) * time.Second)
-		} else {
-			h.log.Infof("AgentID %s has been found.", clientID)
-			break
-		}
+	clientID = h.core.GetAgentID()
+	if clientID == "" {
+		h.log.Infof("Agent is not yet configured, skipping Websocket connection for auto-approval")
+		return
 	}
+
 	req := &lib.Request{}
 	genWSQredoCoreClientFeedURL(h, clientID, req)
 	lib.GenTimestamp(req)
@@ -280,7 +274,9 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 	if err != nil {
 		h.log.Errorf("Could not set AgentID to Storage: %s", err)
 	}
-	response.FeedURL = fmt.Sprintf("ws://%s%s/client/%s/feed", h.cfg.HTTP.Addr, pathPrefix, initResults.AccountCode)
+
+	// Also enable auto-approval of requests
+	h.AutoApproval()
 
 	return response, nil
 }
