@@ -166,22 +166,71 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 	if coreClientID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("coreClientID")
 	}
-	req := &request{}
+	req := &lib.Request{}
 
 	genWSQredoCoreClientFeedURL(coreClientID, req)
-	genTimestamp(req)
-	err := loadRSAKey(req)
+	lib.GenTimestamp(req)
+	err := lib.LoadRSAKey(req, *flagPrivatePEMFilePath)
 	if err != nil {
 		return nil, err
 	}
-	err = loadAPIKey(req)
+	err = lib.LoadAPIKey(req, *flagAPIKeyFilePath)
 	if err != nil {
 		return nil, err
 	}
-	err = signRequest(req)
+	err = lib.SignRequest(req)
 	if err != nil {
 		return nil, err
 	}
 	webSocketHandler(h, req, w, r)
 	return nil, nil
+}
+
+// ClientFullRegister
+//
+// swagger:route POST /client/register  clientFullRegister ClientFullRegister
+//
+// Client registration process (3 steps in one)
+//
+// Responses:
+//      200: ClientRegisterFinishResponse
+func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+	fmt.Printf("Handler for ClientFullRegister endpoint")
+	response := api.ClientFullRegisterResponse{}
+	req := &api.ClientRegisterRequest{}
+	err := util.DecodeRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+	registerResults, err := h.core.ClientRegister(req.Name) // we get bls, ec publicks keys
+	if err != nil {
+		return nil, err
+	}
+
+	reqDataInit := &api.QredoRegisterInitRequest{
+		Name:         req.Name,
+		BLSPublicKey: registerResults.BLSPublicKey,
+		ECPublicKey:  registerResults.ECPublicKey,
+	}
+	initResults, err := h.core.ClientInit(reqDataInit, registerResults.RefID)
+	if err != nil {
+		return response, err
+	}
+
+	response.AgentID = initResults.AccountCode
+	reqDataFinish := &api.ClientRegisterFinishRequest{
+		ID:           initResults.ID,
+		AccountCode:  initResults.AccountCode,
+		ClientID:     initResults.ClientID,
+		ClientSecret: initResults.ClientSecret,
+		IDDoc:        initResults.IDDocument,
+	}
+	_, err = h.core.ClientRegisterFinish(reqDataFinish, registerResults.RefID)
+	if err != nil {
+		return response, err
+	}
+
+	response.FeedURL = fmt.Sprintf("ws://%s/api/v1/client/%s/feed", hostREST, initResults.AccountCode)
+
+	return response, nil
 }

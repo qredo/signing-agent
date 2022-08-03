@@ -78,4 +78,4 @@ COPY --from=go_builder /src/gitlab.qredo.com/qredo-server/core-client /core-clie
 VOLUME /volume
 WORKDIR /core-client
 EXPOSE 8007
-CMD ["./core-client", "start", "-c", "core-client.yaml"]
+CMD ["./core-client", "start", "-c", "/volume/core-client.yaml"]

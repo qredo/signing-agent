@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"crypto/rsa"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,16 +10,8 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	lib "gitlab.qredo.com/qredo-server/core-client/lib"
 )
-
-type request struct {
-	uri       string
-	body      []byte
-	apiKey    string
-	timestamp string
-	signature string
-	rsaKey    *rsa.PrivateKey
-}
 
 type Parser interface {
 	Parse() string
@@ -46,11 +37,7 @@ type AutoApprove struct {
 	Status       string `json:"status"`
 }
 
-func genTimestamp(req *request) {
-	req.timestamp = fmt.Sprintf("%v", time.Now().Unix())
-}
-
-func genWSQredoCoreClientFeedURL(coreClientID string, req *request) {
+func genWSQredoCoreClientFeedURL(coreClientID string, req *lib.Request) {
 	builder := strings.Builder{}
 	builder.WriteString("wss://")
 	builder.WriteString(*flagQredoAPIDomain)
@@ -58,12 +45,12 @@ func genWSQredoCoreClientFeedURL(coreClientID string, req *request) {
 	builder.WriteString("/coreclient/")
 	builder.WriteString(coreClientID)
 	builder.WriteString("/feed")
-	req.uri = builder.String()
+	req.Uri = builder.String()
 }
 
-func webSocketHandler(h *handler, req *request, w http.ResponseWriter, r *http.Request) {
+func webSocketHandler(h *handler, req *lib.Request, w http.ResponseWriter, r *http.Request) {
 	// TODO: change fmt to logger
-	url := req.uri
+	url := req.Uri
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -71,9 +58,9 @@ func webSocketHandler(h *handler, req *request, w http.ResponseWriter, r *http.R
 	fmt.Printf("\nconnecting to %s\n", url)
 
 	headers := http.Header{}
-	headers.Add("x-api-key", req.apiKey)
-	headers.Add("x-sign", req.signature)
-	headers.Add("x-timestamp", req.timestamp)
+	headers.Add("x-api-key", req.ApiKey)
+	headers.Add("x-sign", req.Signature)
+	headers.Add("x-timestamp", req.Timestamp)
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {

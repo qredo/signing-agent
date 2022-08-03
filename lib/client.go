@@ -3,6 +3,7 @@ package lib
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"net/http"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -16,7 +17,7 @@ import (
 	"gitlab.qredo.com/qredo-server/core-client/api"
 
 	"gitlab.qredo.com/qredo-server/core-client/crypto"
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	defs "gitlab.qredo.com/qredo-server/core-client/defs"
 )
 
 func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
@@ -121,6 +122,35 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 		FeedURL: finishResp.Feed,
 	}, nil
 }
+
 func (h *coreClient) ClientsList() (interface{}, error) {
 	return "not implemented", nil
+}
+
+func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {
+	reqDataBody, err := json.Marshal(reqData)
+	if err != nil {
+		return nil, err
+	}
+	req := &Request{Body: reqDataBody}
+	GenTimestamp(req)
+	err = LoadRSAKey(req, h.cfg.PrivatePEMFilePath)
+	if err != nil {
+		return nil, err
+	}
+	err = LoadAPIKey(req, h.cfg.APIKeyFilePath)
+	if err != nil {
+		return nil, err
+	}
+	err = SignRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	headers := GetHttpHeaders(req)
+
+	var respData *api.QredoRegisterInitResponse = &api.QredoRegisterInitResponse{}
+	if err = h.htc.Request(http.MethodPost, util.URLClientInit(h.cfg.QredoURL), reqData, respData, headers); err != nil {
+		return nil, err
+	}
+	return respData, nil
 }

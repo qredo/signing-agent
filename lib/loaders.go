@@ -1,4 +1,4 @@
-package rest
+package lib
 
 import (
 	"crypto/x509"
@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func loadRSAKey(req *request) error {
-	f, err := os.Open(*flagPrivatePEMFilePath)
+func LoadRSAKey(req *Request, path string) error {
+	f, err := os.Open(path)
 	if err != nil {
 		return errors.Wrap(err, "load RSA key")
 	}
@@ -30,15 +30,15 @@ func loadRSAKey(req *request) error {
 
 	block, _ := pem.Decode(pemData)
 
-	req.rsaKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+	req.RsaKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		return errors.Wrap(err, "parse RSA key")
 	}
 	return nil
 }
 
-func loadAPIKey(req *request) error {
-	k, err := os.Open(*flagAPIKeyFilePath)
+func LoadAPIKey(req *Request, path string) error {
+	k, err := os.Open(path)
 	if err != nil {
 		return errors.Wrap(err, "cannot open api key file")
 
@@ -55,6 +55,6 @@ func loadAPIKey(req *request) error {
 		return errors.Wrap(err, "cannot read api key file")
 	}
 
-	req.apiKey = strings.TrimSpace(string(key))
+	req.ApiKey = strings.TrimSpace(string(key))
 	return nil
 }

@@ -1,5 +1,8 @@
 base_url: http://0.0.0.0:8007
 qredo_server_url: https://play-api.qredo.network
+base:
+  private_key_path: /volume/private.pem
+  api_key_path: /volume/apikey
 http:
   addr: 0.0.0.0:8007
   cors_allow_origins:

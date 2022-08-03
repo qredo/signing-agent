@@ -7,6 +7,8 @@ import (
 )
 
 type CoreClient interface {
+	// ClientInit initiate the core client registration process
+	ClientInit(register *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error)
 	// ClientRegister initiates the core client registration procedure
 	// by generating BLS and EC key pairs and returns the public keys
 	ClientRegister(name string) (*api.ClientRegisterResponse, error)
