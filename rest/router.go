@@ -2,7 +2,6 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -149,7 +148,7 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 	}
 	r.log.Infof("Starting listener on %v for API url %v", r.config.HTTP.Addr, r.config.Base.URL)
 
-	r.handler.AutoApproval()
+	go r.handler.AutoApproval()
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
 }
@@ -191,7 +190,7 @@ func WriteHTTPError(w http.ResponseWriter, r *http.Request, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(apiErr.Code())
-	_, _ = fmt.Fprintln(w, apiErr.JSON())
+	w.Write(apiErr.JSON())
 }
 
 // FormatJSONResp encodes response as JSON and handle errors

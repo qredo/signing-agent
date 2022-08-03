@@ -26,6 +26,11 @@ type CoreClient interface {
 	Sign(clientID, messageHex string) (*api.SignResponse, error)
 	// Verify verifies a signature provided with VerifyRequest
 	Verify(req *api.VerifyRequest) error
+
+	// SetAgentID function to collect Core Client ID to storage, so the system will stand alone per 1 Core Client ID (AgentID)
+	SetAgentID(agetID string) error
+	// GetAgentID function to get Core Client ID that was storage at registration process.
+	GetAgentID() string
 }
 
 type coreClient struct {

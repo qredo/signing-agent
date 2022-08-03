@@ -154,3 +154,11 @@ func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref strin
 	}
 	return respData, nil
 }
+
+func (h *coreClient) SetAgentID(agetID string) error {
+	return h.store.SetAgentID(agetID)
+}
+
+func (h *coreClient) GetAgentID() string {
+	return h.store.GetAgentID()
+}

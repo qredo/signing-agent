@@ -169,13 +169,7 @@ func (h *handler) AutoApproval() {
 	var clientID string
 
 	for {
-		fStore, err := util.NewFileStore(h.cfg.StoreFile)
-		if err != nil {
-			h.log.Errorf("File Storage path doesn't work properly: %s", err)
-			panic(err)
-		}
-		store := lib.NewStore(fStore)
-		clientID = store.GetAgentID()
+		clientID = h.core.GetAgentID()
 		if clientID == "" {
 			h.log.Infof("AgentID has been not found. The system is going to check register again in next %v sec", h.cfg.Base.RetrySleepGetAgentID)
 			time.Sleep(time.Duration(h.cfg.Base.RetrySleepGetAgentID) * time.Second)
@@ -245,6 +239,9 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 //      200: ClientRegisterFinishResponse
 func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFullRegister endpoint")
+	if h.core.GetAgentID() != "" {
+		return nil, defs.ErrBadRequest().WithDetail("AgentID already exist. You can not set new one.")
+	}
 	response := api.ClientFullRegisterResponse{}
 	req := &api.ClientRegisterRequest{}
 	err := util.DecodeRequest(req, r)
@@ -279,6 +276,10 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		return response, err
 	}
 
+	err = h.core.SetAgentID(initResults.AccountCode)
+	if err != nil {
+		h.log.Errorf("Could not set AgentID to Storage: %s", err)
+	}
 	response.FeedURL = fmt.Sprintf("ws://%s%s/client/%s/feed", h.cfg.HTTP.Addr, pathPrefix, initResults.AccountCode)
 
 	return response, nil
