@@ -50,5 +50,4 @@ type QredoRegisterInitResponse struct {
 
 type ClientFullRegisterResponse struct {
 	AgentID string `json:"agentID"`
-	FeedURL string `json:"feedURL"`
 }
