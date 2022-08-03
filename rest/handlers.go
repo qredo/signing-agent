@@ -164,7 +164,7 @@ func (h *handler) Verify(_ *defs.RequestContext, _ http.ResponseWriter, r *http.
 //
 func (h *handler) AutoApproval() {
 	// enable auto-approval only if configured
-	if h.cfg.Base.AutoApprove == false {
+	if !h.cfg.Base.AutoApprove {
 		return
 	}
 
