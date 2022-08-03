@@ -3,7 +3,6 @@ base:
   qredo_url: https://play-api.qredo.network
   qredo_api_domain: play-api.qredo.network
   qredo_api_base_path: /api/v1/p
-  retry_sleep_get_agent_id: 12
   private_key_path: /volume/private.pem
   api_key_path: /volume/apikey
 http:
