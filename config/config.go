@@ -25,14 +25,13 @@ type Config struct {
 }
 
 type Base struct {
-	URL                  string `yaml:"url"`
-	PIN                  int    `yaml:"int"`
-	QredoURL             string `yaml:"qredo_url"`
-	QredoAPIDomain       string `yaml:"qredo_api_domain"`
-	QredoAPIBasePath     string `yaml:"qredo_api_base_path"`
-	RetrySleepGetAgentID int    `yaml:"retry_sleep_get_agent_id"`
-	PrivatePEMFilePath   string `yaml:"private_key_path"`
-	APIKeyFilePath       string `yaml:"api_key_path"`
+	URL                string `yaml:"url"`
+	PIN                int    `yaml:"int"`
+	QredoURL           string `yaml:"qredo_url"`
+	QredoAPIDomain     string `yaml:"qredo_api_domain"`
+	QredoAPIBasePath   string `yaml:"qredo_api_base_path"`
+	PrivatePEMFilePath string `yaml:"private_key_path"`
+	APIKeyFilePath     string `yaml:"api_key_path"`
 }
 
 type Logging struct {
