@@ -44,6 +44,7 @@ func (c *startCmd) Execute([]string) error {
 
 	setCtrlC()
 	log := logger(&cfg.Logging)
+	log.Debug("Loaded config file from " + c.ConfigFile)
 
 	router, err := rest.NewQRouter(log, &cfg)
 	if err != nil {
@@ -100,7 +101,7 @@ func logger(cfg *config.Logging) *zap.SugaredLogger {
 	}
 
 	logConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-	if cfg.Level == "debug" {
+	if cfg.Level == "info" {
 		logConfig.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 	}
 

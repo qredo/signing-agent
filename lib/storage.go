@@ -1,11 +1,14 @@
 package lib
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 
 	"gitlab.qredo.com/qredo-server/core-client/defs"
 )
+
+var agentIDString = "AgentID"
 
 // KVStore is an interface to a simple key-value store used by the core lib
 type KVStore interface {
@@ -161,4 +164,22 @@ func (s *Storage) GetClient(id string) *Client {
 	}
 
 	return c
+}
+
+func (s *Storage) GetAgentID() string {
+	d, err := s.kv.Get(agentIDString)
+	if err != nil {
+		if err != defs.KVErrNotFound {
+			return ""
+		}
+		return ""
+	}
+	return bytes.NewBuffer(d).String()
+}
+
+func (s *Storage) SetAgentID(agentID string) error {
+	if err := s.kv.Set(agentIDString, []byte(agentID)); err != nil {
+		return err
+	}
+	return nil
 }
