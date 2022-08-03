@@ -23,7 +23,7 @@ dev_local_build() {
       -ldflags "-X 'main.buildDate=$BUILD_DATE' \
                 -X 'main.commit=$GIT_COMMIT' \
                 -X 'main.version=$VERSION'" \
-      -o out/core-client \
+      -o out/automated-approver \
       gitlab.qredo.com/qredo-server/core-client/cmd/service
 }
 

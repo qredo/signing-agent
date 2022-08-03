@@ -56,7 +56,7 @@ func (c *Config) Default() {
 	c.StoreFile = "ccstore.db"
 	c.Base.PrivatePEMFilePath = "private.pem"
 	c.Base.APIKeyFilePath = "apikey"
-	c.Base.AutoApprove = false
+	c.Base.AutoApprove = true
 }
 
 // ParseConfigFile parses yaml config

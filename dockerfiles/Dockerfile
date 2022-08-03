@@ -64,7 +64,7 @@ RUN CGO_ENABLED=1 \
       -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/qredo-server/core-client/service.buildDate=$BUILD_DATE' \
                                                             -X 'gitlab.qredo.com/qredo-server/core-client/service.commit=$BUILD_COMMIT' \
                                                             -X 'gitlab.qredo.com/qredo-server/core-client/service.version=$BUILD_VERSION'" \
-      -o core-client \
+      -o automated-approver \
       gitlab.qredo.com/qredo-server/core-client/cmd/service
 
 
@@ -73,9 +73,9 @@ RUN apk add -U --no-cache ca-certificates
 
 FROM scratch
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /src/gitlab.qredo.com/qredo-server/core-client /core-client
+COPY --from=go_builder /src/gitlab.qredo.com/qredo-server/core-client /automated-approver
 
 VOLUME /volume
-WORKDIR /core-client
+WORKDIR /automated-approver
 EXPOSE 8007
-CMD ["./core-client", "start", "-c", "/volume/core-client.yaml"]
+CMD ["./automated-approver", "start", "-c", "/volume/config.yaml"]
