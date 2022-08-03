@@ -148,7 +148,7 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 	}
 	r.log.Infof("Starting listener on %v for API url %v", r.config.HTTP.Addr, r.config.Base.URL)
 
-	go r.handler.AutoApproval()
+	r.handler.AutoApproval()
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
 }

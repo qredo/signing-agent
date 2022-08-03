@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -162,6 +163,11 @@ func (h *handler) Verify(_ *defs.RequestContext, _ http.ResponseWriter, r *http.
 // AutoApprovalFunction
 //
 func (h *handler) AutoApproval() {
+	// enable auto-approval only if configured
+	if h.cfg.Base.AutoApprove == false {
+		return
+	}
+
 	h.log.Debug("Handler for AutoApproval background job")
 
 	var clientID string
@@ -275,7 +281,10 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		h.log.Errorf("Could not set AgentID to Storage: %s", err)
 	}
 
-	// Also enable auto-approval of requests
+	// return local feedUrl for request approvals
+	response.FeedURL = fmt.Sprintf("ws://%s%s/client/%s/feed", h.cfg.HTTP.Addr, pathPrefix, initResults.AccountCode)
+
+	// also enable auto-approval of requests
 	h.AutoApproval()
 
 	return response, nil
