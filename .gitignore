@@ -3,3 +3,7 @@ public.pem
 apikey
 out/*
 *.db
+*.html
+*.out
+*.zip
+*.tar
