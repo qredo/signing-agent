@@ -90,11 +90,11 @@ Request:
 
 ```json
 {
-  "account_code": "string",
-  "client_id": "string",
-  "client_secret": "string",
+  "accountCode": "string",
+  "clientID": "string",
+  "clientSecret": "string",
   "id": "string",
-  "id_doc": "string"
+  "idDoc": "string"
 }
 ```
 
@@ -141,11 +141,11 @@ Request:
 
 ```Go
 ClientRegisterFinishRequest {
-    account_code    string
-    client_id   string
-    client_secret   string
+    accountCode    string
+    clientID   string
+    clientSecret   string
     id  string
-    id_doc  string
+    idDoc  string
 }
 ```
 

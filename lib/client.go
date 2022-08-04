@@ -80,7 +80,7 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 		return nil, errors.Wrap(err, "extract pin")
 	}
 
-	idDocRaw, err := hex.DecodeString(req.IDDoc)
+	idDocRaw, err := hex.DecodeString(req.IDDocument)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid id document in response")
 	}

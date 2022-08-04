@@ -13,10 +13,10 @@ type ClientRegisterResponse struct {
 
 type ClientRegisterFinishRequest struct {
 	ID           string `json:"id"`
-	AccountCode  string `json:"account_code"`
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	IDDoc        string `json:"id_doc"`
+	AccountCode  string `json:"accountCode"`
+	ClientID     string `json:"clientID"`
+	ClientSecret string `json:"clientSecret"`
+	IDDocument   string `json:"idDoc"`
 }
 
 // swagger:model clientRegisterFinishResponse

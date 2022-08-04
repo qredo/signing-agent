@@ -1,15 +1,15 @@
 definitions:
   ClientRegisterFinishRequest:
     properties:
-      account_code:
+      accountCode:
         type: string
-      client_id:
+      clientID:
         type: string
-      client_secret:
+      clientSecret:
         type: string
       id:
         type: string
-      id_doc:
+      idDoc:
         type: string
     type: object
   ClientRegisterRequest:
