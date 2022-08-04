@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
 
 	"gitlab.qredo.com/qredo-server/core-client/api"
@@ -264,13 +265,8 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 	}
 
 	response.AgentID = initResults.AccountCode
-	reqDataFinish := &api.ClientRegisterFinishRequest{
-		ID:           initResults.ID,
-		AccountCode:  initResults.AccountCode,
-		ClientID:     initResults.ClientID,
-		ClientSecret: initResults.ClientSecret,
-		IDDoc:        initResults.IDDocument,
-	}
+	reqDataFinish := &api.ClientRegisterFinishRequest{}
+	copier.Copy(&reqDataFinish, &initResults) // initResults contain only one field more - timestamp
 	_, err = h.core.ClientRegisterFinish(reqDataFinish, registerResults.RefID)
 	if err != nil {
 		return response, err

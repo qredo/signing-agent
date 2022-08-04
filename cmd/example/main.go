@@ -103,7 +103,7 @@ func main() {
 		ClientID:     qredoResponse.ClientID,
 		ClientSecret: qredoResponse.ClientSecret,
 		AccountCode:  qredoResponse.AccountCode,
-		IDDoc:        qredoResponse.IDDocument,
+		IDDocument:   qredoResponse.IDDocument,
 	}, regInitResponse.RefID)
 	if err != nil {
 		panic(errors.Wrap(err, "client register finish request"))
