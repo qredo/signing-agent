@@ -135,5 +135,40 @@ func TestClient(t *testing.T) {
 			registerFinishResponse, err = core.ClientRegisterFinish(registerFinishRequest, registerResponse.RefID)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, registerFinishResponse.FeedURL)
+
+			// logic verification after registration process
+			assert.NotEmpty(t, core.GetAgentID(), "At this stage, we should be able to get AgentID")
+			assert.Nil(t, core.store.GetPending(registerResponse.RefID), "At this stage, we shouldn't get pending client")
+			registeredClient := core.store.GetClient(initResponse.AccountCode)
+			assert.NotNil(t, registeredClient, "At this stage, we should get client")
+			assert.False(t, registeredClient.Pending, "Client is not any more at Pending process.")
+			assert.NotEmpty(t, registeredClient.ID, "At this stage, client if created properly")
+			assert.NotEmpty(t, registeredClient.Name, "At this stage, client if created properly")
+			assert.NotEmpty(t, registeredClient.AccountCode, "At this stage, client if created properly")
+			assert.NotEmpty(t, registeredClient.BLSSeed, "At this stage, client if created properly")
+			assert.NotEmpty(t, registeredClient.ZKPID, "At this stage, client if created properly")
+			assert.NotEmpty(t, registeredClient.ZKPToken, "At this stage, client if created properly")
+		})
+
+	t.Run(
+		"ClientsList",
+		func(t *testing.T) {
+			var agentsIDList []string
+			agentsIDList, err = core.ClientsList()
+			assert.NoError(t, err)
+			assert.Equal(t, []string{initResponse.AccountCode}, agentsIDList)
+		})
+
+	t.Run(
+		"Agent - setting and getting",
+		func(t *testing.T) {
+			agentID := "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"
+			core.SetAgentID(agentID)
+			assert.Equal(t, core.GetAgentID(), agentID)
+
+			var agentsIDList []string
+			agentsIDList, err = core.ClientsList()
+			assert.NoError(t, err)
+			assert.Equal(t, []string{agentID}, agentsIDList)
 		})
 }
