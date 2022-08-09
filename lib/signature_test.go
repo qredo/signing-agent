@@ -12,10 +12,9 @@ import (
 )
 
 func TestSignature(t *testing.T) {
-	dbFilePath := "../test-store.db"
-	kv, err := util.NewFileStore(dbFilePath)
+	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
 	defer func() {
-		err = os.Remove(dbFilePath)
+		err = os.Remove(TestDataDBStoreFilePath)
 		assert.NoError(t, err)
 	}()
 

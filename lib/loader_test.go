@@ -12,21 +12,20 @@ import (
 )
 
 func TestLoaderAPIKey(t *testing.T) {
-	apikeyPath := "../test-apikey"
 
 	t.Run(
 		"Load correct APIKey",
 		func(t *testing.T) {
 			data := []byte("testapikeydata")
-			err := os.WriteFile(apikeyPath, data, 0644)
+			err := os.WriteFile(TestDataAPIKeyFilePath, data, 0644)
 			assert.NoError(t, err)
 			defer func() {
-				err = os.Remove(apikeyPath)
+				err = os.Remove(TestDataAPIKeyFilePath)
 				assert.NoError(t, err)
 			}()
 			var req = &Request{}
 			assert.Empty(t, req.ApiKey)
-			LoadAPIKey(req, apikeyPath)
+			LoadAPIKey(req, TestDataAPIKeyFilePath)
 			assert.NotEmpty(t, req.ApiKey)
 		})
 	t.Run(
@@ -34,7 +33,7 @@ func TestLoaderAPIKey(t *testing.T) {
 		func(t *testing.T) {
 			var req = &Request{}
 			assert.Empty(t, req.ApiKey)
-			err := LoadAPIKey(req, apikeyPath)
+			err := LoadAPIKey(req, TestDataAPIKeyFilePath)
 			assert.Error(t, err)
 			assert.Empty(t, req.ApiKey)
 		})
@@ -58,17 +57,16 @@ func generatePrivateKey(t *testing.T, filePath string) {
 }
 
 func TestLoaderRSAKey(t *testing.T) {
-	filePath := "../test-privatekey.pem"
-	generatePrivateKey(t, filePath)
+	generatePrivateKey(t, TestDataPrivatePEMFilePath)
 	defer func() {
-		os.Remove(filePath)
+		os.Remove(TestDataPrivatePEMFilePath)
 	}()
 	t.Run(
 		"Load correct RSAKey",
 		func(t *testing.T) {
 			var req = &Request{}
 			assert.Empty(t, req.RsaKey)
-			LoadRSAKey(req, filePath)
+			LoadRSAKey(req, TestDataPrivatePEMFilePath)
 			assert.NotEmpty(t, req.RsaKey)
 		})
 	t.Run(
@@ -76,7 +74,7 @@ func TestLoaderRSAKey(t *testing.T) {
 		func(t *testing.T) {
 			var req = &Request{}
 			assert.Nil(t, req.RsaKey)
-			LoadRSAKey(req, filePath+"faile_path")
+			LoadRSAKey(req, TestDataPrivatePEMFilePath+"faile_path")
 			assert.Nil(t, req.RsaKey)
 		})
 }

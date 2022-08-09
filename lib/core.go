@@ -47,3 +47,12 @@ func New(cfg *config.Base, kv KVStore) (*coreClient, error) {
 		htc:   util.NewHTTPClient(),
 	}, nil
 }
+
+func NewMock(cfg *config.Base, kv KVStore) (*coreClient, error) {
+
+	return &coreClient{
+		cfg:   cfg,
+		store: NewStore(kv),
+		htc:   util.NewHTTPMockClient(),
+	}, nil
+}

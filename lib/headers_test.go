@@ -35,10 +35,9 @@ func TestHeaders(t *testing.T) {
 		"SignRequest",
 		func(t *testing.T) {
 			// setup test private key
-			filePath := "../test-privatekey.pem"
-			generatePrivateKey(t, filePath)
+			generatePrivateKey(t, TestDataPrivatePEMFilePath)
 			defer func() {
-				os.Remove(filePath)
+				os.Remove(TestDataPrivatePEMFilePath)
 			}()
 			// setup request
 			var req = &Request{
@@ -46,7 +45,7 @@ func TestHeaders(t *testing.T) {
 				Body: []byte(`{"name": "Test Data"}`),
 			}
 			GenTimestamp(req)
-			LoadRSAKey(req, filePath)
+			LoadRSAKey(req, TestDataPrivatePEMFilePath)
 			assert.NotEmpty(t, req.RsaKey)
 			// make the signature
 			assert.Empty(t, req.Signature)

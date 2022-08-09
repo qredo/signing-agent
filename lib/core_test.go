@@ -8,6 +8,39 @@ import (
 	"gitlab.qredo.com/qredo-server/core-client/util"
 )
 
+const (
+	TestDataPrivatePEMFilePath = "../testdata/private.pem"
+	TestDataAPIKeyFilePath     = "../testdata/apikey"
+	TestDataDBStoreFilePath    = "../testdata/test-store.db"
+)
+
+func makeCoreHandlerForTests() (*coreClient, error) {
+	var (
+		cfg *config.Base
+		err error
+	)
+	cfg = &config.Base{
+		URL:                "url",
+		PIN:                1234,
+		QredoURL:           "https://play-api.qredo.network",
+		QredoAPIDomain:     "play-api.qredo.network",
+		QredoAPIBasePath:   "/api/v1/p",
+		PrivatePEMFilePath: TestDataPrivatePEMFilePath,
+		APIKeyFilePath:     TestDataAPIKeyFilePath,
+		AutoApprove:        true,
+	}
+
+	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
+	if err != nil {
+		return nil, err
+	}
+	core, err := NewMock(cfg, kv)
+	if err != nil {
+		return nil, err
+	}
+	return core, nil
+}
+
 func TestCreateCoreClient(t *testing.T) {
 	t.Run(
 		"Create a coreClient",
@@ -22,14 +55,13 @@ func TestCreateCoreClient(t *testing.T) {
 				QredoURL:           "https://play-api.qredo.network",
 				QredoAPIDomain:     "play-api.qredo.network",
 				QredoAPIBasePath:   "/api/v1/p",
-				PrivatePEMFilePath: "/path/to/private.pem",
-				APIKeyFilePath:     "/path/to/apikey",
+				PrivatePEMFilePath: TestDataPrivatePEMFilePath,
+				APIKeyFilePath:     TestDataAPIKeyFilePath,
 				AutoApprove:        true,
 			}
-			cC, err := New(cfg, kv)
+			cC, err := NewMock(cfg, kv)
 			assert.NoError(t, err)
 			assert.Equal(t, cC.cfg.PIN, cfg.PIN)
 			assert.Equal(t, cC.cfg.PrivatePEMFilePath, cfg.PrivatePEMFilePath)
-			assert.Equal(t, cC.htc, &util.Client{})
 		})
 }
