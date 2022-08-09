@@ -33,13 +33,13 @@ type MockHTTPClient struct {
 }
 
 var (
-	// GetDoFunc fetches the mock client's `Do` func
-	GetDoFunc func(req *http.Request) (*http.Response, error)
+	// GetDoMockHTTPClientFunc fetches the mock client's `Do` func
+	GetDoMockHTTPClientFunc func(req *http.Request) (*http.Response, error)
 )
 
 // Do is the mock client's `Do` func
 func (mc *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	return GetDoFunc(req)
+	return GetDoMockHTTPClientFunc(req)
 }
 
 func NewHTTPMockClient() *Client {

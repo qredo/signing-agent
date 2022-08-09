@@ -3,12 +3,14 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"gitlab.qredo.com/qredo-server/core-client/api"
 	"gitlab.qredo.com/qredo-server/core-client/config"
@@ -45,10 +47,12 @@ func TestClient(t *testing.T) {
 	assert.NoError(t, err)
 
 	var (
-		pendingClient    *Client
-		registerResponse *api.ClientRegisterResponse
-		initRequest      *api.QredoRegisterInitRequest
-		initResponse     *api.QredoRegisterInitResponse
+		pendingClient          *Client
+		registerResponse       *api.ClientRegisterResponse
+		initRequest            *api.QredoRegisterInitRequest
+		initResponse           *api.QredoRegisterInitResponse
+		registerFinishRequest  *api.ClientRegisterFinishRequest
+		registerFinishResponse *api.ClientRegisterFinishResponse
 	)
 
 	t.Run(
@@ -75,7 +79,7 @@ func TestClient(t *testing.T) {
 				Name:         clientName,
 			}
 
-			util.GetDoFunc = func(*http.Request) (*http.Response, error) {
+			util.GetDoMockHTTPClientFunc = func(*http.Request) (*http.Response, error) {
 				response := &api.QredoRegisterInitResponse{
 					ID:           "5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn",
 					ClientID:     "7b226964223a22357a5057714c5a61507141614e656e6a797a577935726361476d345075543162665037344767727a46554a6e222c226375727665223a22424c53333831222c2263726561746564223a313635393631323832317d",
@@ -99,5 +103,37 @@ func TestClient(t *testing.T) {
 			initResponse, err = core.ClientInit(initRequest, registerResponse.RefID)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, initResponse.AccountCode)
+
+		})
+
+	t.Run(
+		"Register client - finish registration",
+		func(t *testing.T) {
+			util.GetDoMockHTTPClientFunc = func(*http.Request) (*http.Response, error) {
+
+				response := &api.CoreClientServiceRegisterFinishResponse{
+					Feed: fmt.Sprintf(
+						"ws://%s%s/coreclient/%s/feed",
+						core.cfg.QredoAPIDomain,
+						core.cfg.QredoAPIBasePath,
+						initResponse.AccountCode,
+					),
+				}
+
+				dataJSON, _ := json.Marshal(response)
+				body := ioutil.NopCloser(bytes.NewReader(dataJSON))
+
+				return &http.Response{
+					Status:     "200 OK",
+					StatusCode: 200,
+					Body:       body,
+				}, nil
+
+			}
+			registerFinishRequest = &api.ClientRegisterFinishRequest{}
+			copier.Copy(&registerFinishRequest, &initResponse)
+			registerFinishResponse, err = core.ClientRegisterFinish(registerFinishRequest, registerResponse.RefID)
+			assert.NoError(t, err)
+			assert.NotEmpty(t, registerFinishResponse.FeedURL)
 		})
 }
