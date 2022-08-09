@@ -15,7 +15,7 @@ type CoreClient interface {
 	// ClientRegisterFinish concludes the core client registration process
 	ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error)
 	// ClientsList is not currently implemented
-	ClientsList() (interface{}, error)
+	ClientsList() ([]string, error)
 
 	// ActionApprove signs actionID and sends it for approval to the Qredo backend
 	ActionApprove(clientID, actionID string) error
