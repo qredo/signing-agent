@@ -56,6 +56,7 @@ func TestAction(t *testing.T) {
 		assert.NoError(t, err)
 	}()
 	accountCode := "5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn"
+	actionID := "2D7YA7Ojo3zGRtHP9bw37wF5jq3"
 	client := &Client{
 		Name:        "Test name client",
 		ID:          accountCode,
@@ -72,7 +73,6 @@ func TestAction(t *testing.T) {
 		"ActionApprove",
 		func(t *testing.T) {
 			var httpResponseList = []*http.Response{}
-			actionID := "2D7YA7Ojo3zGRtHP9bw37wF5jq3"
 
 			msg := []byte(`{"messages":["08051220b3bc39c21df680e9925bcc6872b06d583545c62f3cca12c6353e8a1d5dbe` +
 				`83dc1a20c6e194bd4e2af25d200680555196df700577be01328719085d2bcd0f61efc57b28023297010a06536574746c` +
@@ -91,11 +91,10 @@ func TestAction(t *testing.T) {
 				StatusCode: 200,
 				Body:       body,
 			}
-			// tutaj powinien byc msg ze status approved
 			httpResponseMockPutActionApprove := &http.Response{
 				Status:     "200 OK",
 				StatusCode: 200,
-				Body:       nil,
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
 			}
 			httpResponseList = append(httpResponseList, httpResponseMockPutActionApprove)
 			httpResponseList = append(httpResponseList, httpResponseMockGetActionMessages)
@@ -105,5 +104,85 @@ func TestAction(t *testing.T) {
 
 			err = core.ActionApprove(accountCode, actionID)
 			assert.NoError(t, err)
+		})
+
+	t.Run(
+		"ActionApprove - without first message from Qredo",
+		func(t *testing.T) {
+			var httpResponseList = []*http.Response{}
+
+			msg := []byte(`{"messages":[]}`)
+			body := ioutil.NopCloser(bytes.NewReader(msg))
+			httpResponseMockGetActionMessages := &http.Response{
+				Status:     "200 OK",
+				StatusCode: 200,
+				Body:       body,
+			}
+			httpResponseMockPutActionApprove := &http.Response{
+				StatusCode: 400,
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
+			}
+			httpResponseList = append(httpResponseList, httpResponseMockPutActionApprove)
+			httpResponseList = append(httpResponseList, httpResponseMockGetActionMessages)
+			util.GetDoMockHTTPClientFunc = func(request *http.Request) (*http.Response, error) {
+				return popMockHttpResponse(httpResponseList), nil
+			}
+
+			err = core.ActionApprove(accountCode, actionID)
+			assert.Error(t, err)
+		})
+
+	t.Run(
+		"ActionApprove - with first message from Qredo that is wrong",
+		func(t *testing.T) {
+			var httpResponseList = []*http.Response{}
+
+			msg := []byte(`{"messages":["wrong message that is not a hex"]}`)
+			body := ioutil.NopCloser(bytes.NewReader(msg))
+			httpResponseMockGetActionMessages := &http.Response{
+				Status:     "200 OK",
+				StatusCode: 200,
+				Body:       body,
+			}
+			httpResponseMockPutActionApprove := &http.Response{
+				StatusCode: 400,
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
+			}
+			httpResponseList = append(httpResponseList, httpResponseMockPutActionApprove)
+			httpResponseList = append(httpResponseList, httpResponseMockGetActionMessages)
+			util.GetDoMockHTTPClientFunc = func(request *http.Request) (*http.Response, error) {
+				return popMockHttpResponse(httpResponseList), nil
+			}
+
+			err = core.ActionApprove(accountCode, actionID)
+			assert.Error(t, err)
+		})
+
+	t.Run(
+		"ActionApprove with fake Agent ID",
+		func(t *testing.T) {
+			err = core.ActionApprove("fake accountCode", actionID)
+			assert.Error(t, err)
+		})
+
+	t.Run(
+		"ActionReject",
+		func(t *testing.T) {
+			util.GetDoMockHTTPClientFunc = func(request *http.Request) (*http.Response, error) {
+				return &http.Response{
+					Status:     "200 OK",
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
+				}, nil
+			}
+			err = core.ActionReject(accountCode, actionID)
+			assert.NoError(t, err)
+		})
+
+	t.Run(
+		"ActionReject with fake Agent ID",
+		func(t *testing.T) {
+			err = core.ActionReject("fake accountCode", actionID)
+			assert.Error(t, err)
 		})
 }

@@ -3,7 +3,6 @@ package lib
 import (
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -16,12 +15,7 @@ func LoadRSAKey(req *Request, path string) error {
 	if err != nil {
 		return errors.Wrap(err, "load RSA key")
 	}
-	defer func() {
-		err = f.Close()
-		if err != nil {
-			fmt.Println("unable to close open file RSA key: ", err)
-		}
-	}()
+	defer f.Close()
 
 	pemData, err := ioutil.ReadAll(f)
 	if err != nil {
@@ -43,12 +37,7 @@ func LoadAPIKey(req *Request, path string) error {
 		return errors.Wrap(err, "cannot open api key file")
 
 	}
-	defer func() {
-		err = k.Close()
-		if err != nil {
-			fmt.Println("unable to close open file apikey: ", err)
-		}
-	}()
+	defer k.Close()
 
 	key, err := ioutil.ReadAll(k)
 	if err != nil {

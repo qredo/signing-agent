@@ -31,7 +31,7 @@ func (h *coreClient) ActionApprove(clientID, actionID string) error {
 		return err
 	}
 
-	if messagesResp.Messages == nil {
+	if messagesResp.Messages == nil || len(messagesResp.Messages) == 0 {
 		return defs.ErrNotFound().WithDetail("messages")
 	}
 

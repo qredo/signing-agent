@@ -2,6 +2,7 @@ private.pem
 public.pem
 apikey
 out/*
+local-config.yaml
 *.db
 *.html
 *.out

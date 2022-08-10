@@ -151,6 +151,22 @@ func TestClient(t *testing.T) {
 		})
 
 	t.Run(
+		"Register client - finish registration fake Agent ID",
+		func(t *testing.T) {
+			registerFinishRequestFake := &api.ClientRegisterFinishRequest{}
+			_, err = core.ClientRegisterFinish(registerFinishRequestFake, "fake RefID")
+			assert.Error(t, err)
+			_, err = core.ClientRegisterFinish(registerFinishRequestFake, registerResponse.RefID)
+			assert.Error(t, err)
+			registerFinishRequestFake.ClientID = initResponse.AccountCode
+			_, err = core.ClientRegisterFinish(registerFinishRequestFake, registerResponse.RefID)
+			assert.Error(t, err)
+			registerFinishRequestFake.ClientSecret = initResponse.ClientSecret
+			_, err = core.ClientRegisterFinish(registerFinishRequestFake, registerResponse.RefID)
+			assert.Error(t, err)
+		})
+
+	t.Run(
 		"ClientsList",
 		func(t *testing.T) {
 			var agentsIDList []string
