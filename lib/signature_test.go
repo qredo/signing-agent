@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"gitlab.qredo.com/qredo-server/core-client/api"
 	"gitlab.qredo.com/qredo-server/core-client/config"
@@ -19,18 +18,14 @@ func TestSignature(t *testing.T) {
 		assert.NoError(t, err)
 	}()
 
-	if err != nil {
-		panic(errors.Wrap(err, "file store init"))
-	}
+	assert.NoError(t, err)
 	cfg := config.Base{
 		QredoURL: "https://play-api.qredo.network",
 		PIN:      1234,
 	}
 
 	core, err := New(&cfg, kv)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	var (
 		clientID            = "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"

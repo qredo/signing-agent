@@ -14,6 +14,15 @@ const (
 	TestDataDBStoreFilePath    = "../testdata/test-store.db"
 )
 
+func NewMock(cfg *config.Base, kv KVStore) (*coreClient, error) {
+
+	return &coreClient{
+		cfg:   cfg,
+		store: NewStore(kv),
+		htc:   util.NewHTTPMockClient(),
+	}, nil
+}
+
 func makeCoreHandlerForTests() (*coreClient, error) {
 	var (
 		cfg *config.Base

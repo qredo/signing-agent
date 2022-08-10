@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"gitlab.qredo.com/qredo-server/core-client/util"
 )
@@ -16,10 +15,8 @@ func TestStorage(t *testing.T) {
 		err = os.Remove(TestDataDBStoreFilePath)
 		assert.NoError(t, err)
 	}()
+	assert.NoError(t, err)
 
-	if err != nil {
-		panic(errors.Wrap(err, "file store init"))
-	}
 	store := NewStore(kv)
 
 	t.Run(
