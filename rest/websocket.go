@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	lib "gitlab.qredo.com/qredo-server/core-client/lib"
+	lib "gitlab.qredo.com/custody-engine/automated-approver/lib"
 )
 
 type Parser interface {

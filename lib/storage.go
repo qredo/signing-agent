@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
 var agentIDString = "AgentID"

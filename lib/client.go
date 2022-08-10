@@ -12,12 +12,12 @@ import (
 
 	"github.com/google/uuid"
 
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
 
-	"gitlab.qredo.com/qredo-server/core-client/crypto"
-	defs "gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/crypto"
+	defs "gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
 func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, error) {

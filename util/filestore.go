@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
 func NewFileStore(fileName string) (*FileStore, error) {

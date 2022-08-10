@@ -8,13 +8,13 @@ import (
 	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
-	"gitlab.qredo.com/qredo-server/core-client/config"
-	"gitlab.qredo.com/qredo-server/core-client/rest/version"
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
-	"gitlab.qredo.com/qredo-server/core-client/lib"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 )
 
 type handler struct {

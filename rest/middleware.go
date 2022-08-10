@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 
 	"github.com/google/uuid"
 

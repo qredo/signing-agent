@@ -60,7 +60,7 @@ Notes:
 
 All the data above is currently stored on premises in a file by the core-client-service, and since some of it (ClientSecret, EC & BLS private keys) is quite sensitive it needs to be running in a secure environment.
 
-**Note:** an always up to date API documentation can be accessed within the (private) [Gitlab repo](https://gitlab.qredo.com/qredo-server/core-client/-/blob/master/doc/swagger/swagger.yaml).
+**Note:** an always up to date API documentation can be accessed within the (private) [Gitlab repo](https://gitlab.qredo.com/custody-engine/automated-approver/-/blob/master/doc/swagger/swagger.yaml).
 
 ## API
 

@@ -12,12 +12,12 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/qredo-server/core-client/config"
-	"gitlab.qredo.com/qredo-server/core-client/lib"
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/lib"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
 // Fill in you partner api key and public key pem here

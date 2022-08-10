@@ -4,13 +4,13 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
 
 	"github.com/pkg/errors"
 
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
 func (h *coreClient) ActionApprove(clientID, actionID string) error {
