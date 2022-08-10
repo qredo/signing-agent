@@ -39,6 +39,7 @@ func TestSignature(t *testing.T) {
 		signResponse *api.SignResponse
 	)
 	data, err := os.ReadFile(fixturePathClient)
+	assert.NoError(t, err)
 	err = json.Unmarshal(data, client)
 	assert.NoError(t, err)
 	core.store.AddClient(clientID, client)

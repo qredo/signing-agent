@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/json"
 	"os"
 	"testing"
 
@@ -41,15 +42,12 @@ func TestStorage(t *testing.T) {
 			client := store.GetClient(clientID)
 			assert.Equal(t, client, (*Client)(nil)) // Not found
 
-			client = &Client{
-				Name:        "Client Test Name",
-				ID:          "7b226964223a22357a5057714c5a61507141614e656e6a797a5779357263614",
-				BLSSeed:     []byte("BLSSeed"),
-				AccountCode: clientID,
-				ZKPID:       []byte("zkpid"),
-				ZKPToken:    []byte("zkptoken"),
-				Pending:     true,
-			}
+			data, err := os.ReadFile(fixturePathClient)
+			assert.NoError(t, err)
+			client = &Client{}
+			err = json.Unmarshal(data, client)
+			assert.NoError(t, err)
+
 			err = store.AddClient(clientID, client)
 			assert.NoError(t, err)
 			takenClient := store.GetClient(clientID)

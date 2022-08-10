@@ -67,6 +67,7 @@ func TestAction(t *testing.T) {
 		client      = &Client{}
 	)
 	data, err := os.ReadFile(fixturePathClient)
+	assert.NoError(t, err)
 	err = json.Unmarshal(data, client)
 	assert.NoError(t, err)
 	core.store.AddClient(accountCode, client)
