@@ -74,7 +74,7 @@ func TestLoaderRSAKey(t *testing.T) {
 		func(t *testing.T) {
 			var req = &Request{}
 			assert.Nil(t, req.RsaKey)
-			LoadRSAKey(req, TestDataPrivatePEMFilePath+"faile_path")
+			LoadRSAKey(req, TestDataPrivatePEMFilePath+"failed_path")
 			assert.Nil(t, req.RsaKey)
 		})
 }
