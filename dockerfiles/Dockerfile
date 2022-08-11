@@ -52,7 +52,7 @@ ARG BUILD_VERSION
 ARG BUILD_COMMIT
 ARG GIT_TOKEN
 
-ENV PROJECT_PATH=/src/gitlab.qredo.com/qredo-server/core-client
+ENV PROJECT_PATH=/src/gitlab.qredo.com/custody-engine/automated-approver
 
 ADD . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
@@ -61,11 +61,11 @@ RUN CGO_ENABLED=1 \
     GO111MODULES=on \
     go build \
       -tags debug \
-      -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/qredo-server/core-client/service.buildDate=$BUILD_DATE' \
-                                                            -X 'gitlab.qredo.com/qredo-server/core-client/service.commit=$BUILD_COMMIT' \
-                                                            -X 'gitlab.qredo.com/qredo-server/core-client/service.version=$BUILD_VERSION'" \
+      -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/custody-engine/automated-approver/service.buildDate=$BUILD_DATE' \
+                                                            -X 'gitlab.qredo.com/custody-engine/automated-approver/service.commit=$BUILD_COMMIT' \
+                                                            -X 'gitlab.qredo.com/custody-engine/automated-approver/service.version=$BUILD_VERSION'" \
       -o automated-approver \
-      gitlab.qredo.com/qredo-server/core-client/cmd/service
+      gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 
 
 FROM alpine as certs
@@ -73,7 +73,7 @@ RUN apk add -U --no-cache ca-certificates
 
 FROM scratch
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /src/gitlab.qredo.com/qredo-server/core-client /automated-approver
+COPY --from=go_builder /src/gitlab.qredo.com/custody-engine/automated-approver /automated-approver
 
 VOLUME /volume
 WORKDIR /automated-approver

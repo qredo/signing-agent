@@ -12,12 +12,12 @@ import (
 
 	"github.com/google/uuid"
 
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
 
-	"gitlab.qredo.com/qredo-server/core-client/crypto"
-	defs "gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/crypto"
+	defs "gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
 func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
@@ -118,13 +118,24 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 		return nil, err
 	}
 
+	err = h.store.SetAgentID(req.AccountCode)
+	if err != nil {
+		return nil, err
+	}
+
 	return &api.ClientRegisterFinishResponse{
 		FeedURL: finishResp.Feed,
 	}, nil
 }
 
-func (h *coreClient) ClientsList() (interface{}, error) {
-	return "not implemented", nil
+// ClientsList - Automated approver agent can be only one
+func (h *coreClient) ClientsList() ([]string, error) {
+	agentID := h.store.GetAgentID()
+	if len(agentID) > 0 {
+		return []string{agentID}, nil
+	} else {
+		return []string{}, nil
+	}
 }
 
 func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {

@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/qredo-server/core-client/crypto"
+	"gitlab.qredo.com/custody-engine/automated-approver/crypto"
 )
 
 const (

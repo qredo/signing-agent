@@ -6,16 +6,16 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 
-	"gitlab.qredo.com/qredo-server/core-client/lib"
+	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 
 	"github.com/gorilla/context"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"gitlab.qredo.com/qredo-server/core-client/config"
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 	"go.uber.org/zap"
 )
 

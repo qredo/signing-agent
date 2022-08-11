@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 
 	"github.com/go-playground/validator/v10"
 )

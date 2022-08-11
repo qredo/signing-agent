@@ -24,7 +24,7 @@ dev_local_build() {
                 -X 'main.commit=$GIT_COMMIT' \
                 -X 'main.version=$VERSION'" \
       -o out/automated-approver \
-      gitlab.qredo.com/qredo-server/core-client/cmd/service
+      gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 }
 
 

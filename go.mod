@@ -1,4 +1,4 @@
-module gitlab.qredo.com/qredo-server/core-client
+module gitlab.qredo.com/custody-engine/automated-approver
 
 go 1.18
 

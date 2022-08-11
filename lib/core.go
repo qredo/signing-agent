@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"gitlab.qredo.com/qredo-server/core-client/api"
-	"gitlab.qredo.com/qredo-server/core-client/config"
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
 type CoreClient interface {
@@ -15,7 +15,7 @@ type CoreClient interface {
 	// ClientRegisterFinish concludes the core client registration process
 	ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error)
 	// ClientsList is not currently implemented
-	ClientsList() (interface{}, error)
+	ClientsList() ([]string, error)
 
 	// ActionApprove signs actionID and sends it for approval to the Qredo backend
 	ActionApprove(clientID, actionID string) error

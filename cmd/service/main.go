@@ -5,10 +5,10 @@ import (
 	"os"
 	"os/signal"
 
-	"gitlab.qredo.com/qredo-server/core-client/rest"
+	"gitlab.qredo.com/custody-engine/automated-approver/rest"
 
 	"github.com/jessevdk/go-flags"
-	"gitlab.qredo.com/qredo-server/core-client/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/config"
 	"go.uber.org/zap"
 )
 

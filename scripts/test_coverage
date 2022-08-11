@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -Cue -o pipefail
+
+PROJECT_DIR="$(cd "$(dirname "${0}")/.."; pwd)"
+
+(
+	cd "$PROJECT_DIR"
+
+	go test -v -coverprofile coverage.out -covermode=atomic  ./...
+	go tool cover -func coverage.out
+	go tool cover -html=coverage.out -o cover.html
+)

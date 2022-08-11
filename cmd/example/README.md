@@ -8,4 +8,4 @@ openssl rsa -in private.pem -outform PEM -pubout -out public.pem
 ```
 * Upload public.pem in the partner API screen of the qredo webapp
 * Set the correct values for the consts on top of main.go (`partnerAPIKey`,`rsaPrivateKey`, `qredoURL`)
-* `go run gitlab.qredo.com/qredo-server/core-client/cmd/example`
+* `go run gitlab.qredo.com/custody-engine/automated-approver/cmd/example`

@@ -12,18 +12,41 @@ import (
 	"github.com/pkg/errors"
 )
 
+// HTTPClient interface
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type Client struct {
+	httpClient HTTPClient
 }
 
 func NewHTTPClient() *Client {
-	return &Client{}
-}
-
-func (c *Client) Request(method string, url string, reqData interface{}, respData interface{}, headers http.Header) error {
 	client := &http.Client{
 		Timeout: time.Second * 100000,
 	}
+	return &Client{httpClient: client}
+}
 
+type MockHTTPClient struct {
+	DoFunc func(req *http.Request) (*http.Response, error)
+}
+
+var (
+	// GetDoMockHTTPClientFunc fetches the mock client's `Do` func
+	GetDoMockHTTPClientFunc func(req *http.Request) (*http.Response, error)
+)
+
+// Do is the mock client's `Do` func
+func (mc *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	return GetDoMockHTTPClientFunc(req)
+}
+
+func NewHTTPMockClient() *Client {
+	return &Client{httpClient: &MockHTTPClient{}}
+}
+
+func (c *Client) Request(method string, url string, reqData interface{}, respData interface{}, headers http.Header) error {
 	var body io.Reader
 	if reqData != nil {
 		jd, err := json.Marshal(reqData)
@@ -42,7 +65,7 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 		req.Header = headers
 	}
 
-	resp, err := client.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "request error")
 	}
@@ -78,10 +101,6 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 }
 
 func (c *Client) RequestNoLog(method string, url string, reqData interface{}, respData interface{}, headers http.Header) error {
-	client := &http.Client{
-		Timeout: time.Second * 10000,
-	}
-
 	var body io.Reader
 	if reqData != nil {
 		jd, err := json.Marshal(reqData)
@@ -100,7 +119,7 @@ func (c *Client) RequestNoLog(method string, url string, reqData interface{}, re
 		req.Header = headers
 	}
 
-	resp, err := client.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "request error")
 	}

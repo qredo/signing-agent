@@ -7,10 +7,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"gitlab.qredo.com/qredo-server/core-client/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 
-	"gitlab.qredo.com/qredo-server/core-client/api"
-	"gitlab.qredo.com/qredo-server/core-client/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
 // Sign signs a payload
