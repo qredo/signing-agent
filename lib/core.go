@@ -26,7 +26,6 @@ type CoreClient interface {
 	Sign(clientID, messageHex string) (*api.SignResponse, error)
 	// Verify verifies a signature provided with VerifyRequest
 	Verify(req *api.VerifyRequest) error
-
 	// SetAgentID function to collect agent ID to storage, so the system will default to a single agent ID (AgentID)
 	SetAgentID(agetID string) error
 	// GetAgentID function to get agent ID that was stored during registration process.
