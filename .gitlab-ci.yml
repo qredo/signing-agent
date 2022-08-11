@@ -3,7 +3,7 @@ stages:
 
 Unit test:
   stage: unit-test
-  image: ubuntu:latest
+  image: bitnami/gitlab-runner
   tags:
     - "amd64-eks"
     - "dev"
