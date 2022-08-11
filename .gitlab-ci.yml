@@ -8,4 +8,5 @@ Unit test:
     - "amd64-eks"
     - "dev"
   script:
+    - ls -a
     - ./scripts/test_coverage

@@ -67,5 +67,7 @@ RUN CGO_ENABLED=1 \
       -o automated-approver \
       gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 
+RUN useradd appuser
+USER appuser
 
 CMD ["./scripts/test_coverage"]
