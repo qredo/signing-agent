@@ -1,0 +1,12 @@
+stages:
+  - unit-test
+
+Unit test:
+  stage: unit-test
+  image: ubuntu:latest
+  tags:
+    - "amd64-eks"
+    - "dev"
+  script:
+    - ./build.sh docker_unittest
+    - docker run automated-approver-unittest:dev /bin/sh ./scripts/test_coverage
