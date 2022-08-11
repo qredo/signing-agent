@@ -3,10 +3,9 @@ stages:
 
 Unit test:
   stage: unit-test
-  image: bitnami/gitlab-runner
+  image: 965240221932.dkr.ecr.eu-west-1.amazonaws.com/automated-approver:dev
   tags:
     - "amd64-eks"
     - "dev"
   script:
-    - ./build.sh docker_unittest
-    - docker run automated-approver-unittest:dev /bin/sh ./scripts/test_coverage
+    - ./scripts/test_coverage
