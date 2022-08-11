@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -146,9 +147,13 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 	if r.config.HTTP.ProxyForwardedHeader != "" {
 		r.log.Info("Use Proxy forwarded-for header: %s", r.config.HTTP.ProxyForwardedHeader)
 	}
-	r.log.Infof("Starting listener on %v for API url %v", r.config.HTTP.Addr, r.config.Base.URL)
+	r.log.Infof("Starting listener on %v", r.config.Base.URL)
 
-	r.handler.AutoApproval()
+	err := r.handler.AutoApproval()
+	if err != nil {
+		r.log.Infof("Cannot start server. Error: %s", err.Error())
+		os.Exit(1)
+	}
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
 }
@@ -168,7 +173,7 @@ func (r *Router) printRoutes(router *mux.Router) {
 		if tpl, err := route.GetPathTemplate(); err == nil {
 			if met, err := route.GetMethods(); err == nil {
 				for _, m := range met {
-					r.log.Infof("Registered handler %v %v", m, tpl)
+					r.log.Debugf("Registered handler %v %v", m, tpl)
 				}
 			}
 		}

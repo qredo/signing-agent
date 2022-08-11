@@ -19,7 +19,7 @@ var (
 )
 
 func startText() {
-	fmt.Printf("Core Client service %v (%v) build date: %v\n\n", version, commit, buildDate)
+	fmt.Printf("Automated approver service %v (%v) build date: %v\n\n", version, commit, buildDate)
 }
 
 type versionCmd struct{}
@@ -44,7 +44,7 @@ func (c *startCmd) Execute([]string) error {
 
 	setCtrlC()
 	log := logger(&cfg.Logging)
-	log.Debug("Loaded config file from " + c.ConfigFile)
+	log.Info("Loaded config file from " + c.ConfigFile)
 
 	router, err := rest.NewQRouter(log, &cfg)
 	if err != nil {
