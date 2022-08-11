@@ -13,7 +13,7 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func (h *coreClient) ActionApprove(clientID, actionID string) error {
+func (h *autoApprover) ActionApprove(clientID, actionID string) error {
 	client := h.store.GetClient(clientID)
 	if client == nil {
 		return defs.ErrNotFound().WithDetail("client_id")
@@ -67,7 +67,7 @@ func (h *coreClient) ActionApprove(clientID, actionID string) error {
 	return nil
 }
 
-func (h *coreClient) ActionReject(clientID, actionID string) error {
+func (h *autoApprover) ActionReject(clientID, actionID string) error {
 	client := h.store.GetClient(clientID)
 	if client == nil {
 		return defs.ErrNotFound().WithDetail("client_id")

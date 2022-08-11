@@ -32,15 +32,15 @@ type CoreClient interface {
 	GetAgentID() string
 }
 
-type coreClient struct {
+type autoApprover struct {
 	store *Storage
 	cfg   *config.Base
 	htc   *util.Client
 }
 
-func New(cfg *config.Base, kv KVStore) (*coreClient, error) {
+func New(cfg *config.Base, kv KVStore) (*autoApprover, error) {
 
-	return &coreClient{
+	return &autoApprover{
 		cfg:   cfg,
 		store: NewStore(kv),
 		htc:   util.NewHTTPClient(),

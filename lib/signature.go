@@ -14,7 +14,7 @@ import (
 )
 
 // Sign signs a payload
-func (h *coreClient) Sign(clientID, messageHex string) (*api.SignResponse, error) {
+func (h *autoApprover) Sign(clientID, messageHex string) (*api.SignResponse, error) {
 	msg, err := hex.DecodeString(messageHex)
 	if err != nil {
 		return nil, defs.ErrBadRequest().WithDetail("invalid_message_hex").Wrap(err)
@@ -41,7 +41,7 @@ func (h *coreClient) Sign(clientID, messageHex string) (*api.SignResponse, error
 }
 
 // Verify verifies a signature
-func (h *coreClient) Verify(req *api.VerifyRequest) error {
+func (h *autoApprover) Verify(req *api.VerifyRequest) error {
 	msg, err := hex.DecodeString(req.MessageHashHex)
 	if err != nil {
 		return defs.ErrBadRequest().WithDetail("invalid_message_hex").Wrap(err)

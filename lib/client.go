@@ -20,7 +20,7 @@ import (
 	defs "gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
+func (h *autoApprover) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
 
 	var err error
 
@@ -55,7 +55,7 @@ func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, e
 
 }
 
-func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error) {
+func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error) {
 
 	pending := h.store.GetPending(ref)
 	if pending == nil {
@@ -129,7 +129,7 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 }
 
 // ClientsList - Automated approver agent can be only one
-func (h *coreClient) ClientsList() ([]string, error) {
+func (h *autoApprover) ClientsList() ([]string, error) {
 	agentID := h.store.GetAgentID()
 	if len(agentID) > 0 {
 		return []string{agentID}, nil
@@ -138,7 +138,7 @@ func (h *coreClient) ClientsList() ([]string, error) {
 	}
 }
 
-func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {
+func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {
 	reqDataBody, err := json.Marshal(reqData)
 	if err != nil {
 		return nil, err
@@ -166,10 +166,10 @@ func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref strin
 	return respData, nil
 }
 
-func (h *coreClient) SetAgentID(agetID string) error {
+func (h *autoApprover) SetAgentID(agetID string) error {
 	return h.store.SetAgentID(agetID)
 }
 
-func (h *coreClient) GetAgentID() string {
+func (h *autoApprover) GetAgentID() string {
 	return h.store.GetAgentID()
 }
