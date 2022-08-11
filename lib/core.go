@@ -7,12 +7,12 @@ import (
 )
 
 type CoreClient interface {
-	// ClientInit initiate the core client registration process
+	// ClientInit starts the agent registration process
 	ClientInit(register *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error)
-	// ClientRegister initiates the core client registration procedure
+	// ClientRegister starts the simplified agent registration procedure
 	// by generating BLS and EC key pairs and returns the public keys
 	ClientRegister(name string) (*api.ClientRegisterResponse, error)
-	// ClientRegisterFinish concludes the core client registration process
+	// ClientRegisterFinish concludes the agent registration process
 	ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error)
 	// ClientsList is not currently implemented
 	ClientsList() ([]string, error)
@@ -27,9 +27,9 @@ type CoreClient interface {
 	// Verify verifies a signature provided with VerifyRequest
 	Verify(req *api.VerifyRequest) error
 
-	// SetAgentID function to collect Core Client ID to storage, so the system will stand alone per 1 Core Client ID (AgentID)
+	// SetAgentID function to collect agent ID to storage, so the system will default to a single agent ID (AgentID)
 	SetAgentID(agetID string) error
-	// GetAgentID function to get Core Client ID that was storage at registration process.
+	// GetAgentID function to get agent ID that was stored during registration process.
 	GetAgentID() string
 }
 

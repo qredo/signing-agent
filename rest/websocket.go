@@ -31,7 +31,7 @@ func (a *ActionInfo) Parse() string {
 	return string(out)
 }
 
-func genWSQredoCoreClientFeedURL(h *handler, coreClientID string, req *lib.Request) {
+func GenWSQredoCoreClientFeedURL(h *handler, coreClientID string, req *lib.Request) {
 	builder := strings.Builder{}
 	builder.WriteString("wss://")
 	builder.WriteString(h.cfg.Base.QredoAPIDomain)
@@ -42,8 +42,8 @@ func genWSQredoCoreClientFeedURL(h *handler, coreClientID string, req *lib.Reque
 	req.Uri = builder.String()
 }
 
-func webSocketHandler(h *handler, req *lib.Request) {
-	h.log.Debug("Handler for webSocketHandler")
+func WebSocketHandler(h *handler, req *lib.Request) {
+	h.log.Debug("Handler for WebSocketHandler")
 	url := req.Uri
 
 	interrupt := make(chan os.Signal, 1)
@@ -58,14 +58,14 @@ func webSocketHandler(h *handler, req *lib.Request) {
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
-		h.log.Errorf("cannot connect to Core Client websocket feed at Qredo Backend: ", err)
+		h.log.Errorf("cannot connect to Websocket feed at Qredo: ", err)
 		return
 	}
 	defer wsQredoBackedConn.Close()
 
 	done := make(chan struct{})
 
-	h.log.Infof("background connected to %s websocket feed at Qredo Backend", url)
+	h.log.Infof("Connected to Qredo websocket feed %s", url)
 	go func() {
 		defer close(done)
 		for {
@@ -129,8 +129,8 @@ func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, inter
 	}
 }
 
-func webSocketFeedHandler(h *handler, req *lib.Request, w http.ResponseWriter, r *http.Request) {
-	h.log.Debug("Handler for webSocketFeedHandler")
+func WebSocketFeedHandler(h *handler, req *lib.Request, w http.ResponseWriter, r *http.Request) {
+	h.log.Debug("Handler for WebSocketFeedHandler")
 
 	url := req.Uri
 	interrupt := make(chan os.Signal, 1)
@@ -145,14 +145,12 @@ func webSocketFeedHandler(h *handler, req *lib.Request, w http.ResponseWriter, r
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
-		h.log.Errorf("cannot connect to Core Client websocket feed at Qredo Backend: ", err)
+		h.log.Errorf("cannot connect to websocket feed %s", url, err)
 		return
 	}
 	defer wsQredoBackedConn.Close()
 
 	done := make(chan struct{})
-
-	h.log.Infof("feed ep connected to Core Client websocket feed at Qredo Backend")
 
 	wsPartnerAppUpgrader := websocket.Upgrader{
 		ReadBufferSize:  512, // moreless ActionInfo contain 255 B
@@ -160,11 +158,11 @@ func webSocketFeedHandler(h *handler, req *lib.Request, w http.ResponseWriter, r
 	}
 	wsPartnerAppConn, err := wsPartnerAppUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		h.log.Errorf("feed ep cannot set websocket Partner App Connection: ", err)
+		h.log.Errorf("cannot set websocket Partner App Connection: ", err)
 		return
 	}
 	defer wsPartnerAppConn.Close()
-	h.log.Debugf("feed ep connected to %s websocket feed at Qredo Backend", url)
+	h.log.Debugf("Connected to Qredo websocket feed %s", url)
 	go func() {
 		defer close(done)
 		for {
@@ -173,7 +171,7 @@ func webSocketFeedHandler(h *handler, req *lib.Request, w http.ResponseWriter, r
 				h.log.Errorf("error when reading from websocket: ", err)
 				return
 			}
-			h.log.Debugf("feed ep incoming message: %v", v.Parse())
+			h.log.Debugf("incoming message: %v", v.Parse())
 			err = wsPartnerAppConn.WriteJSON(v)
 			if err != nil {
 				h.log.Errorf("websocket wsPartnerAppConn WriteJSON contain error: ", err)

@@ -62,15 +62,15 @@ func main() {
 		panic(err)
 	}
 
-	// initiate on-boarding of new core client
-	regInitResponse, err := core.ClientRegister("core-client-test1")
+	// initiate on-boarding of new agent
+	regInitResponse, err := core.ClientRegister("agent-test1")
 	if err != nil {
-		panic(errors.Wrap(err, "core client register init"))
+		panic(errors.Wrap(err, "register init"))
 	}
 
-	// send EC and BLS keys to Qredo Partner API, initializing the new core client in the backend
+	// send EC and BLS keys to Qredo Partner API, initializing the new agent in the backend
 	qredoReq := &qredoRegisterInitRequest{
-		Name:         "core-client-test",
+		Name:         "agent-test",
 		BLSPublicKey: regInitResponse.BLSPublicKey,
 		ECPublicKey:  regInitResponse.ECPublicKey,
 	}
@@ -96,8 +96,8 @@ func main() {
 		panic(errors.Wrap(err, "request to partner api"))
 	}
 
-	// finish registration of core client.
-	// after this step there will be an entry in examplestore.db for the new core client
+	// finish registration of agent.
+	// after this step there will be an entry in examplestore.db for the new agent
 	finishResp, err := core.ClientRegisterFinish(&api.ClientRegisterFinishRequest{
 		ID:           qredoResponse.ID,
 		ClientID:     qredoResponse.ClientID,
@@ -109,7 +109,7 @@ func main() {
 		panic(errors.Wrap(err, "client register finish request"))
 	}
 
-	fmt.Printf("created core client\nid: %s\nfeed url: %s\n", qredoResponse.ID, finishResp.FeedURL)
+	fmt.Printf("created agent\nid: %s\nfeed url: %s\n", qredoResponse.ID, finishResp.FeedURL)
 }
 
 func partnerSign(req *httpRequest) string {

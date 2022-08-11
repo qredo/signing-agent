@@ -163,10 +163,11 @@ func (h *handler) Verify(_ *defs.RequestContext, _ http.ResponseWriter, r *http.
 
 // AutoApprovalFunction
 //
-func (h *handler) AutoApproval() {
+func (h *handler) AutoApproval() error {
 	// enable auto-approval only if configured
 	if !h.cfg.Base.AutoApprove {
-		return
+		h.log.Debug("Autoapproval feature not enabled in config")
+		return nil
 	}
 
 	h.log.Debug("Handler for AutoApproval background job")
@@ -175,34 +176,39 @@ func (h *handler) AutoApproval() {
 
 	clientID = h.core.GetAgentID()
 	if clientID == "" {
-		h.log.Infof("Agent is not yet configured, skipping Websocket connection for auto-approval")
-		return
+		h.log.Info("Agent is not yet configured, skipping Websocket connection for auto-approval")
+		return nil
 	}
 
 	req := &lib.Request{}
-	genWSQredoCoreClientFeedURL(h, clientID, req)
+	GenWSQredoCoreClientFeedURL(h, clientID, req)
 	lib.GenTimestamp(req)
 
 	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
 	if err != nil {
-		return
+		return err
 	}
+	h.log.Debugf("Loaded RSA key for AutoApproval from %s", h.cfg.Base.PrivatePEMFilePath)
+
 	err = lib.LoadAPIKey(req, h.cfg.Base.APIKeyFilePath)
 	if err != nil {
-		return
+		return err
 	}
+	h.log.Debugf("Loaded API key for AutoApproval from %s", h.cfg.Base.APIKeyFilePath)
+
 	err = lib.SignRequest(req)
 	if err != nil {
-		return
+		return err
 	}
-	go webSocketHandler(h, req)
 
-	return
+	go WebSocketHandler(h, req)
+
+	return nil
 }
 
 // ClientFeed
 //
-// Get Core Client Feed (via websocket) from Qredo Backend
+// Get approval requests Feed (via websocket) from Qredo Backend
 //
 func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFeed endpoint")
@@ -212,7 +218,7 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 	}
 	req := &lib.Request{}
 
-	genWSQredoCoreClientFeedURL(h, coreClientID, req)
+	GenWSQredoCoreClientFeedURL(h, coreClientID, req)
 	lib.GenTimestamp(req)
 	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
 	if err != nil {
@@ -226,7 +232,7 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 	if err != nil {
 		return nil, err
 	}
-	webSocketFeedHandler(h, req, w, r)
+	WebSocketFeedHandler(h, req, w, r)
 	return nil, nil
 }
 
