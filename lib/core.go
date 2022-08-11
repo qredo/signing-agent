@@ -18,12 +18,12 @@ type AutomatedApproverClient interface {
 	ClientsList() ([]string, error)
 
 	// ActionApprove signs actionID and sends it for approval to the Qredo backend
-	ActionApprove(clientID, actionID string) error
+	ActionApprove(agentID, actionID string) error
 	// ActionReject sends a rejection to the Qredo backend for actionID
-	ActionReject(clientID, actionID string) error
+	ActionReject(agentID, actionID string) error
 
-	// Sign uses clientID's BLS seed to sign messageHex and returns the signature
-	Sign(clientID, messageHex string) (*api.SignResponse, error)
+	// Sign uses agentID's BLS seed to sign messageHex and returns the signature
+	Sign(agentID, messageHex string) (*api.SignResponse, error)
 	// Verify verifies a signature provided with VerifyRequest
 	Verify(req *api.VerifyRequest) error
 	// SetAgentID function to collect agent ID to storage, so the system will default to a single agent ID (AgentID)

@@ -30,7 +30,7 @@ func NewStore(store KVStore) *Storage {
 	return s
 }
 
-type Client struct {
+type Agent struct {
 	Name        string `json:"name"`
 	ID          string `json:"id"`
 	BLSSeed     []byte `json:"bls_seed"`
@@ -40,7 +40,7 @@ type Client struct {
 	Pending     bool   `json:"pending"`
 }
 
-func (s *Storage) AddPending(ref string, c *Client) error {
+func (s *Storage) AddPending(ref string, c *Agent) error {
 	c.Pending = true
 	_, err := s.kv.Get(ref)
 	if err != nil && err != defs.KVErrNotFound {
@@ -65,7 +65,7 @@ func (s *Storage) RemovePending(ref string) error {
 		return err
 	}
 
-	c := &Client{}
+	c := &Agent{}
 	err = json.Unmarshal(d, c)
 	if err != nil {
 		return err
@@ -78,13 +78,13 @@ func (s *Storage) RemovePending(ref string) error {
 	return s.kv.Del(ref)
 }
 
-func (s *Storage) GetPending(ref string) *Client {
+func (s *Storage) GetPending(ref string) *Agent {
 	d, err := s.kv.Get(ref)
 	if err != nil && err != defs.KVErrNotFound {
 		return nil
 	}
 
-	c := &Client{}
+	c := &Agent{}
 	err = json.Unmarshal(d, c)
 	if err != nil {
 		return nil
@@ -97,7 +97,7 @@ func (s *Storage) GetPending(ref string) *Client {
 	return c
 }
 
-func (s *Storage) AddClient(id string, c *Client) error {
+func (s *Storage) AddClient(id string, c *Agent) error {
 	_, err := s.kv.Get(id)
 	if err != nil && err != defs.KVErrNotFound {
 		return err
@@ -122,7 +122,7 @@ func (s *Storage) RemoveClient(id string) error {
 		return err
 	}
 
-	c := &Client{}
+	c := &Agent{}
 	err = json.Unmarshal(d, c)
 	if err != nil {
 		return err
@@ -135,13 +135,13 @@ func (s *Storage) RemoveClient(id string) error {
 	return s.kv.Del(id)
 }
 
-func (s *Storage) GetClient(id string) *Client {
+func (s *Storage) GetClient(id string) *Agent {
 	d, err := s.kv.Get(id)
 	if err != nil && err != defs.KVErrNotFound {
 		return nil
 	}
 
-	c := &Client{}
+	c := &Agent{}
 	err = json.Unmarshal(d, c)
 	if err != nil {
 		return nil

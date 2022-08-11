@@ -24,7 +24,7 @@ func (h *autoApprover) ClientRegister(name string) (*api.ClientRegisterResponse,
 
 	var err error
 
-	client := &Client{Name: name}
+	client := &Agent{Name: name}
 
 	client.BLSSeed, err = util.RandomBytes(48)
 	if err != nil {
@@ -65,13 +65,13 @@ func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 	pending.AccountCode = req.AccountCode
 
 	var err error
-	pending.ZKPID, err = hex.DecodeString(req.ClientID)
+	pending.ZKPID, err = hex.DecodeString(req.ClientID) // this ClientID is a sensitive data
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid client id in response")
+		return nil, errors.Wrap(err, "invalid sensitive data - ClientID in response")
 	}
 	cs, err := hex.DecodeString(req.ClientSecret)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid client id in response")
+		return nil, errors.Wrap(err, "invalid sensitive data - ClientSecret in response")
 	}
 
 	// ZKP Token

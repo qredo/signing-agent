@@ -105,13 +105,13 @@ func (r *Router) setHandlers() (http.Handler, error) {
 		{"/client", http.MethodPost, r.handler.ClientRegister},
 		{"/client/{ref}", http.MethodPut, r.handler.ClientRegisterFinish},
 		{"/client", http.MethodGet, r.handler.ClientsList},
-		{"/client/{client_id}/action/{action_id}", http.MethodPut, r.handler.ActionApprove},
-		{"/client/{client_id}/action/{action_id}", http.MethodDelete, r.handler.ActionReject},
+		{"/client/{agent_id}/action/{action_id}", http.MethodPut, r.handler.ActionApprove},
+		{"/client/{agent_id}/action/{action_id}", http.MethodDelete, r.handler.ActionReject},
 
-		{"/client/{client_id}/sign", http.MethodPost, r.handler.Sign},
+		{"/client/{agent_id}/sign", http.MethodPost, r.handler.Sign},
 		{"/verify", http.MethodPost, r.handler.Verify},
 
-		{"/client/{client_id}/feed", defs.MethodWebsocket, r.handler.ClientFeed},
+		{"/client/{agent_id}/feed", defs.MethodWebsocket, r.handler.ClientFeed},
 	}
 
 	router := mux.NewRouter().PathPrefix(pathPrefix).Subrouter()

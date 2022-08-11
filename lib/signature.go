@@ -14,7 +14,7 @@ import (
 )
 
 // Sign signs a payload
-func (h *autoApprover) Sign(clientID, messageHex string) (*api.SignResponse, error) {
+func (h *autoApprover) Sign(agentID, messageHex string) (*api.SignResponse, error) {
 	msg, err := hex.DecodeString(messageHex)
 	if err != nil {
 		return nil, defs.ErrBadRequest().WithDetail("invalid_message_hex").Wrap(err)
@@ -24,19 +24,19 @@ func (h *autoApprover) Sign(clientID, messageHex string) (*api.SignResponse, err
 		return nil, defs.ErrBadRequest().WithDetail("invalid_message_hex_size").Wrap(fmt.Errorf("invalid message hex size %s ", strconv.Itoa(len(msg))))
 	}
 
-	client := h.store.GetClient(clientID)
+	client := h.store.GetClient(agentID)
 	if client == nil {
-		return nil, defs.ErrNotFound().WithDetail("core_client_seed").Wrap(fmt.Errorf("get lib client seed from secrets store %s", clientID))
+		return nil, defs.ErrNotFound().WithDetail("core_client_seed").Wrap(fmt.Errorf("get lib client seed from secrets store %s", agentID))
 	}
 
 	signature, err := util.BLSSign(client.BLSSeed, msg)
 	if err != nil {
-		return nil, errors.Wrapf(err, "sign message for lib client %s", clientID)
+		return nil, errors.Wrapf(err, "sign message for lib client %s", agentID)
 	}
 
 	return &api.SignResponse{
 		SignatureHex: hex.EncodeToString(signature),
-		SignerID:     clientID,
+		SignerID:     agentID,
 	}, nil
 }
 

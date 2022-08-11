@@ -35,7 +35,7 @@ func TestClient(t *testing.T) {
 		APIKeyFilePath:     TestDataAPIKeyFilePath,
 		AutoApprove:        true,
 	}
-	clientName := "Test name client"
+	agentName := "Test name agent"
 	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
 	assert.NoError(t, err)
 	defer func() {
@@ -50,7 +50,7 @@ func TestClient(t *testing.T) {
 	assert.NoError(t, err)
 
 	var (
-		pendingClient          *Client
+		pendingAgent           *Agent
 		registerResponse       *api.ClientRegisterResponse
 		initRequest            *api.QredoRegisterInitRequest
 		initResponse           *api.QredoRegisterInitResponse
@@ -59,27 +59,27 @@ func TestClient(t *testing.T) {
 	)
 
 	t.Run(
-		"Register client - first step",
+		"Register agent - first step",
 		func(t *testing.T) {
 
-			registerResponse, err = core.ClientRegister(clientName)
+			registerResponse, err = core.ClientRegister(agentName)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, registerResponse.BLSPublicKey)
 			assert.NotEmpty(t, registerResponse.ECPublicKey)
 			assert.NotEmpty(t, registerResponse.RefID)
-			pendingClient = core.store.GetPending(registerResponse.RefID)
-			assert.Equal(t, true, pendingClient.Pending)
-			assert.Equal(t, clientName, pendingClient.Name)
-			assert.Empty(t, pendingClient.ID)
+			pendingAgent = core.store.GetPending(registerResponse.RefID)
+			assert.Equal(t, true, pendingAgent.Pending)
+			assert.Equal(t, agentName, pendingAgent.Name)
+			assert.Empty(t, pendingAgent.ID)
 		})
 
 	t.Run(
-		"Register client - call init ep",
+		"Register agent - call init ep",
 		func(t *testing.T) {
 			initRequest = &api.QredoRegisterInitRequest{
 				BLSPublicKey: registerResponse.BLSPublicKey,
 				ECPublicKey:  registerResponse.ECPublicKey,
-				Name:         clientName,
+				Name:         agentName,
 			}
 
 			util.GetDoMockHTTPClientFunc = func(*http.Request) (*http.Response, error) {
@@ -102,7 +102,7 @@ func TestClient(t *testing.T) {
 		})
 
 	t.Run(
-		"Register client - finish registration",
+		"Register agent - finish registration",
 		func(t *testing.T) {
 			util.GetDoMockHTTPClientFunc = func(*http.Request) (*http.Response, error) {
 
@@ -133,20 +133,20 @@ func TestClient(t *testing.T) {
 
 			// logic verification after registration process
 			assert.NotEmpty(t, core.GetAgentID(), "At this stage, we should be able to get AgentID")
-			assert.Nil(t, core.store.GetPending(registerResponse.RefID), "At this stage, we shouldn't get pending client")
-			registeredClient := core.store.GetClient(initResponse.AccountCode)
-			assert.NotNil(t, registeredClient, "At this stage, we should get client")
-			assert.False(t, registeredClient.Pending, "Client is not any more at Pending process.")
-			assert.NotEmpty(t, registeredClient.ID, "At this stage, client if created properly")
-			assert.NotEmpty(t, registeredClient.Name, "At this stage, client if created properly")
-			assert.NotEmpty(t, registeredClient.AccountCode, "At this stage, client if created properly")
-			assert.NotEmpty(t, registeredClient.BLSSeed, "At this stage, client if created properly")
-			assert.NotEmpty(t, registeredClient.ZKPID, "At this stage, client if created properly")
-			assert.NotEmpty(t, registeredClient.ZKPToken, "At this stage, client if created properly")
+			assert.Nil(t, core.store.GetPending(registerResponse.RefID), "At this stage, we shouldn't get pending agent")
+			registeredAgent := core.store.GetClient(initResponse.AccountCode)
+			assert.NotNil(t, registeredAgent, "At this stage, we should get agent")
+			assert.False(t, registeredAgent.Pending, "Agent is not any more at Pending process.")
+			assert.NotEmpty(t, registeredAgent.ID, "At this stage, agent if created properly")
+			assert.NotEmpty(t, registeredAgent.Name, "At this stage, agent if created properly")
+			assert.NotEmpty(t, registeredAgent.AccountCode, "At this stage, agent if created properly")
+			assert.NotEmpty(t, registeredAgent.BLSSeed, "At this stage, agent if created properly")
+			assert.NotEmpty(t, registeredAgent.ZKPID, "At this stage, agent if created properly")
+			assert.NotEmpty(t, registeredAgent.ZKPToken, "At this stage, agent if created properly")
 		})
 
 	t.Run(
-		"Register client - finish registration fake Agent ID",
+		"Register agent - finish registration fake Agent ID",
 		func(t *testing.T) {
 			registerFinishRequestFake := &api.ClientRegisterFinishRequest{}
 			_, err = core.ClientRegisterFinish(registerFinishRequestFake, "fake RefID")

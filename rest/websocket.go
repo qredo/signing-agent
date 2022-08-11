@@ -31,13 +31,13 @@ func (a *ActionInfo) Parse() string {
 	return string(out)
 }
 
-func GenWSQredoCoreClientFeedURL(h *handler, coreClientID string, req *lib.Request) {
+func GenWSQredoCoreClientFeedURL(h *handler, agentID string, req *lib.Request) {
 	builder := strings.Builder{}
 	builder.WriteString("wss://")
 	builder.WriteString(h.cfg.Base.QredoAPIDomain)
 	builder.WriteString(h.cfg.Base.QredoAPIBasePath)
 	builder.WriteString("/coreclient/")
-	builder.WriteString(coreClientID)
+	builder.WriteString(agentID)
 	builder.WriteString("/feed")
 	req.Uri = builder.String()
 }

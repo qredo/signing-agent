@@ -274,7 +274,7 @@ sequenceDiagram
   PartnerAPP->>QredoBE:POST /company/{company_id}/transfer
   QredoBE->>PartnerAPP: tx_id
   QredoBE->>PartnerAPP: {via websocket } action_id(==tx_id), type, status
-  PartnerAPP->>PartnerAPP: ActionApprove(clientID, actionID)
+  PartnerAPP->>PartnerAPP: ActionApprove(agentID, actionID)
   rect rgb(200, 150, 255)
   note right of PartnerAPP: inside the automated approver lib
   PartnerAPP->>QredoBE: GET /coreclient/action/{action_id}

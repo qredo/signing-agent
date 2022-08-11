@@ -35,30 +35,30 @@ func TestStorage(t *testing.T) {
 	t.Run(
 		"Operations on storage - registered Client",
 		func(t *testing.T) {
-			clientID := "5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn"
-			client := store.GetClient(clientID)
-			assert.Equal(t, client, (*Client)(nil)) // Not found
+			agentID := "5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn"
+			agent := store.GetClient(agentID)
+			assert.Equal(t, agent, (*Agent)(nil)) // Not found
 
-			data, err := os.ReadFile(fixturePathClient)
+			data, err := os.ReadFile(fixturePathAgent)
 			assert.NoError(t, err)
-			client = &Client{}
-			err = json.Unmarshal(data, client)
+			agent = &Agent{}
+			err = json.Unmarshal(data, agent)
 			assert.NoError(t, err)
 
-			err = store.AddClient(clientID, client)
+			err = store.AddClient(agentID, agent)
 			assert.NoError(t, err)
-			takenClient := store.GetClient(clientID)
-			assert.Equal(t, takenClient.Name, client.Name)
-			assert.Equal(t, takenClient.ID, client.ID)
+			takenClient := store.GetClient(agentID)
+			assert.Equal(t, takenClient.Name, agent.Name)
+			assert.Equal(t, takenClient.ID, agent.ID)
 			assert.Equal(t, takenClient.Pending, false, "Pending mode is not expected.")
 
-			err = store.RemoveClient(clientID)
+			err = store.RemoveClient(agentID)
 			assert.NoError(t, err)
-			takenClient = store.GetClient(clientID)
-			assert.Equal(t, takenClient, (*Client)(nil), "Shouldn't exist anymore.")
+			takenClient = store.GetClient(agentID)
+			assert.Equal(t, takenClient, (*Agent)(nil), "Shouldn't exist anymore.")
 
-			err = store.RemoveClient(clientID)
-			assert.Error(t, err, "You can't remove client that doesn't exist.")
+			err = store.RemoveClient(agentID)
+			assert.Error(t, err, "You can't remove agent that doesn't exist.")
 		})
 
 	t.Run(
@@ -66,20 +66,20 @@ func TestStorage(t *testing.T) {
 		func(t *testing.T) {
 
 			refID := "47fc1bfa-1aab-4421-aad7-5c42c6e38f1d"
-			client := store.GetPending(refID)
-			assert.Equal(t, client, (*Client)(nil))
+			agent := store.GetPending(refID)
+			assert.Equal(t, agent, (*Agent)(nil))
 
-			//add client that is in pending mode
-			client = &Client{
-				Name:    "Pending Client Test Name",
+			//add agent that is in pending mode
+			agent = &Agent{
+				Name:    "Pending Agent Test Name",
 				Pending: false,
 			}
-			err = store.AddPending(refID, client)
+			err = store.AddPending(refID, agent)
 			assert.NoError(t, err)
 
 			takenClient := store.GetPending(refID)
-			assert.Equal(t, takenClient.Name, client.Name)
-			assert.Equal(t, takenClient.ID, client.ID)
+			assert.Equal(t, takenClient.Name, agent.Name)
+			assert.Equal(t, takenClient.ID, agent.ID)
 			assert.Equal(t, takenClient.Pending, true, "Pending mode is expected.")
 
 			err := store.RemovePending(refID)

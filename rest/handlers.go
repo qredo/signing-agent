@@ -95,12 +95,12 @@ func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r
 	if actionID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("actionID")
 	}
-	clientID := mux.Vars(r)["client_id"]
-	if clientID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("clientID")
+	agentID := mux.Vars(r)["agent_id"]
+	if agentID == "" {
+		return nil, defs.ErrBadRequest().WithDetail("agentID")
 	}
 
-	return nil, h.core.ActionApprove(clientID, actionID)
+	return nil, h.core.ActionApprove(agentID, actionID)
 }
 
 // ActionReject
@@ -114,12 +114,12 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 	if actionID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("actionID")
 	}
-	clientID := mux.Vars(r)["client_id"]
-	if clientID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("clientID")
+	agentID := mux.Vars(r)["agent_id"]
+	if agentID == "" {
+		return nil, defs.ErrBadRequest().WithDetail("agentID")
 	}
 
-	return nil, h.core.ActionReject(clientID, actionID)
+	return nil, h.core.ActionReject(agentID, actionID)
 }
 
 // Sign
@@ -137,12 +137,12 @@ func (h *handler) Sign(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	clientID := mux.Vars(r)["client_id"]
-	if clientID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("clientID")
+	agentID := mux.Vars(r)["agent_id"]
+	if agentID == "" {
+		return nil, defs.ErrBadRequest().WithDetail("agentID")
 	}
 
-	return h.core.Sign(clientID, req.MessageHashHex)
+	return h.core.Sign(agentID, req.MessageHashHex)
 }
 
 // Verify
@@ -172,16 +172,17 @@ func (h *handler) AutoApproval() error {
 
 	h.log.Debug("Handler for AutoApproval background job")
 
-	var clientID string
+	var agentID string
 
-	clientID = h.core.GetAgentID()
-	if clientID == "" {
+	agentID = h.core.GetAgentID()
+	if agentID == "" {
 		h.log.Info("Agent is not yet configured, skipping Websocket connection for auto-approval")
 		return nil
 	}
 
 	req := &lib.Request{}
-	GenWSQredoCoreClientFeedURL(h, clientID, req)
+	GenWSQredoCoreClientFeedURL(h, agentID, req)
+
 	lib.GenTimestamp(req)
 
 	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
@@ -212,13 +213,13 @@ func (h *handler) AutoApproval() error {
 //
 func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFeed endpoint")
-	coreClientID := mux.Vars(r)["client_id"] // also called AccoundID or AgentID
-	if coreClientID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("coreClientID")
+	agentID := mux.Vars(r)["agent_id"]
+	if agentID == "" {
+		return nil, defs.ErrBadRequest().WithDetail("agentID")
 	}
 	req := &lib.Request{}
 
-	GenWSQredoCoreClientFeedURL(h, coreClientID, req)
+	GenWSQredoCoreClientFeedURL(h, agentID, req)
 	lib.GenTimestamp(req)
 	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
 	if err != nil {

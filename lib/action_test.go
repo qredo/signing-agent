@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	fixturePathClient                  = "../testdata/lib/client.json"
+	fixturePathAgent                   = "../testdata/lib/agent.json"
 	fixturePathActionApproveGetMessage = "../testdata/lib/actionApproveGetMessage.json"
 )
 
@@ -64,13 +64,13 @@ func TestAction(t *testing.T) {
 	var (
 		accountCode = "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"
 		actionID    = "2D7YA7Ojo3zGRtHP9bw37wF5jq3"
-		client      = &Client{}
+		agent       = &Agent{}
 	)
-	data, err := os.ReadFile(fixturePathClient)
+	data, err := os.ReadFile(fixturePathAgent)
 	assert.NoError(t, err)
-	err = json.Unmarshal(data, client)
+	err = json.Unmarshal(data, agent)
 	assert.NoError(t, err)
-	core.store.AddClient(accountCode, client)
+	core.store.AddClient(accountCode, agent)
 
 	t.Run(
 		"ActionApprove",
