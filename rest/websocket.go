@@ -18,12 +18,12 @@ type Parser interface {
 }
 
 type ActionInfo struct {
-	ID           string `json:"id"`
-	CoreClientID string `json:"coreClientID"`
-	Type         string `json:"type"`
-	Status       string `json:"status"`
-	Timestamp    int64  `json:"timestamp"`
-	ExpireTime   int64  `json:"expireTime"`
+	ID         string `json:"id"`
+	AgentID    string `json:"coreClientID"`
+	Type       string `json:"type"`
+	Status     string `json:"status"`
+	Timestamp  int64  `json:"timestamp"`
+	ExpireTime int64  `json:"expireTime"`
 }
 
 func (a *ActionInfo) Parse() string {
@@ -110,20 +110,20 @@ func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, inter
 	baseInc := intervalSeconds
 	timeEdge := time.Duration(maxMinutes) * time.Minute
 	for {
-		err := h.core.ActionApprove(action.CoreClientID, action.ID)
+		err := h.core.ActionApprove(action.AgentID, action.ID)
 		if err == nil {
-			h.log.Infof("[CoreClientID:%v] Action %v approved automatically", action.CoreClientID, action.ID)
+			h.log.Infof("[AgentID:%v] Action %v approved automatically", action.AgentID, action.ID)
 			break
 		} else {
-			h.log.Errorf("[CoreClientID:%v] Action %v approval failed, error msg: %v", action.CoreClientID, action.ID, err)
+			h.log.Errorf("[AgentID:%v] Action %v approval failed, error msg: %v", action.AgentID, action.ID, err)
 		}
 		if time.Since(tStart) >= timeEdge {
 			// Action Approval should be skiped after maxMinutes is achieved (e.g. 5 minutes)
-			h.log.Warnf("Auto action approve failed [CoreClientID:%v][actionID:%v]", action.CoreClientID, action.ID)
+			h.log.Warnf("Auto action approve failed [AgentID:%v][actionID:%v]", action.AgentID, action.ID)
 			break
 		}
 
-		h.log.Warnf("Auto approve action is repeated [CoreClientID:%v][actionID:%v] ", action.CoreClientID, action.ID)
+		h.log.Warnf("Auto approve action is repeated [AgentID:%v][actionID:%v] ", action.AgentID, action.ID)
 		time.Sleep(time.Duration(baseInc) * time.Second)
 		baseInc += intervalSeconds
 	}

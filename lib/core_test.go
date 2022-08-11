@@ -50,7 +50,7 @@ func makeCoreHandlerForTests() (*autoApprover, error) {
 	return core, nil
 }
 
-func TestCreateCoreClient(t *testing.T) {
+func TestCreateAutomatedApproverClient(t *testing.T) {
 	t.Run(
 		"Create a autoApprover",
 		func(t *testing.T) {

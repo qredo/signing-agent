@@ -18,7 +18,7 @@ import (
 )
 
 type handler struct {
-	core lib.CoreClient
+	core lib.AutomatedApproverClient
 	cfg  config.Config
 	log  *zap.SugaredLogger
 }

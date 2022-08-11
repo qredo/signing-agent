@@ -6,7 +6,7 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
-type CoreClient interface {
+type AutomatedApproverClient interface {
 	// ClientInit starts the agent registration process
 	ClientInit(register *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error)
 	// ClientRegister starts the simplified agent registration procedure
