@@ -70,7 +70,7 @@ func TestAction(t *testing.T) {
 	assert.NoError(t, err)
 	err = json.Unmarshal(data, agent)
 	assert.NoError(t, err)
-	core.store.AddClient(accountCode, agent)
+	core.store.AddAgent(accountCode, agent)
 
 	t.Run(
 		"ActionApprove",

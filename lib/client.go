@@ -113,12 +113,12 @@ func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 		return nil, err
 	}
 
-	err = h.store.AddClient(pending.ID, pending)
+	err = h.store.AddAgent(pending.ID, pending)
 	if err != nil {
 		return nil, err
 	}
 
-	err = h.store.SetAgentID(req.AccountCode)
+	err = h.store.SetSystemAgentID(req.AccountCode)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 
 // ClientsList - Automated approver agent can be only one
 func (h *autoApprover) ClientsList() ([]string, error) {
-	agentID := h.store.GetAgentID()
+	agentID := h.store.GetSystemAgentID()
 	if len(agentID) > 0 {
 		return []string{agentID}, nil
 	} else {
@@ -167,9 +167,9 @@ func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref str
 }
 
 func (h *autoApprover) SetAgentID(agetID string) error {
-	return h.store.SetAgentID(agetID)
+	return h.store.SetSystemAgentID(agetID)
 }
 
 func (h *autoApprover) GetAgentID() string {
-	return h.store.GetAgentID()
+	return h.store.GetSystemAgentID()
 }

@@ -134,7 +134,7 @@ func TestClient(t *testing.T) {
 			// logic verification after registration process
 			assert.NotEmpty(t, core.GetAgentID(), "At this stage, we should be able to get AgentID")
 			assert.Nil(t, core.store.GetPending(registerResponse.RefID), "At this stage, we shouldn't get pending agent")
-			registeredAgent := core.store.GetClient(initResponse.AccountCode)
+			registeredAgent := core.store.GetAgent(initResponse.AccountCode)
 			assert.NotNil(t, registeredAgent, "At this stage, we should get agent")
 			assert.False(t, registeredAgent.Pending, "Agent is not any more at Pending process.")
 			assert.NotEmpty(t, registeredAgent.ID, "At this stage, agent if created properly")

@@ -14,7 +14,7 @@ import (
 )
 
 func (h *autoApprover) ActionApprove(agentID, actionID string) error {
-	agent := h.store.GetClient(agentID)
+	agent := h.store.GetAgent(agentID)
 	if agent == nil {
 		return defs.ErrNotFound().WithDetail("agentID")
 	}
@@ -68,7 +68,7 @@ func (h *autoApprover) ActionApprove(agentID, actionID string) error {
 }
 
 func (h *autoApprover) ActionReject(agentID, actionID string) error {
-	agent := h.store.GetClient(agentID)
+	agent := h.store.GetAgent(agentID)
 	if agent == nil {
 		return defs.ErrNotFound().WithDetail("agentID")
 	}

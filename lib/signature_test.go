@@ -37,7 +37,7 @@ func TestSignature(t *testing.T) {
 	assert.NoError(t, err)
 	err = json.Unmarshal(data, agent)
 	assert.NoError(t, err)
-	core.store.AddClient(agentID, agent)
+	core.store.AddAgent(agentID, agent)
 	t.Run(
 		"Sign the message",
 		func(t *testing.T) {
@@ -70,7 +70,7 @@ func TestSignature(t *testing.T) {
 			err = core.Verify(req)
 			assert.NoError(t, err)
 		})
-	core.store.AddClient(agentID, agent)
+	core.store.AddAgent(agentID, agent)
 	t.Run(
 		"Verifying the message will fail - wrong SignatureHex",
 		func(t *testing.T) {

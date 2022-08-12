@@ -23,12 +23,12 @@ func TestStorage(t *testing.T) {
 		"Operations on storage - register AgentID",
 		func(t *testing.T) {
 
-			val := store.GetAgentID()
+			val := store.GetSystemAgentID()
 			assert.Equal(t, val, "")
 			agentID := "5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn"
-			store.SetAgentID(agentID)
+			store.SetSystemAgentID(agentID)
 
-			val = store.GetAgentID()
+			val = store.GetSystemAgentID()
 			assert.Equal(t, val, agentID)
 		})
 
@@ -36,7 +36,7 @@ func TestStorage(t *testing.T) {
 		"Operations on storage - registered Client",
 		func(t *testing.T) {
 			agentID := "5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn"
-			agent := store.GetClient(agentID)
+			agent := store.GetAgent(agentID)
 			assert.Equal(t, agent, (*Agent)(nil)) // Not found
 
 			data, err := os.ReadFile(fixturePathAgent)
@@ -45,19 +45,19 @@ func TestStorage(t *testing.T) {
 			err = json.Unmarshal(data, agent)
 			assert.NoError(t, err)
 
-			err = store.AddClient(agentID, agent)
+			err = store.AddAgent(agentID, agent)
 			assert.NoError(t, err)
-			takenClient := store.GetClient(agentID)
-			assert.Equal(t, takenClient.Name, agent.Name)
-			assert.Equal(t, takenClient.ID, agent.ID)
-			assert.Equal(t, takenClient.Pending, false, "Pending mode is not expected.")
+			takenAgent := store.GetAgent(agentID)
+			assert.Equal(t, takenAgent.Name, agent.Name)
+			assert.Equal(t, takenAgent.ID, agent.ID)
+			assert.Equal(t, takenAgent.Pending, false, "Pending mode is not expected.")
 
-			err = store.RemoveClient(agentID)
+			err = store.RemoveAgent(agentID)
 			assert.NoError(t, err)
-			takenClient = store.GetClient(agentID)
-			assert.Equal(t, takenClient, (*Agent)(nil), "Shouldn't exist anymore.")
+			takenAgent = store.GetAgent(agentID)
+			assert.Equal(t, takenAgent, (*Agent)(nil), "Shouldn't exist anymore.")
 
-			err = store.RemoveClient(agentID)
+			err = store.RemoveAgent(agentID)
 			assert.Error(t, err, "You can't remove agent that doesn't exist.")
 		})
 

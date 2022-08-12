@@ -72,7 +72,7 @@ func (s *Storage) RemovePending(ref string) error {
 	}
 
 	if !c.Pending {
-		return errors.New("client not pending")
+		return errors.New("agent not pending")
 	}
 
 	return s.kv.Del(ref)
@@ -97,7 +97,7 @@ func (s *Storage) GetPending(ref string) *Agent {
 	return c
 }
 
-func (s *Storage) AddClient(id string, c *Agent) error {
+func (s *Storage) AddAgent(id string, c *Agent) error {
 	_, err := s.kv.Get(id)
 	if err != nil && err != defs.KVErrNotFound {
 		return err
@@ -116,7 +116,7 @@ func (s *Storage) AddClient(id string, c *Agent) error {
 	return nil
 }
 
-func (s *Storage) RemoveClient(id string) error {
+func (s *Storage) RemoveAgent(id string) error {
 	d, err := s.kv.Get(id)
 	if err != nil && err != defs.KVErrNotFound {
 		return err
@@ -129,13 +129,13 @@ func (s *Storage) RemoveClient(id string) error {
 	}
 
 	if c.Pending {
-		return errors.New("client pending")
+		return errors.New("agent pending")
 	}
 
 	return s.kv.Del(id)
 }
 
-func (s *Storage) GetClient(id string) *Agent {
+func (s *Storage) GetAgent(id string) *Agent {
 	d, err := s.kv.Get(id)
 	if err != nil && err != defs.KVErrNotFound {
 		return nil
@@ -154,7 +154,7 @@ func (s *Storage) GetClient(id string) *Agent {
 	return c
 }
 
-func (s *Storage) GetAgentID() string {
+func (s *Storage) GetSystemAgentID() string {
 	d, err := s.kv.Get(agentIDString)
 	if err != nil && err != defs.KVErrNotFound {
 		return ""
@@ -162,7 +162,7 @@ func (s *Storage) GetAgentID() string {
 	return bytes.NewBuffer(d).String()
 }
 
-func (s *Storage) SetAgentID(agentID string) error {
+func (s *Storage) SetSystemAgentID(agentID string) error {
 	if err := s.kv.Set(agentIDString, []byte(agentID)); err != nil {
 		return err
 	}
