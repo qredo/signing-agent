@@ -1,7 +1,3 @@
-***Question***: should we rename this project to “Custody Agent” instead of Automated Approver?
-
-**Answer** (by Leszek K): Yes, it have more sense (Qredo Custody Agent). 
-
 # Introduction
 
 The Automated Approver is an approver agent, that can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application. The service must run on premise, hosted on the customer’s infrastructure. Every automated approver instance can be used to generate and manage multiple unique IDs (keys) — e.g. Banco Hipotecario can use the automated approver to create custody signers for each of their clients. The automated approver uses a dedicated subset of the Qredo Server APIs to perform its functions. It uses each client ID to connect to a websocket feed that listens for transactions pending approvals. Also, you it can be used to create a programmable approver bot that uses a automated approver instance to perform automated custody. For this, the Automated Approver must be appointed as an approver of a wallet (or fund).
