@@ -1,8 +1,10 @@
+.DS_Store
 private.pem
 public.pem
 apikey
 out/*
 local-config.yaml
+volume/
 *.db
 *.html
 *.out
