@@ -166,10 +166,10 @@ func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref str
 	return respData, nil
 }
 
-func (h *autoApprover) SetAgentID(agetID string) error {
+func (h *autoApprover) SetSystemAgentID(agetID string) error {
 	return h.store.SetSystemAgentID(agetID)
 }
 
-func (h *autoApprover) GetAgentID() string {
+func (h *autoApprover) GetSystemAgentID() string {
 	return h.store.GetSystemAgentID()
 }

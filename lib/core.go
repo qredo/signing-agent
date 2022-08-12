@@ -26,10 +26,10 @@ type AutomatedApproverClient interface {
 	Sign(agentID, messageHex string) (*api.SignResponse, error)
 	// Verify verifies a signature provided with VerifyRequest
 	Verify(req *api.VerifyRequest) error
-	// SetAgentID function to collect agent ID to storage, so the system will default to a single agent ID (AgentID)
-	SetAgentID(agetID string) error
-	// GetAgentID function to get agent ID that was stored during registration process.
-	GetAgentID() string
+	// SetSystemAgentID function to collect agent ID to storage, so the system will default to a single agent ID (AgentID)
+	SetSystemAgentID(agetID string) error
+	// GetSystemAgentID function to get agent ID that was stored during registration process.
+	GetSystemAgentID() string
 }
 
 type autoApprover struct {

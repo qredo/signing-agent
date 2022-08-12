@@ -174,7 +174,7 @@ func (h *handler) AutoApproval() error {
 
 	var agentID string
 
-	agentID = h.core.GetAgentID()
+	agentID = h.core.GetSystemAgentID()
 	if agentID == "" {
 		h.log.Info("Agent is not yet configured, skipping Websocket connection for auto-approval")
 		return nil
@@ -247,7 +247,7 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 //      200: ClientRegisterFinishResponse
 func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFullRegister endpoint")
-	if h.core.GetAgentID() != "" {
+	if h.core.GetSystemAgentID() != "" {
 		return nil, defs.ErrBadRequest().WithDetail("AgentID already exist. You can not set new one.")
 	}
 	response := api.ClientFullRegisterResponse{}
@@ -279,7 +279,7 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		return response, err
 	}
 
-	err = h.core.SetAgentID(initResults.AccountCode)
+	err = h.core.SetSystemAgentID(initResults.AccountCode)
 	if err != nil {
 		h.log.Errorf("Could not set AgentID to Storage: %s", err)
 	}

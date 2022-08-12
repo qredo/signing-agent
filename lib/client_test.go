@@ -132,7 +132,7 @@ func TestClient(t *testing.T) {
 			assert.NotEmpty(t, registerFinishResponse.FeedURL)
 
 			// logic verification after registration process
-			assert.NotEmpty(t, core.GetAgentID(), "At this stage, we should be able to get AgentID")
+			assert.NotEmpty(t, core.GetSystemAgentID(), "At this stage, we should be able to get AgentID")
 			assert.Nil(t, core.store.GetPending(registerResponse.RefID), "At this stage, we shouldn't get pending agent")
 			registeredAgent := core.store.GetAgent(initResponse.AccountCode)
 			assert.NotNil(t, registeredAgent, "At this stage, we should get agent")
@@ -174,8 +174,8 @@ func TestClient(t *testing.T) {
 		"Agent - setting and getting",
 		func(t *testing.T) {
 			agentID := "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"
-			core.SetAgentID(agentID)
-			assert.Equal(t, core.GetAgentID(), agentID)
+			core.SetSystemAgentID(agentID)
+			assert.Equal(t, core.GetSystemAgentID(), agentID)
 
 			var agentsIDList []string
 			agentsIDList, err = core.ClientsList()
