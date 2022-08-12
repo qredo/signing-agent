@@ -14,16 +14,16 @@ const (
 	TestDataDBStoreFilePath    = "../testdata/test-store.db"
 )
 
-func NewMock(cfg *config.Base, kv KVStore) (*coreClient, error) {
+func NewMock(cfg *config.Base, kv KVStore) (*autoApprover, error) {
 
-	return &coreClient{
+	return &autoApprover{
 		cfg:   cfg,
 		store: NewStore(kv),
 		htc:   util.NewHTTPMockClient(),
 	}, nil
 }
 
-func makeCoreHandlerForTests() (*coreClient, error) {
+func makeCoreHandlerForTests() (*autoApprover, error) {
 	var (
 		cfg *config.Base
 		err error
@@ -50,9 +50,9 @@ func makeCoreHandlerForTests() (*coreClient, error) {
 	return core, nil
 }
 
-func TestCreateCoreClient(t *testing.T) {
+func TestCreateAutomatedApproverClient(t *testing.T) {
 	t.Run(
-		"Create a coreClient",
+		"Create a autoApprover",
 		func(t *testing.T) {
 			var (
 				cfg *config.Base

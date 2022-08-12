@@ -13,13 +13,13 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func (h *coreClient) ActionApprove(clientID, actionID string) error {
-	client := h.store.GetClient(clientID)
-	if client == nil {
-		return defs.ErrNotFound().WithDetail("client_id")
+func (h *autoApprover) ActionApprove(agentID, actionID string) error {
+	agent := h.store.GetAgent(agentID)
+	if agent == nil {
+		return defs.ErrNotFound().WithDetail("agentID")
 	}
 
-	zkpToken, err := util.ZKPToken(client.ZKPID, client.ZKPToken, h.cfg.PIN)
+	zkpToken, err := util.ZKPToken(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}
@@ -43,14 +43,14 @@ func (h *coreClient) ActionApprove(clientID, actionID string) error {
 			return err
 		}
 
-		signature, err := util.BLSSign(client.BLSSeed, msg)
+		signature, err := util.BLSSign(agent.BLSSeed, msg)
 		if err != nil {
 			return err
 		}
 		signatures[i] = hex.EncodeToString(signature)
 	}
 
-	zkpToken, err = util.ZKPToken(client.ZKPID, client.ZKPToken, h.cfg.PIN)
+	zkpToken, err = util.ZKPToken(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}
@@ -67,13 +67,13 @@ func (h *coreClient) ActionApprove(clientID, actionID string) error {
 	return nil
 }
 
-func (h *coreClient) ActionReject(clientID, actionID string) error {
-	client := h.store.GetClient(clientID)
-	if client == nil {
-		return defs.ErrNotFound().WithDetail("client_id")
+func (h *autoApprover) ActionReject(agentID, actionID string) error {
+	agent := h.store.GetAgent(agentID)
+	if agent == nil {
+		return defs.ErrNotFound().WithDetail("agentID")
 	}
 
-	zkpToken, err := util.ZKPToken(client.ZKPID, client.ZKPToken, h.cfg.PIN)
+	zkpToken, err := util.ZKPToken(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}

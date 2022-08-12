@@ -14,7 +14,7 @@ import (
 )
 
 // Sign signs a payload
-func (h *coreClient) Sign(clientID, messageHex string) (*api.SignResponse, error) {
+func (h *autoApprover) Sign(agentID, messageHex string) (*api.SignResponse, error) {
 	msg, err := hex.DecodeString(messageHex)
 	if err != nil {
 		return nil, defs.ErrBadRequest().WithDetail("invalid_message_hex").Wrap(err)
@@ -24,24 +24,24 @@ func (h *coreClient) Sign(clientID, messageHex string) (*api.SignResponse, error
 		return nil, defs.ErrBadRequest().WithDetail("invalid_message_hex_size").Wrap(fmt.Errorf("invalid message hex size %s ", strconv.Itoa(len(msg))))
 	}
 
-	client := h.store.GetClient(clientID)
-	if client == nil {
-		return nil, defs.ErrNotFound().WithDetail("core_client_seed").Wrap(fmt.Errorf("get lib client seed from secrets store %s", clientID))
+	agent := h.store.GetAgent(agentID)
+	if agent == nil {
+		return nil, defs.ErrNotFound().WithDetail("core_client_seed").Wrap(fmt.Errorf("get lib client seed from secrets store %s", agentID))
 	}
 
-	signature, err := util.BLSSign(client.BLSSeed, msg)
+	signature, err := util.BLSSign(agent.BLSSeed, msg)
 	if err != nil {
-		return nil, errors.Wrapf(err, "sign message for lib client %s", clientID)
+		return nil, errors.Wrapf(err, "sign message for lib client %s", agentID)
 	}
 
 	return &api.SignResponse{
 		SignatureHex: hex.EncodeToString(signature),
-		SignerID:     clientID,
+		SignerID:     agentID,
 	}, nil
 }
 
 // Verify verifies a signature
-func (h *coreClient) Verify(req *api.VerifyRequest) error {
+func (h *autoApprover) Verify(req *api.VerifyRequest) error {
 	msg, err := hex.DecodeString(req.MessageHashHex)
 	if err != nil {
 		return defs.ErrBadRequest().WithDetail("invalid_message_hex").Wrap(err)
@@ -55,12 +55,12 @@ func (h *coreClient) Verify(req *api.VerifyRequest) error {
 		return defs.ErrBadRequest().WithDetail("invalid_signature_hex").Wrap(err)
 	}
 
-	client := h.store.GetClient(req.SignerID)
-	if client == nil {
+	agent := h.store.GetAgent(req.SignerID)
+	if agent == nil {
 		return defs.ErrNotFound().WithDetail("signer_not_found").Wrap(fmt.Errorf("get signer %s", req.SignerID))
 	}
 
-	if err := util.BLSVerify(client.BLSSeed, msg, sig); err != nil {
+	if err := util.BLSVerify(agent.BLSSeed, msg, sig); err != nil {
 		return defs.ErrForbidden().WithDetail("invalid_signature").Wrap(err)
 	}
 

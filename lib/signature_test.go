@@ -28,35 +28,35 @@ func TestSignature(t *testing.T) {
 	assert.NoError(t, err)
 
 	var (
-		clientID            = "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"
-		client              = &Client{}
+		agentID             = "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"
+		agent               = &Agent{}
 		messageHex   string = "0300228be28434d7362d45a85797da316ae4f3f015fb9c1ecf502d1af8d1f6b6c7e40d28c1b9da2996a095da5829f3e98e"
 		signResponse *api.SignResponse
 	)
-	data, err := os.ReadFile(fixturePathClient)
+	data, err := os.ReadFile(fixturePathAgent)
 	assert.NoError(t, err)
-	err = json.Unmarshal(data, client)
+	err = json.Unmarshal(data, agent)
 	assert.NoError(t, err)
-	core.store.AddClient(clientID, client)
+	core.store.AddAgent(agentID, agent)
 	t.Run(
 		"Sign the message",
 		func(t *testing.T) {
 
-			signResponse, err = core.Sign(clientID, messageHex)
+			signResponse, err = core.Sign(agentID, messageHex)
 			assert.NoError(t, err)
-			assert.Equal(t, clientID, signResponse.SignerID)
+			assert.Equal(t, agentID, signResponse.SignerID)
 			assert.NotNil(t, signResponse.SignatureHex)
 		})
 	t.Run(
 		"Signing the message will fail - wrong SignatureHex",
 		func(t *testing.T) {
-			_, err := core.Sign(clientID, "this is not hex")
+			_, err := core.Sign(agentID, "this is not hex")
 			assert.Error(t, err)
 		})
 	t.Run(
-		"Signing the message will fail - client not found",
+		"Signing the message will fail - agent not found",
 		func(t *testing.T) {
-			_, err := core.Sign("client not found", messageHex)
+			_, err := core.Sign("agent not found", messageHex)
 			assert.Error(t, err)
 		})
 	t.Run(
@@ -70,7 +70,7 @@ func TestSignature(t *testing.T) {
 			err = core.Verify(req)
 			assert.NoError(t, err)
 		})
-	core.store.AddClient(clientID, client)
+	core.store.AddAgent(agentID, agent)
 	t.Run(
 		"Verifying the message will fail - wrong SignatureHex",
 		func(t *testing.T) {

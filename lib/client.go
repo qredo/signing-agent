@@ -20,11 +20,11 @@ import (
 	defs "gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
+func (h *autoApprover) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
 
 	var err error
 
-	client := &Client{Name: name}
+	client := &Agent{Name: name}
 
 	client.BLSSeed, err = util.RandomBytes(48)
 	if err != nil {
@@ -55,7 +55,7 @@ func (h *coreClient) ClientRegister(name string) (*api.ClientRegisterResponse, e
 
 }
 
-func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error) {
+func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error) {
 
 	pending := h.store.GetPending(ref)
 	if pending == nil {
@@ -65,13 +65,13 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 	pending.AccountCode = req.AccountCode
 
 	var err error
-	pending.ZKPID, err = hex.DecodeString(req.ClientID)
+	pending.ZKPID, err = hex.DecodeString(req.ClientID) // this ClientID is a sensitive data
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid client id in response")
+		return nil, errors.Wrap(err, "invalid sensitive data - ClientID in response")
 	}
 	cs, err := hex.DecodeString(req.ClientSecret)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid client id in response")
+		return nil, errors.Wrap(err, "invalid sensitive data - ClientSecret in response")
 	}
 
 	// ZKP Token
@@ -113,12 +113,12 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 		return nil, err
 	}
 
-	err = h.store.AddClient(pending.ID, pending)
+	err = h.store.AddAgent(pending.ID, pending)
 	if err != nil {
 		return nil, err
 	}
 
-	err = h.store.SetAgentID(req.AccountCode)
+	err = h.store.SetSystemAgentID(req.AccountCode)
 	if err != nil {
 		return nil, err
 	}
@@ -129,8 +129,8 @@ func (h *coreClient) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, 
 }
 
 // ClientsList - Automated approver agent can be only one
-func (h *coreClient) ClientsList() ([]string, error) {
-	agentID := h.store.GetAgentID()
+func (h *autoApprover) ClientsList() ([]string, error) {
+	agentID := h.store.GetSystemAgentID()
 	if len(agentID) > 0 {
 		return []string{agentID}, nil
 	} else {
@@ -138,7 +138,7 @@ func (h *coreClient) ClientsList() ([]string, error) {
 	}
 }
 
-func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {
+func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {
 	reqDataBody, err := json.Marshal(reqData)
 	if err != nil {
 		return nil, err
@@ -166,10 +166,10 @@ func (h *coreClient) ClientInit(reqData *api.QredoRegisterInitRequest, ref strin
 	return respData, nil
 }
 
-func (h *coreClient) SetAgentID(agetID string) error {
-	return h.store.SetAgentID(agetID)
+func (h *autoApprover) SetSystemAgentID(agetID string) error {
+	return h.store.SetSystemAgentID(agetID)
 }
 
-func (h *coreClient) GetAgentID() string {
-	return h.store.GetAgentID()
+func (h *autoApprover) GetSystemAgentID() string {
+	return h.store.GetSystemAgentID()
 }

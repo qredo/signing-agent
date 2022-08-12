@@ -1,3 +1,3 @@
-# core-client
+# Automated Approver
 
-core-client partner side service
+automated-approver partner side service
