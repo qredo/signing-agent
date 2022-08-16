@@ -61,12 +61,11 @@ RUN CGO_ENABLED=1 \
     GO111MODULES=on \
     go build \
       -tags debug \
-      -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/custody-engine/automated-approver/service.buildDate=$BUILD_DATE' \
-                                                            -X 'gitlab.qredo.com/custody-engine/automated-approver/service.commit=$BUILD_COMMIT' \
-                                                            -X 'gitlab.qredo.com/custody-engine/automated-approver/service.version=$BUILD_VERSION'" \
+      -ldflags "-w -linkmode external -extldflags '-static' -X 'main.buildDate=$BUILD_DATE' \
+                                                            -X 'main.commit=$BUILD_COMMIT' \
+                                                            -X 'main.version=$BUILD_VERSION'" \
       -o automated-approver \
       gitlab.qredo.com/custody-engine/automated-approver/cmd/service
-
 
 FROM alpine as certs
 RUN apk add -U --no-cache ca-certificates
