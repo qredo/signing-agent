@@ -20,8 +20,9 @@ func TestSignature(t *testing.T) {
 
 	assert.NoError(t, err)
 	cfg := config.Base{
-		QredoURL: "https://play-api.qredo.network",
-		PIN:      1234,
+		QredoAPIDomain:   "play-api.qredo.network",
+		QredoAPIBasePath: "/api/v1/p",
+		PIN:              1234,
 	}
 
 	core, err := New(&cfg, kv)

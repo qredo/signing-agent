@@ -31,7 +31,7 @@ func (h *autoApprover) ActionApprove(actionID string) error {
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 	messagesResp := &api.CoreClientServiceActionMessagesResponse{}
-	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.QredoURL, actionID), nil, messagesResp, header); err != nil {
+	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath, actionID), nil, messagesResp, header); err != nil {
 		return err
 	}
 
@@ -64,7 +64,7 @@ func (h *autoApprover) ActionApprove(actionID string) error {
 	}
 	header = http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
-	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.QredoURL, actionID), req, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath, actionID), req, nil, header); err != nil {
 		return err
 	}
 
@@ -80,7 +80,7 @@ func (h *autoApprover) ActionReject(actionID string) error {
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 
-	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.QredoURL, actionID), nil, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath, actionID), nil, nil, header); err != nil {
 		return err
 	}
 

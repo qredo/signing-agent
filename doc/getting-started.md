@@ -90,7 +90,33 @@ In the terminal, run this command to create the folder in your home dir:
 
 On the steps that follow, you will create the `private.pem` files and you can store it in the Docker volume folder that you’ve created above.
 
-## Generate RSA keys for signing request on register step (Partner API)
+## Config data
+
+Please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to the `volume` directory.
+Here you will find explanation, what does mean each line:
+
+```yaml
+
+base:  # base config set 
+  qredo_api_domain: play-api.qredo.network  # qredo environment domain like: (play-api.qredo.network, dev.qredo.net, qa-api.qredo.net).
+  qredo_api_base_path: /api/v1/p  # The base path that contain verion info of the REST interface.
+  store_file: /volume/ccstore.db  # This is a store file path inside docker image.
+  auto_approve: true  # Set to true if You would like to turn on background job that will automaticly approve incoming actions (transactions).
+http:  # host http config set
+  addr: 0.0.0.0:8007  # host server name e.g. agent.example.org
+  cors_allow_origins:  # specify resource sharing list:
+  - '*'
+  proxy_forwarded_header: ""  # specify Proxy forwarded-for header
+  log_all_requests: true  # log all REST request, not only those with errors
+logging:  # logging config set
+  format: text  # choose format of logging (text or json), currently we support only text
+  level: debug  # choose level of logs that should be noticed (e.g. error, warn, info, debug)
+pin: 0  # set your pin
+
+```
+
+
+## Generate RSA keys for signing request on reqister step (Partner API)
 
 The following example uses the terminal (CLI) for generating the RSA key pair but you can use any preferred tool to perform this task. The Qredo Partner API works with 2048 bit RSA keys.
 

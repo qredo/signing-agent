@@ -53,8 +53,9 @@ func main() {
 		panic(errors.Wrap(err, "file store init"))
 	}
 	cfg := config.Base{
-		QredoURL: qredoURL,
-		PIN:      0,
+		QredoAPIDomain:   "play-api.qredo.network",
+		QredoAPIBasePath: "/api/v1/p",
+		PIN:              0,
 	}
 
 	core, err := lib.New(&cfg, store)
@@ -81,7 +82,7 @@ func main() {
 	req := &httpRequest{
 		timestamp: fmt.Sprintf("%v", time.Now().Unix()),
 		method:    "POST",
-		url:       fmt.Sprintf("%s/api/v1/p/coreclient/init", cfg.QredoURL),
+		url:       fmt.Sprintf("https://%s%s/coreclient/init", cfg.QredoAPIDomain, cfg.QredoAPIBasePath),
 		body:      body,
 	}
 	signature := partnerSign(req)

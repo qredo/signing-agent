@@ -105,7 +105,7 @@ func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 
 	finishResp := &api.CoreClientServiceRegisterFinishResponse{}
 
-	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoURL), confirmRequest, finishResp, header); err != nil {
+	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath), confirmRequest, finishResp, header); err != nil {
 		return nil, err
 	}
 
@@ -158,7 +158,7 @@ func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref, ap
 	headers := GetClientInitHttpHeaders(req)
 
 	var respData *api.QredoRegisterInitResponse = &api.QredoRegisterInitResponse{}
-	if err = h.htc.Request(http.MethodPost, util.URLClientInit(h.cfg.QredoURL), reqData, respData, headers); err != nil {
+	if err = h.htc.Request(http.MethodPost, util.URLClientInit(h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath), reqData, respData, headers); err != nil {
 		return nil, err
 	}
 	return respData, nil

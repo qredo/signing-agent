@@ -4,22 +4,22 @@ import (
 	"fmt"
 )
 
-func URLClientInit(baseURL string) string {
-	return fmt.Sprintf("%s/api/v1/p/coreclient/init", baseURL)
+func URLClientInit(baseURL, basePath string) string {
+	return fmt.Sprintf("https://%s%s/coreclient/init", baseURL, basePath)
 }
 
-func URLRegisterConfirm(baseURL string) string {
-	return fmt.Sprintf("%s/api/v1/p/coreclient/finish", baseURL)
+func URLRegisterConfirm(baseURL, basePath string) string {
+	return fmt.Sprintf("https://%s%s/coreclient/finish", baseURL, basePath)
 }
 
-func URLActionMessages(baseURL, actionID string) string {
-	return fmt.Sprintf("%s/api/v1/p/coreclient/action/%s", baseURL, actionID)
+func URLActionMessages(baseURL, basePath, actionID string) string {
+	return fmt.Sprintf("https://%s%s/coreclient/action/%s", baseURL, basePath, actionID)
 }
 
-func URLActionApprove(baseURL, actionID string) string {
-	return fmt.Sprintf("%s/api/v1/p/coreclient/action/%s", baseURL, actionID)
+func URLActionApprove(baseURL, basePath, actionID string) string {
+	return fmt.Sprintf("https://%s%s/coreclient/action/%s", baseURL, basePath, actionID)
 }
 
-func URLActionReject(baseURL, actionID string) string {
-	return fmt.Sprintf("%s/api/v1/p/coreclient/action/%s", baseURL, actionID)
+func URLActionReject(baseURL, basePath, actionID string) string {
+	return fmt.Sprintf("https://%s%s/coreclient/action/%s", baseURL, basePath, actionID)
 }

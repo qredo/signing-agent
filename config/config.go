@@ -11,25 +11,21 @@ type httpSettings struct {
 	Addr                 string   `yaml:"addr"`
 	CORSAllowOrigins     []string `yaml:"cors_allow_origins"`
 	ProxyForwardedHeader string   `yaml:"proxy_forwarded_header"`
-	CookieSameSiteMode   string   `yaml:"cookie_same_site"`
-	CookieSecure         bool     `yaml:"cookie_secure"`
 	LogAllRequests       bool     `yaml:"log_all_requests"`
 }
 
 // Config is the service configuration
 type Config struct {
-	Base      Base         `yaml:"base"`
-	HTTP      httpSettings `yaml:"http"`
-	Logging   Logging      `yaml:"logging"`
-	StoreFile string       `yaml:"store_file"`
+	Base    Base         `yaml:"base"`
+	HTTP    httpSettings `yaml:"http"`
+	Logging Logging      `yaml:"logging"`
 }
 
 type Base struct {
-	URL              string `yaml:"url"`
 	PIN              int    `yaml:"int"`
-	QredoURL         string `yaml:"qredo_url"`
 	QredoAPIDomain   string `yaml:"qredo_api_domain"`
 	QredoAPIBasePath string `yaml:"qredo_api_base_path"`
+	StoreFile        string `yaml:"store_file"`
 	AutoApprove      bool   `yaml:"auto_approve"`
 }
 
@@ -41,17 +37,15 @@ type Logging struct {
 // Default creates configuration with default values
 func (c *Config) Default() {
 	c.HTTP = httpSettings{
-		Addr:               "127.0.0.1:8007",
-		CORSAllowOrigins:   []string{"*"},
-		CookieSameSiteMode: "lax",
-		CookieSecure:       true,
+		Addr:             "127.0.0.1:8007",
+		CORSAllowOrigins: []string{"*"},
 	}
-	c.Base.URL = "http://127.0.0.1:8007"
 	c.Base.PIN = 0
-	c.Base.QredoURL = "https://play-api.qredo.network"
+	c.Base.QredoAPIDomain = "play-api.qredo.network"
+	c.Base.QredoAPIBasePath = "/api/v1/p"
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
-	c.StoreFile = "ccstore.db"
+	c.Base.StoreFile = "ccstore.db"
 	c.Base.AutoApprove = true
 }
 
