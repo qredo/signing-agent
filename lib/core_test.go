@@ -27,9 +27,7 @@ func makeCoreHandlerForTests() (*autoApprover, error) {
 		err error
 	)
 	cfg = &config.Base{
-		URL:              "url",
 		PIN:              1234,
-		QredoURL:         "https://play-api.qredo.network",
 		QredoAPIDomain:   "play-api.qredo.network",
 		QredoAPIBasePath: "/api/v1/p",
 		AutoApprove:      true,
@@ -55,9 +53,7 @@ func TestCreateAutomatedApproverClient(t *testing.T) {
 				kv  KVStore
 			)
 			cfg = &config.Base{
-				URL:              "url",
 				PIN:              1234,
-				QredoURL:         "https://play-api.qredo.network",
 				QredoAPIDomain:   "play-api.qredo.network",
 				QredoAPIBasePath: "/api/v1/p",
 				AutoApprove:      true,
