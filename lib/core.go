@@ -8,7 +8,7 @@ import (
 
 type AutomatedApproverClient interface {
 	// ClientInit starts the agent registration process
-	ClientInit(register *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error)
+	ClientInit(register *api.QredoRegisterInitRequest, ref, apikey, b64PrivateKey string) (*api.QredoRegisterInitResponse, error)
 	// ClientRegister starts the simplified agent registration procedure
 	// by generating BLS and EC key pairs and returns the public keys
 	ClientRegister(name string) (*api.ClientRegisterResponse, error)
@@ -18,9 +18,9 @@ type AutomatedApproverClient interface {
 	ClientsList() ([]string, error)
 
 	// ActionApprove signs actionID and sends it for approval to the Qredo backend
-	ActionApprove(agentID, actionID string) error
+	ActionApprove(actionID string) error
 	// ActionReject sends a rejection to the Qredo backend for actionID
-	ActionReject(agentID, actionID string) error
+	ActionReject(actionID string) error
 
 	// Sign uses agentID's BLS seed to sign messageHex and returns the signature
 	Sign(agentID, messageHex string) (*api.SignResponse, error)
@@ -30,6 +30,8 @@ type AutomatedApproverClient interface {
 	SetSystemAgentID(agetID string) error
 	// GetSystemAgentID function to get agent ID that was stored during registration process.
 	GetSystemAgentID() string
+	// GetAgentZKPOnePass function to generate Zero Knowladge Proof one password (for auth header).
+	GetAgentZKPOnePass() ([]byte, error)
 }
 
 type autoApprover struct {

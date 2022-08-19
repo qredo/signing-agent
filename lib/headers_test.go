@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,13 +18,13 @@ func TestHeaders(t *testing.T) {
 		})
 
 	t.Run(
-		"GetHttpHeaders",
+		"GetClientInitHttpHeaders",
 		func(t *testing.T) {
 			var req = &Request{}
 			req.ApiKey = "test"
 			req.Signature = "test"
 			GenTimestamp(req)
-			headers := GetHttpHeaders(req)
+			headers := GetClientInitHttpHeaders(req)
 			assert.Equal(t, req.ApiKey, headers.Get("x-api-key"))
 			assert.Equal(t, req.Signature, headers.Get("x-sign"))
 			assert.Equal(t, req.Timestamp, headers.Get("x-timestamp"))
@@ -35,17 +34,14 @@ func TestHeaders(t *testing.T) {
 		"SignRequest",
 		func(t *testing.T) {
 			// setup test private key
-			generatePrivateKey(t, TestDataPrivatePEMFilePath)
-			defer func() {
-				os.Remove(TestDataPrivatePEMFilePath)
-			}()
+			base64PrivateKey := generatePrivateKeyBase64()
 			// setup request
 			var req = &Request{
 				Uri:  "https://test-domain/",
 				Body: []byte(`{"name": "Test Data"}`),
 			}
 			GenTimestamp(req)
-			LoadRSAKey(req, TestDataPrivatePEMFilePath)
+			DecodeBase64RSAKey(req, base64PrivateKey)
 			assert.NotEmpty(t, req.RsaKey)
 			// make the signature
 			assert.Empty(t, req.Signature)

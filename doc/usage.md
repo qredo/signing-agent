@@ -16,19 +16,19 @@ As mentioned above, the Automated Approver is a standalone component of the Qred
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  PartnerAPP->>automated-approver-service:POST /register {"name":"..."}
+autonumber
+  PartnerAPP->>automated-approver-service:POST /register {"name":"...","APIKey":"...","Base64PrivateKey":"..."}
   automated-approver-service->>automated-approver-service: Generate BLS and EC Keys
   automated-approver-service->>QredoBE: Register agent with Qredo Chain
   QredoBE->>automated-approver-service: {agentId, feedURL, other data} 
   automated-approver-service->>PartnerAPP: {agentId, feedURL}
 ```
 
-1. The *PartnerApp* triggers the registration process by providing its client name to the *automated-approver-service*.
+1. The *PartnerApp* triggers the registration process by providing its client name, parther APIKey and Base64PrivateKey  to the *automated-approver-service*.
 2. *automated-approver-service* generates BLS and EC keys. 
-4. The *automated-approver-service* can now register itself to the partner API on the *QredoBE*, by sending the `client name`, `BLS`, and `EC` public keys.
-12. The `agentId` and a `feedURL` is returned by the *QredoBE* to the *automated-approver-service*. This feed is used by the *automated-approver-service* to keep a communication channel open with the *QredoBE*.
-13. The `agentId` and a `feedURL` is also passed along to the *PartnerApp* so that the latter can monitor for new actions that need to be approved in case the service is not configured for auto-approval.
+3. The *automated-approver-service* can now register itself to the partner API on the *QredoBE*, by sending the `client name`, `BLS`, and `EC` public keys. The *QredoBE* is returning ClientID, CLientSecret that will be responsible for authentication.
+4. The `agentId` and a `feedURL` is returned by the *QredoBE* to the *automated-approver-service*. This feed is used by the *automated-approver-service* to keep a communication channel open with the *QredoBE*.
+5. The `agentId` and a `feedURL` is also passed along to the *PartnerApp* so that the latter can monitor for new actions that need to be approved in case the service is not configured for auto-approval.
 
 All the data above is currently stored on premises in a file by the automated-approver-service, and since some of it (ClientSecret, EC & BLS private keys) is quite sensitive it needs to be running in a secure environment.
 
@@ -42,7 +42,9 @@ Request:
 
 ```json
 {
-  "name": "string"
+  "name": "string", 
+  "APIKey": "string",
+  "Base64PrivateKey": "string"
 }
 ```
 
@@ -72,7 +74,7 @@ sequenceDiagram
   note right of PartnerAPP: inside the automated approver lib
   PartnerAPP->>PartnerAPP: Generate BLS and EC Keys
   end
-  PartnerAPP->>QredoBE: POST /p/coreclient/init Body: {BLS & EC Public keys}
+  PartnerAPP->>QredoBE: ClientInit(reqDataInit, RefID, APIKey, Base64PrivateKey) reqDataInit: {name, BLS & EC PubKeys}
   QredoBE->>QredoBE: Create New MFA ID, New IDDoc
   QredoBE->>PartnerAPP:{ClientSecret, ClientID, unsigned IDDoc, AccountCode}
   PartnerAPP->>PartnerAPP: ClientRegisterFinish(ClientSercert, ID, unsigned IDDoc, AccountCode)
@@ -91,18 +93,18 @@ sequenceDiagram
 Prerequisites: 
 
 - a automated approver service instance has been installed and configured
-- a automated-approver has been created with id `client_id`
+- a automated-approver has been created with id `agentID`
 
 Steps:
 
-1. A websocket connection to the *Qredo BE* is opened for said `client_id`
+1. A websocket connection to the *Qredo BE* is opened for said `agentID`
 2. *PartnerAPP* is constantly monitoring for new actions to be handled
 3. A new transfer is initiated
 4. The *Qredo BE* returns the transaction id: `tx_id`
 5. Shortly after, a new action is received through the websocket with `action_id` equal to the `tx_id` for the transfer.
 6. Initiate new action
 7. The *PartnerAPP* requests from the *Qredo BE* details for the action
-8. *Qredo BE* returns action details incl. the payload
+8. *Qredo BE* returns action details incl. the payload (list of messages)
 9. Sign payload (for the new action)
 10. The *PartnerAPP* decides to approve the transactions, thus sending the payload to the automated-approver with a `PUT` request. (`DELETE` is for reject)
 
@@ -115,21 +117,21 @@ sequenceDiagram
   autonumber
 
   par
-  PartnerAPP->>QredoBE: WEBSOCKET /coreclient/{client_id}/feed
+  PartnerAPP->>QredoBE: WEBSOCKET /coreclient/feed
   PartnerAPP->>PartnerAPP: monitor for new actions
   end
   PartnerAPP->>QredoBE:POST /company/{company_id}/transfer
   QredoBE->>PartnerAPP: tx_id
   QredoBE->>PartnerAPP: {via websocket } action_id(==tx_id), type, status
-  PartnerAPP->>PartnerAPP: ActionApprove(agentID, actionID)
+  PartnerAPP->>PartnerAPP: ActionApprove(actionID)
   rect rgb(200, 150, 255)
   note right of PartnerAPP: inside the automated approver lib
   PartnerAPP->>QredoBE: GET /coreclient/action/{action_id}
-  QredoBE->>PartnerAPP: action details incl. payload
-  PartnerAPP->>PartnerAPP: sign payload
-  PartnerAPP->>QredoBE: PUT /coreclient/action/{action_id} send signed payload to BE
-  end
+  QredoBE->>PartnerAPP: action details incl. list of messages
+  PartnerAPP->>PartnerAPP: signing those messages
+  PartnerAPP->>QredoBE: PUT /coreclient/action/{action_id} send signed messages to BE
 
+  end
 ```
 
 
@@ -148,7 +150,9 @@ ClientRegisterFinishRequest {
 
 ```Go
 ClientRegisterRequest {
-    name    string
+    name             string
+    apikey           string
+    base64privatekey string
 }
 ```
 

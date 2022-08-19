@@ -9,9 +9,7 @@ import (
 )
 
 const (
-	TestDataPrivatePEMFilePath = "../testdata/private.pem"
-	TestDataAPIKeyFilePath     = "../testdata/apikey"
-	TestDataDBStoreFilePath    = "../testdata/test-store.db"
+	TestDataDBStoreFilePath = "../testdata/test-store.db"
 )
 
 func NewMock(cfg *config.Base, kv KVStore) (*autoApprover, error) {
@@ -29,14 +27,12 @@ func makeCoreHandlerForTests() (*autoApprover, error) {
 		err error
 	)
 	cfg = &config.Base{
-		URL:                "url",
-		PIN:                1234,
-		QredoURL:           "https://play-api.qredo.network",
-		QredoAPIDomain:     "play-api.qredo.network",
-		QredoAPIBasePath:   "/api/v1/p",
-		PrivatePEMFilePath: TestDataPrivatePEMFilePath,
-		APIKeyFilePath:     TestDataAPIKeyFilePath,
-		AutoApprove:        true,
+		URL:              "url",
+		PIN:              1234,
+		QredoURL:         "https://play-api.qredo.network",
+		QredoAPIDomain:   "play-api.qredo.network",
+		QredoAPIBasePath: "/api/v1/p",
+		AutoApprove:      true,
 	}
 
 	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
@@ -59,18 +55,15 @@ func TestCreateAutomatedApproverClient(t *testing.T) {
 				kv  KVStore
 			)
 			cfg = &config.Base{
-				URL:                "url",
-				PIN:                1234,
-				QredoURL:           "https://play-api.qredo.network",
-				QredoAPIDomain:     "play-api.qredo.network",
-				QredoAPIBasePath:   "/api/v1/p",
-				PrivatePEMFilePath: TestDataPrivatePEMFilePath,
-				APIKeyFilePath:     TestDataAPIKeyFilePath,
-				AutoApprove:        true,
+				URL:              "url",
+				PIN:              1234,
+				QredoURL:         "https://play-api.qredo.network",
+				QredoAPIDomain:   "play-api.qredo.network",
+				QredoAPIBasePath: "/api/v1/p",
+				AutoApprove:      true,
 			}
 			cC, err := NewMock(cfg, kv)
 			assert.NoError(t, err)
 			assert.Equal(t, cC.cfg.PIN, cfg.PIN)
-			assert.Equal(t, cC.cfg.PrivatePEMFilePath, cfg.PrivatePEMFilePath)
 		})
 }

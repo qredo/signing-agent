@@ -43,50 +43,21 @@ func (h *handler) HealthCheck(_ *defs.RequestContext, _ http.ResponseWriter, r *
 	return response, nil
 }
 
-// ClientRegister
+// ClientsList
 //
-// swagger:route POST /client clientRegister clientRegisterInit
+// swagger:route GET /client clientsList ClientsList
 //
-// Initiate client registration procedure
-//
-// Responses:
-//      200: clientRegisterResponse
-func (h *handler) ClientRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	req := &api.ClientRegisterRequest{}
-	err := util.DecodeRequest(req, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return h.core.ClientRegister(req.Name)
-}
-
-// ClientRegisterFinish
-//
-// swagger:route POST /client/{ref}  clientRegister clientRegisterFinish
-//
-// Finish client registration procedure
+// Return AgentID if it's configured
 //
 // Responses:
-//      200: clientRegisterFinishResponse
-func (h *handler) ClientRegisterFinish(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	ref := mux.Vars(r)["ref"]
-	req := &api.ClientRegisterFinishRequest{}
-	err := util.DecodeRequest(req, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return h.core.ClientRegisterFinish(req, ref)
-}
-
+//      200: []string
 func (h *handler) ClientsList(_ *defs.RequestContext, _ http.ResponseWriter, _ *http.Request) (interface{}, error) {
 	return h.core.ClientsList()
 }
 
 // ActionApprove
 //
-// swagger:route PUT /client/{client_id}/action/{action_id}  actions actionApprove
+// swagger:route PUT /client/action/{action_id}  actions actionApprove
 //
 // Approve action
 //
@@ -95,17 +66,13 @@ func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r
 	if actionID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("actionID")
 	}
-	agentID := mux.Vars(r)["agent_id"]
-	if agentID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("agentID")
-	}
 
-	return nil, h.core.ActionApprove(agentID, actionID)
+	return nil, h.core.ActionApprove(actionID)
 }
 
 // ActionReject
 //
-// swagger:route DELETE /client/{client_id}/action/{action_id}  actions actionReject
+// swagger:route DELETE /client/action/{action_id}  actions actionReject
 //
 // Reject action
 //
@@ -114,12 +81,7 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 	if actionID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("actionID")
 	}
-	agentID := mux.Vars(r)["agent_id"]
-	if agentID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("agentID")
-	}
-
-	return nil, h.core.ActionReject(agentID, actionID)
+	return nil, h.core.ActionReject(actionID)
 }
 
 // Sign
@@ -171,69 +133,20 @@ func (h *handler) AutoApproval() error {
 	}
 
 	h.log.Debug("Handler for AutoApproval background job")
-
-	var agentID string
-
-	agentID = h.core.GetSystemAgentID()
-	if agentID == "" {
-		h.log.Info("Agent is not yet configured, skipping Websocket connection for auto-approval")
-		return nil
-	}
-
-	req := &lib.Request{}
-	GenWSQredoCoreClientFeedURL(h, agentID, req)
-
-	lib.GenTimestamp(req)
-
-	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
-	if err != nil {
-		return err
-	}
-	h.log.Debugf("Loaded RSA key for AutoApproval from %s", h.cfg.Base.PrivatePEMFilePath)
-
-	err = lib.LoadAPIKey(req, h.cfg.Base.APIKeyFilePath)
-	if err != nil {
-		return err
-	}
-	h.log.Debugf("Loaded API key for AutoApproval from %s", h.cfg.Base.APIKeyFilePath)
-
-	err = lib.SignRequest(req)
-	if err != nil {
-		return err
-	}
-
-	go WebSocketHandler(h, req)
+	go WebSocketHandler(h)
 
 	return nil
 }
 
 // ClientFeed
 //
+// swagger:route POST /client/feed  clientFeed ClientFeed
+//
 // Get approval requests Feed (via websocket) from Qredo Backend
 //
 func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFeed endpoint")
-	agentID := mux.Vars(r)["agent_id"]
-	if agentID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("agentID")
-	}
-	req := &lib.Request{}
-
-	GenWSQredoCoreClientFeedURL(h, agentID, req)
-	lib.GenTimestamp(req)
-	err := lib.LoadRSAKey(req, h.cfg.Base.PrivatePEMFilePath)
-	if err != nil {
-		return nil, err
-	}
-	err = lib.LoadAPIKey(req, h.cfg.Base.APIKeyFilePath)
-	if err != nil {
-		return nil, err
-	}
-	err = lib.SignRequest(req)
-	if err != nil {
-		return nil, err
-	}
-	WebSocketFeedHandler(h, req, w, r)
+	WebSocketFeedHandler(h, w, r)
 	return nil, nil
 }
 
@@ -251,22 +164,26 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 		return nil, defs.ErrBadRequest().WithDetail("AgentID already exist. You can not set new one.")
 	}
 	response := api.ClientFullRegisterResponse{}
-	req := &api.ClientRegisterRequest{}
-	err := util.DecodeRequest(req, r)
+	cRegReq := &api.ClientRegisterRequest{}
+	err := util.DecodeRequest(cRegReq, r)
 	if err != nil {
 		return nil, err
 	}
-	registerResults, err := h.core.ClientRegister(req.Name) // we get bls, ec publicks keys
+	if err := cRegReq.Validate(); err != nil {
+		return nil, defs.ErrBadRequest().WithDetail(err.Error())
+	}
+	registerResults, err := h.core.ClientRegister(cRegReq.Name) // we get bls, ec publicks keys
 	if err != nil {
 		return nil, err
 	}
 
 	reqDataInit := &api.QredoRegisterInitRequest{
-		Name:         req.Name,
+		Name:         cRegReq.Name,
 		BLSPublicKey: registerResults.BLSPublicKey,
 		ECPublicKey:  registerResults.ECPublicKey,
 	}
-	initResults, err := h.core.ClientInit(reqDataInit, registerResults.RefID)
+
+	initResults, err := h.core.ClientInit(reqDataInit, registerResults.RefID, cRegReq.APIKey, cRegReq.Base64PrivateKey)
 	if err != nil {
 		return response, err
 	}
@@ -285,7 +202,7 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWrit
 	}
 
 	// return local feedUrl for request approvals
-	response.FeedURL = fmt.Sprintf("ws://%s%s/client/%s/feed", h.cfg.HTTP.Addr, pathPrefix, initResults.AccountCode)
+	response.FeedURL = fmt.Sprintf("ws://%s%s/client/feed", h.cfg.HTTP.Addr, pathPrefix)
 
 	// also enable auto-approval of requests
 	h.AutoApproval()
