@@ -1,7 +1,36 @@
 package api
 
+import (
+	"errors"
+	"strings"
+)
+
+const (
+	maxBase64FieldSize = 4096
+	maxStringFieldSize = 256
+)
+
 type ClientRegisterRequest struct {
-	Name string `json:"name"`
+	Name             string `json:"name"`
+	APIKey           string `json:"apikey"`
+	Base64PrivateKey string `json:"base64privatekey"`
+}
+
+func (r *ClientRegisterRequest) Validate() error {
+	r.Name = strings.TrimSpace(r.Name)
+	r.APIKey = strings.TrimSpace(r.APIKey)
+	r.Base64PrivateKey = strings.TrimSpace(r.Base64PrivateKey)
+
+	switch {
+	case r.Name == "" || len(r.Name) > maxStringFieldSize:
+		return errors.New("name")
+	case r.APIKey == "" || len(r.APIKey) > maxStringFieldSize:
+		return errors.New("apikey")
+	case r.Base64PrivateKey == "" || len(r.Base64PrivateKey) > maxBase64FieldSize:
+		return errors.New("base64privatekey")
+	default:
+		return nil
+	}
 }
 
 // swagger:model clientRegisterResponse

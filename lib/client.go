@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/btcsuite/btcd/btcec"
 
@@ -90,7 +91,7 @@ func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 		return nil, errors.Wrap(err, "idDoc sign")
 	}
 
-	zkpToken, err := util.ZKPToken(pending.ZKPID, pending.ZKPToken, h.cfg.PIN)
+	zkpOnePass, err := util.ZKPOnePass(pending.ZKPID, pending.ZKPToken, h.cfg.PIN)
 	if err != nil {
 		return nil, errors.Wrap(err, "get zkp token")
 	}
@@ -100,7 +101,7 @@ func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 	}
 
 	header := http.Header{}
-	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
+	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 
 	finishResp := &api.CoreClientServiceRegisterFinishResponse{}
 
@@ -138,26 +139,23 @@ func (h *autoApprover) ClientsList() ([]string, error) {
 	}
 }
 
-func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref string) (*api.QredoRegisterInitResponse, error) {
+func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref, apikey, b64PrivateKey string) (*api.QredoRegisterInitResponse, error) {
 	reqDataBody, err := json.Marshal(reqData)
 	if err != nil {
 		return nil, err
 	}
 	req := &Request{Body: reqDataBody}
 	GenTimestamp(req)
-	err = LoadRSAKey(req, h.cfg.PrivatePEMFilePath)
+	err = DecodeBase64RSAKey(req, b64PrivateKey)
 	if err != nil {
 		return nil, err
 	}
-	err = LoadAPIKey(req, h.cfg.APIKeyFilePath)
-	if err != nil {
-		return nil, err
-	}
+	req.ApiKey = strings.TrimSpace(apikey)
 	err = SignRequest(req)
 	if err != nil {
 		return nil, err
 	}
-	headers := GetHttpHeaders(req)
+	headers := GetClientInitHttpHeaders(req)
 
 	var respData *api.QredoRegisterInitResponse = &api.QredoRegisterInitResponse{}
 	if err = h.htc.Request(http.MethodPost, util.URLClientInit(h.cfg.QredoURL), reqData, respData, headers); err != nil {
@@ -172,4 +170,20 @@ func (h *autoApprover) SetSystemAgentID(agetID string) error {
 
 func (h *autoApprover) GetSystemAgentID() string {
 	return h.store.GetSystemAgentID()
+}
+
+func (h *autoApprover) GetAgentZKPOnePass() ([]byte, error) {
+	agentID := h.store.GetSystemAgentID()
+	if agentID == "" {
+		return nil, errors.Errorf("can not get system agent ID from the store.")
+	}
+	agent := h.store.GetAgent(agentID)
+	if agent == nil {
+		return nil, errors.Errorf("can not get agent from the store.")
+	}
+	zkpOnePass, err := util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
+	if err != nil {
+		return nil, err
+	}
+	return zkpOnePass, nil
 }

@@ -13,19 +13,23 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func (h *autoApprover) ActionApprove(agentID, actionID string) error {
-	agent := h.store.GetAgent(agentID)
-	if agent == nil {
+func (h *autoApprover) ActionApprove(actionID string) error {
+	agentID := h.store.GetSystemAgentID()
+	if agentID == "" {
 		return defs.ErrNotFound().WithDetail("agentID")
 	}
+	agent := h.store.GetAgent(agentID)
+	if agent == nil {
+		return defs.ErrNotFound().WithDetail("agent")
+	}
 
-	zkpToken, err := util.ZKPToken(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
+	zkpOnePass, err := util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}
 
 	header := http.Header{}
-	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
+	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 	messagesResp := &api.CoreClientServiceActionMessagesResponse{}
 	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.QredoURL, actionID), nil, messagesResp, header); err != nil {
 		return err
@@ -50,7 +54,7 @@ func (h *autoApprover) ActionApprove(agentID, actionID string) error {
 		signatures[i] = hex.EncodeToString(signature)
 	}
 
-	zkpToken, err = util.ZKPToken(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
+	zkpOnePass, err = util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}
@@ -59,7 +63,7 @@ func (h *autoApprover) ActionApprove(agentID, actionID string) error {
 		Signatures: signatures,
 	}
 	header = http.Header{}
-	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
+	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.QredoURL, actionID), req, nil, header); err != nil {
 		return err
 	}
@@ -67,19 +71,14 @@ func (h *autoApprover) ActionApprove(agentID, actionID string) error {
 	return nil
 }
 
-func (h *autoApprover) ActionReject(agentID, actionID string) error {
-	agent := h.store.GetAgent(agentID)
-	if agent == nil {
-		return defs.ErrNotFound().WithDetail("agentID")
-	}
-
-	zkpToken, err := util.ZKPToken(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
+func (h *autoApprover) ActionReject(actionID string) error {
+	zkpOnePass, err := h.GetAgentZKPOnePass()
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}
 
 	header := http.Header{}
-	header.Set(defs.AuthHeader, hex.EncodeToString(zkpToken))
+	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 
 	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.QredoURL, actionID), nil, nil, header); err != nil {
 		return err

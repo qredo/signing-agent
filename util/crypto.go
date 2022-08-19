@@ -61,7 +61,7 @@ func BLSVerify(seed, msg, sig []byte) error {
 	return crypto.BLSVerify(msg, blsPublic, sig)
 }
 
-func ZKPToken(zkpID, zkpToken []byte, pin int) ([]byte, error) {
+func ZKPOnePass(zkpID, zkpToken []byte, pin int) ([]byte, error) {
 
 	rng, err := CreateAMCLRng()
 	if err != nil {

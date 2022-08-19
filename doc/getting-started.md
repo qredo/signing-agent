@@ -80,19 +80,17 @@ Click on the “Select user to authenticate” dropdown and select your user fro
 
 ## Create a Docker volume for storing config data
 
-You need to create a local folder to store the database, API key and private RSA key. When you run the Docker image, you must reference that local folder since it is shared between the local system and the Docker image. For this reason, we create need to the Docker volume service first. Go here to learn more about [Docker volumes](https://docs.docker.com/storage/volumes/).
+You need to create a local folder to store the database and eventually private RSA key if You want keep there (it's not required). When you run the Docker image, you must reference that local folder since it is shared between the local system and the Docker image. For this reason, we create need to the Docker volume service first. Go here to learn more about [Docker volumes](https://docs.docker.com/storage/volumes/).
 
-At this stage, you need to create a folder and later you will add to it the API key and private RSA key and then configure it via docker create volume. For example, we will create a local folder and name it `volume`.
-
+At this stage, you need to create a folder and later the db will be created there automaticly (by the docker).
+Configure it via `docker create volume`. For example, we will create a local folder and name it `volume`.
 In the terminal, run this command to create the folder in your home dir:
 
 `mkdir ~/volume`
 
-On the steps that follow, you will create the `private.pem` and `apiKey` files and store them in the Docker volume folder that you’ve created above.
+On the steps that follow, you will create the `private.pem` files and you can store it in the Docker volume folder that you’ve created above.
 
-Please create an empty `apiKey` file for now. You’ll be able to store your actual API key once you go through the Qredo Network onboarding section and you get access to your own account.
-
-## Generate RSA keys for signing requests (Partner API)
+## Generate RSA keys for signing request on register step (Partner API)
 
 The following example uses the terminal (CLI) for generating the RSA key pair but you can use any preferred tool to perform this task. The Qredo Partner API works with 2048 bit RSA keys.
 
@@ -110,11 +108,17 @@ You should see the following message:
 
 `openssl rsa -in private.pem -outform PEM -pubout -out public.pem`
 
-Copy your `private.pem` file to the local `volume` folder you create above.
+Copy your `private.pem` file to the local `volume` folder you create above or keep it in safe place.
+
+4. Generate base64 representation of this `private.pem` key
+
+`base64 /path/to/volume/private.pem`
+
+Copy your `Base64PrivateKey` token to the clipboard. You are going to use it as a part of payload data on registration endpoint.
 
 ## Create Docker volume and run the image
 
-**Important!** before running the docker image, please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to the `volume` as well as the `apiKey` and `private.pem` files.
+**Important!** before running the docker image, please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to the `volume`.
 
 1. Create Docker volume:
 
@@ -134,7 +138,7 @@ You can now continue with testing of the Docker image.
 
 When everything is setup properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) we can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/`.
 
-The PartnerApp triggers the registration process by providing an agent name to the Signing Agent service. Make sure to remember the `agentId` value, since you will need it afterwards.
+The PartnerApp triggers the registration process by providing an agent name, partner api key and private.pem represented by base64 string to the Signing Agent service. You don't have to remember the `agentId` value, because You can call `GET https://agent.example.org/api/v1/client` endpoint to get it.
 
 ```bash
 **Request**:
@@ -143,13 +147,13 @@ curl -X 'POST' \
   'https://agent.example.org/api/v1/register' \
   -H 'Content-Type: application/json' \
   -H 'X-API-KEY: eyJrZXlfaWQiOFuZGJveCI6dHJ1ZX0=' \
-  -d '{"name": "Test Agent"}'
+  -d '{"name": "Test Agent", "APIKey": "Partner APIKey from the webpage", "Base64PrivateKey": "token from the clipboard"}'
 
 **Response**:
 
 {
 	"agentId":"CBApocs97bS7SgE21Ht5xRHFWRbcrH9AMZHgsoUd2gpp",
-	"feedUrl":"ws://localhost:8007/api/v1/client/CBAp...2gpp/feed"
+	"feedUrl":"ws://localhost:8007/api/v1/client/feed"
 }
 ```
 

@@ -25,7 +25,7 @@ func GenTimestamp(req *Request) {
 	req.Timestamp = fmt.Sprintf("%v", time.Now().Unix())
 }
 
-func GetHttpHeaders(req *Request) http.Header {
+func GetClientInitHttpHeaders(req *Request) http.Header {
 	headers := http.Header{}
 	headers.Add("x-api-key", req.ApiKey)
 	headers.Add("x-sign", req.Signature)

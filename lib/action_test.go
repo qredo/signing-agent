@@ -31,14 +31,12 @@ func TestAction(t *testing.T) {
 		err error
 	)
 	cfg = &config.Base{
-		URL:                "url",
-		PIN:                1234,
-		QredoURL:           "https://play-api.qredo.network",
-		QredoAPIDomain:     "play-api.qredo.network",
-		QredoAPIBasePath:   "/api/v1/p",
-		PrivatePEMFilePath: TestDataPrivatePEMFilePath,
-		APIKeyFilePath:     TestDataAPIKeyFilePath,
-		AutoApprove:        true,
+		URL:              "url",
+		PIN:              1234,
+		QredoURL:         "https://play-api.qredo.network",
+		QredoAPIDomain:   "play-api.qredo.network",
+		QredoAPIBasePath: "/api/v1/p",
+		AutoApprove:      true,
 	}
 
 	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
@@ -50,17 +48,6 @@ func TestAction(t *testing.T) {
 
 	core, err := NewMock(cfg, kv)
 	assert.NoError(t, err)
-	generatePrivateKey(t, core.cfg.PrivatePEMFilePath)
-	defer func() {
-		err = os.Remove(TestDataPrivatePEMFilePath)
-		assert.NoError(t, err)
-	}()
-	err = os.WriteFile(core.cfg.APIKeyFilePath, []byte(""), 0644)
-	assert.NoError(t, err)
-	defer func() {
-		err = os.Remove(TestDataAPIKeyFilePath)
-		assert.NoError(t, err)
-	}()
 	var (
 		accountCode = "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"
 		actionID    = "2D7YA7Ojo3zGRtHP9bw37wF5jq3"
@@ -71,6 +58,7 @@ func TestAction(t *testing.T) {
 	err = json.Unmarshal(data, agent)
 	assert.NoError(t, err)
 	core.store.AddAgent(accountCode, agent)
+	core.store.SetSystemAgentID(accountCode)
 
 	t.Run(
 		"ActionApprove",
@@ -100,7 +88,7 @@ func TestAction(t *testing.T) {
 				return popMockHttpResponse(httpResponseList), nil
 			}
 
-			err = core.ActionApprove(accountCode, actionID)
+			err = core.ActionApprove(actionID)
 			assert.NoError(t, err)
 		})
 
@@ -126,7 +114,7 @@ func TestAction(t *testing.T) {
 				return popMockHttpResponse(httpResponseList), nil
 			}
 
-			err = core.ActionApprove(accountCode, actionID)
+			err = core.ActionApprove(actionID)
 			assert.Error(t, err)
 		})
 
@@ -152,14 +140,7 @@ func TestAction(t *testing.T) {
 				return popMockHttpResponse(httpResponseList), nil
 			}
 
-			err = core.ActionApprove(accountCode, actionID)
-			assert.Error(t, err)
-		})
-
-	t.Run(
-		"ActionApprove with fake Agent ID",
-		func(t *testing.T) {
-			err = core.ActionApprove("fake accountCode", actionID)
+			err = core.ActionApprove(actionID)
 			assert.Error(t, err)
 		})
 
@@ -173,14 +154,8 @@ func TestAction(t *testing.T) {
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
 				}, nil
 			}
-			err = core.ActionReject(accountCode, actionID)
+			err = core.ActionReject(actionID)
 			assert.NoError(t, err)
 		})
 
-	t.Run(
-		"ActionReject with fake Agent ID",
-		func(t *testing.T) {
-			err = core.ActionReject("fake accountCode", actionID)
-			assert.Error(t, err)
-		})
 }

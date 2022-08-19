@@ -26,14 +26,12 @@ func TestClient(t *testing.T) {
 		err error
 	)
 	cfg = &config.Base{
-		URL:                "url",
-		PIN:                1234,
-		QredoURL:           "https://play-api.qredo.network",
-		QredoAPIDomain:     "play-api.qredo.network",
-		QredoAPIBasePath:   "/api/v1/p",
-		PrivatePEMFilePath: TestDataPrivatePEMFilePath,
-		APIKeyFilePath:     TestDataAPIKeyFilePath,
-		AutoApprove:        true,
+		URL:              "url",
+		PIN:              1234,
+		QredoURL:         "https://play-api.qredo.network",
+		QredoAPIDomain:   "play-api.qredo.network",
+		QredoAPIBasePath: "/api/v1/p",
+		AutoApprove:      true,
 	}
 	agentName := "Test name agent"
 	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
@@ -44,9 +42,6 @@ func TestClient(t *testing.T) {
 	}()
 
 	core, err := NewMock(cfg, kv)
-	assert.NoError(t, err)
-	generatePrivateKey(t, core.cfg.PrivatePEMFilePath)
-	err = os.WriteFile(core.cfg.APIKeyFilePath, []byte(""), 0644)
 	assert.NoError(t, err)
 
 	var (
@@ -94,8 +89,9 @@ func TestClient(t *testing.T) {
 				}, nil
 
 			}
-
-			initResponse, err = core.ClientInit(initRequest, registerResponse.RefID)
+			apikey := "SoMeTestAPIKey=="
+			b64PrvKey := generatePrivateKeyBase64()
+			initResponse, err = core.ClientInit(initRequest, registerResponse.RefID, apikey, b64PrvKey)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, initResponse.AccountCode)
 

@@ -25,14 +25,12 @@ type Config struct {
 }
 
 type Base struct {
-	URL                string `yaml:"url"`
-	PIN                int    `yaml:"int"`
-	QredoURL           string `yaml:"qredo_url"`
-	QredoAPIDomain     string `yaml:"qredo_api_domain"`
-	QredoAPIBasePath   string `yaml:"qredo_api_base_path"`
-	PrivatePEMFilePath string `yaml:"private_key_path"`
-	APIKeyFilePath     string `yaml:"api_key_path"`
-	AutoApprove        bool   `yaml:"auto_approve"`
+	URL              string `yaml:"url"`
+	PIN              int    `yaml:"int"`
+	QredoURL         string `yaml:"qredo_url"`
+	QredoAPIDomain   string `yaml:"qredo_api_domain"`
+	QredoAPIBasePath string `yaml:"qredo_api_base_path"`
+	AutoApprove      bool   `yaml:"auto_approve"`
 }
 
 type Logging struct {
@@ -54,8 +52,6 @@ func (c *Config) Default() {
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
 	c.StoreFile = "ccstore.db"
-	c.Base.PrivatePEMFilePath = "private.pem"
-	c.Base.APIKeyFilePath = "apikey"
 	c.Base.AutoApprove = true
 }
 

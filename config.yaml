@@ -3,8 +3,6 @@ base:
   qredo_url: https://play-api.qredo.network
   qredo_api_domain: play-api.qredo.network
   qredo_api_base_path: /api/v1/p
-  private_key_path: /volume/private.pem
-  api_key_path: /volume/apikey
   auto_approve: true
 http:
   addr: 0.0.0.0:8007

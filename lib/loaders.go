@@ -2,24 +2,16 @@ package lib
 
 import (
 	"crypto/x509"
+	b64 "encoding/base64"
 	"encoding/pem"
-	"io/ioutil"
-	"os"
-	"strings"
 
 	"github.com/pkg/errors"
 )
 
-func LoadRSAKey(req *Request, path string) error {
-	f, err := os.Open(path)
+func DecodeBase64RSAKey(req *Request, base64PrivateKey string) error {
+	pemData, err := b64.StdEncoding.DecodeString(base64PrivateKey)
 	if err != nil {
-		return errors.Wrap(err, "load RSA key")
-	}
-	defer f.Close()
-
-	pemData, err := ioutil.ReadAll(f)
-	if err != nil {
-		return errors.Wrap(err, "can't read RSA key file")
+		return errors.Wrap(err, "decoding base64 RSA key")
 	}
 
 	block, _ := pem.Decode(pemData)
@@ -31,19 +23,6 @@ func LoadRSAKey(req *Request, path string) error {
 	return nil
 }
 
-func LoadAPIKey(req *Request, path string) error {
-	k, err := os.Open(path)
-	if err != nil {
-		return errors.Wrap(err, "cannot open api key file")
-
-	}
-	defer k.Close()
-
-	key, err := ioutil.ReadAll(k)
-	if err != nil {
-		return errors.Wrap(err, "cannot read api key file")
-	}
-
-	req.ApiKey = strings.TrimSpace(string(key))
-	return nil
+func EncodeBase64RSAKey(privateKeyByte []byte) string {
+	return b64.StdEncoding.EncodeToString(privateKeyByte)
 }

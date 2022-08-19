@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	lib "gitlab.qredo.com/custody-engine/automated-approver/lib"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
 type Parser interface {
@@ -31,30 +32,35 @@ func (a *ActionInfo) Parse() string {
 	return string(out)
 }
 
-func GenWSQredoCoreClientFeedURL(h *handler, agentID string, req *lib.Request) {
+func GenWSQredoCoreClientFeedURL(h *handler) string {
 	builder := strings.Builder{}
 	builder.WriteString("wss://")
 	builder.WriteString(h.cfg.Base.QredoAPIDomain)
 	builder.WriteString(h.cfg.Base.QredoAPIBasePath)
-	builder.WriteString("/coreclient/")
-	builder.WriteString(agentID)
-	builder.WriteString("/feed")
-	req.Uri = builder.String()
+	builder.WriteString("/coreclient/feed")
+	return builder.String()
 }
 
-func WebSocketHandler(h *handler, req *lib.Request) {
+func WebSocketHandler(h *handler) {
 	h.log.Debug("Handler for WebSocketHandler")
-	url := req.Uri
+	agentID := h.core.GetSystemAgentID()
+	if len(agentID) == 0 {
+		h.log.Info("Agent is not yet configured, skipping Websocket connection for auto-approval")
+		return
+	}
+	url := GenWSQredoCoreClientFeedURL(h)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	h.log.Debug(fmt.Sprintf("connecting to %s", url))
+	zkpOnePass, err := h.core.GetAgentZKPOnePass()
+	if err != nil {
+		h.log.Errorf("cannot get zkp token: ", err)
+		return
+	}
 
 	headers := http.Header{}
-	headers.Add("x-api-key", req.ApiKey)
-	headers.Add("x-sign", req.Signature)
-	headers.Add("x-timestamp", req.Timestamp)
+	headers.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
@@ -110,38 +116,41 @@ func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, inter
 	baseInc := intervalSeconds
 	timeEdge := time.Duration(maxMinutes) * time.Minute
 	for {
-		err := h.core.ActionApprove(action.AgentID, action.ID)
+		err := h.core.ActionApprove(action.ID)
 		if err == nil {
-			h.log.Infof("[AgentID:%v] Action %v approved automatically", action.AgentID, action.ID)
+			h.log.Infof("Action [%v] approved automatically", action.ID)
 			break
 		} else {
-			h.log.Errorf("[AgentID:%v] Action %v approval failed, error msg: %v", action.AgentID, action.ID, err)
+			h.log.Errorf("Action [%v] approval failed, error msg: %v", action.AgentID, action.ID, err)
 		}
 		if time.Since(tStart) >= timeEdge {
 			// Action Approval should be skiped after maxMinutes is achieved (e.g. 5 minutes)
-			h.log.Warnf("Auto action approve failed [AgentID:%v][actionID:%v]", action.AgentID, action.ID)
+			h.log.Warnf("Auto action approve failed [actionID:%v]", action.ID)
 			break
 		}
 
-		h.log.Warnf("Auto approve action is repeated [AgentID:%v][actionID:%v] ", action.AgentID, action.ID)
+		h.log.Warnf("Auto approve action is repeated [actionID:%v] ", action.ID)
 		time.Sleep(time.Duration(baseInc) * time.Second)
 		baseInc += intervalSeconds
 	}
 }
 
-func WebSocketFeedHandler(h *handler, req *lib.Request, w http.ResponseWriter, r *http.Request) {
+func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 	h.log.Debug("Handler for WebSocketFeedHandler")
 
-	url := req.Uri
+	url := GenWSQredoCoreClientFeedURL(h)
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
 	h.log.Debug(fmt.Sprintf("connecting to %s", url))
 
+	zkpOnePass, err := h.core.GetAgentZKPOnePass()
+	if err != nil {
+		h.log.Errorf("cannot get zkp token: ", err)
+		return
+	}
 	headers := http.Header{}
-	headers.Add("x-api-key", req.ApiKey)
-	headers.Add("x-sign", req.Signature)
-	headers.Add("x-timestamp", req.Timestamp)
+	headers.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {

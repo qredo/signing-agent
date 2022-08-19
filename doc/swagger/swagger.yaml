@@ -14,6 +14,10 @@ definitions:
     type: object
   ClientRegisterRequest:
     properties:
+      apikey:
+        type: string
+      base64privatekey:
+        type: string
       name:
         type: string
     type: object
@@ -54,32 +58,14 @@ definitions:
     type: object
 paths:
   /client:
-    post:
-      description: Initiate client registration procedure
-      operationId: clientRegisterInit
-      parameters:
-      - in: body
-        name: Body
-        schema:
-          $ref: '#/definitions/ClientRegisterRequest'
+    get:
+      description: Return AgentID if it's configured
+      operationId: ClientsList
       responses:
         "200":
-          description: clientRegisterResponse
-          schema:
-            $ref: '#/definitions/clientRegisterResponse'
+          $ref: '#/responses/string'
       tags:
-      - clientRegister
-  /client/{client_id}/action/{action_id}:
-    delete:
-      description: Reject action
-      operationId: actionReject
-      tags:
-      - actions
-    put:
-      description: Approve action
-      operationId: actionApprove
-      tags:
-      - actions
+      - clientsList
   /client/{client_id}/sign:
     post:
       description: Sign a payload
@@ -96,22 +82,32 @@ paths:
             $ref: '#/definitions/signResponse'
       tags:
       - payloads
-  /client{ref}:
+  /client/action/{action_id}:
+    delete:
+      description: Reject action
+      operationId: actionReject
+      tags:
+      - actions
+    put:
+      description: Approve action
+      operationId: actionApprove
+      tags:
+      - actions
+  /client/feed:
     post:
-      description: Finish client registration procedure
-      operationId: clientRegisterFinish
-      parameters:
-      - in: body
-        name: Body
-        schema:
-          $ref: '#/definitions/ClientRegisterFinishRequest'
+      description: Get approval requests Feed (via websocket) from Qredo Backend
+      operationId: ClientFeed
+      tags:
+      - clientFeed
+  /client/register:
+    post:
+      description: Client registration process (3 steps in one)
+      operationId: ClientFullRegister
       responses:
         "200":
-          description: clientRegisterFinishResponse
-          schema:
-            $ref: '#/definitions/clientRegisterFinishResponse'
+          $ref: '#/responses/ClientRegisterFinishResponse'
       tags:
-      - clientRegister
+      - clientFullRegister
   /verify:
     post:
       description: Verify a signature
