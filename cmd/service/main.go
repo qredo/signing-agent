@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	"gitlab.qredo.com/custody-engine/automated-approver/rest"
+	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
 
 	"github.com/jessevdk/go-flags"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
@@ -13,13 +14,13 @@ import (
 )
 
 var (
-	version   = "dev"
-	commit    = "none"
-	buildDate = "not-set"
+	buildType    = ""
+	buildVersion = ""
+	buildDate    = ""
 )
 
 func startText() {
-	fmt.Printf("Automated approver service %v (%v) build date: %v\n\n", version, commit, buildDate)
+	fmt.Printf("Automated approver service %v (%v) build date: %v\n\n", buildType, buildVersion, buildDate)
 }
 
 type versionCmd struct{}
@@ -46,7 +47,18 @@ func (c *startCmd) Execute([]string) error {
 	log := logger(&cfg.Logging)
 	log.Info("Loaded config file from " + c.ConfigFile)
 
-	router, err := rest.NewQRouter(log, &cfg)
+	ver := version.DefaultVersion()
+	if len(buildType) > 0 {
+		ver.BuildType = buildType
+	}
+	if len(buildVersion) > 0 {
+		ver.BuildVersion = buildVersion
+	}
+	if len(buildDate) > 0 {
+		ver.BuildDate = buildDate
+	}
+
+	router, err := rest.NewQRouter(log, &cfg, ver)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		os.Exit(1)

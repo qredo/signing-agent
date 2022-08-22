@@ -18,28 +18,33 @@ import (
 )
 
 type handler struct {
-	core lib.AutomatedApproverClient
-	cfg  config.Config
-	log  *zap.SugaredLogger
+	core    lib.AutomatedApproverClient
+	cfg     config.Config
+	log     *zap.SugaredLogger
+	version *version.Version
 }
 
-//basic healthcheck response
-type HealthcheckAlive struct {
-	APIVersion    string `json:"api_version"`
-	SchemaVersion string `json:"schema_version"`
+// HealthCheckVersion
+//
+// swagger:route GET /healthcheck/version
+//
+// Check application version.
+//
+func (h *handler) HealthCheckVersion(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	w.Header().Set("Content-Type", "application/json")
+	response := h.version
+	return response, nil
 }
 
-// HealthCheck
+// HealthCheckConfig
 //
-// swagger:route GET /healthcheck
+// swagger:route GET /healthcheck/config
 //
-// Check if application is working.
+// Check application version.
 //
-func (h *handler) HealthCheck(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	response := HealthcheckAlive{
-		APIVersion:    version.APIVersion,
-		SchemaVersion: version.SchemaVersion,
-	}
+func (h *handler) HealthCheckConfig(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	w.Header().Set("Content-Type", "application/json")
+	response := h.cfg
 	return response, nil
 }
 
@@ -51,7 +56,8 @@ func (h *handler) HealthCheck(_ *defs.RequestContext, _ http.ResponseWriter, r *
 //
 // Responses:
 //      200: []string
-func (h *handler) ClientsList(_ *defs.RequestContext, _ http.ResponseWriter, _ *http.Request) (interface{}, error) {
+func (h *handler) ClientsList(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
+	w.Header().Set("Content-Type", "application/json")
 	return h.core.ClientsList()
 }
 
@@ -158,8 +164,11 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 //
 // Responses:
 //      200: ClientRegisterFinishResponse
-func (h *handler) ClientFullRegister(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (h *handler) ClientFullRegister(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFullRegister endpoint")
+
+	w.Header().Set("Content-Type", "application/json")
+
 	if h.core.GetSystemAgentID() != "" {
 		return nil, defs.ErrBadRequest().WithDetail("AgentID already exist. You can not set new one.")
 	}
