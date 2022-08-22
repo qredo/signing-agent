@@ -2,16 +2,16 @@
 
 set -e
 
-GIT_COMMIT=$(git rev-list -1 --abbrev-commit HEAD)
+BUILD_TYPE="dev"
+BUILD_VERSION=$(git rev-list -1 --abbrev-commit HEAD)
 BUILD_DATE="$(date -u)"
-VERSION="dev"
 
 rm -rf vendor
 
 dev_docker_build() {
   docker build --build-arg BUILD_DATE="$BUILD_DATE" \
-                --build-arg BUILD_COMMIT="$GIT_COMMIT" \
-                --build-arg BUILD_VERSION="$VERSION" \
+                --build-arg BUILD_TYPE="$BUILD_TYPE" \
+                --build-arg BUILD_VERSION="$BUILD_VERSION" \
                 -t automated-approver:dev \
                 -f dockerfiles/Dockerfile .
   
@@ -20,8 +20,8 @@ dev_docker_build() {
 
 dev_docker_test_build() {
   docker build --build-arg BUILD_DATE="$BUILD_DATE" \
-                --build-arg BUILD_COMMIT="$GIT_COMMIT" \
-                --build-arg BUILD_VERSION="$VERSION" \
+                --build-arg BUILD_TYPE="$BUILD_TYPE" \
+                --build-arg BUILD_VERSION="$BUILD_VERSION" \
                 -t automated-approver-unittest:dev \
                 -f dockerfiles/DockerfileUnitTest .
   
@@ -35,8 +35,8 @@ dev_docker_build_multiarch() {
   for arch in amd64 arm64 ; do
       docker buildx build \
       --build-arg BUILD_DATE="$BUILD_DATE" \
-      --build-arg BUILD_COMMIT="$GIT_COMMIT" \
-      --build-arg BUILD_VERSION="$VERSION" \
+      --build-arg BUILD_TYPE="$BUILD_TYPE" \
+      --build-arg BUILD_VERSION="$BUILD_VERSION" \
       --platform linux/$arch \
       --output "type=docker,push=false,name=automated-approver:dev-$arch,dest=automated-approver-$arch.tar" \
       -f dockerfiles/Dockerfile .
@@ -51,8 +51,8 @@ dev_local_build() {
   go build \
       -tags debug \
       -ldflags "-X 'main.buildDate=$BUILD_DATE' \
-                -X 'main.commit=$GIT_COMMIT' \
-                -X 'main.version=$VERSION'" \
+                -X 'main.buildVersion=$BUILD_VERSION' \
+                -X 'main.buildType=$BUILD_TYPE'" \
       -o out/automated-approver \
       gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
 
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
@@ -61,14 +62,18 @@ type Router struct {
 	router     http.Handler
 	handler    *handler
 	middleware *Middleware
+	version    *version.Version
 }
 
-func NewQRouter(log *zap.SugaredLogger, config *config.Config) (*Router, error) {
+func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.Version) (*Router, error) {
 
 	rt := &Router{
 		log:        log,
 		config:     config,
+		router:     nil,
+		handler:    &handler{},
 		middleware: NewMiddleware(log, config.HTTP.ProxyForwardedHeader, config.HTTP.LogAllRequests),
+		version:    version,
 	}
 
 	var err error
@@ -83,23 +88,25 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config) (*Router, error) 
 	}
 
 	rt.handler = &handler{
-		core: core,
-		cfg:  *config,
-		log:  log,
+		core:    core,
+		cfg:     *config,
+		log:     log,
+		version: version,
 	}
 	if err != nil {
 		return nil, err
 	}
-	rt.router, _ = rt.setHandlers()
+	rt.router = rt.setHandlers()
 
 	return rt, nil
 }
 
 // set all handler
-func (r *Router) setHandlers() (http.Handler, error) {
+func (r *Router) setHandlers() http.Handler {
 
 	routes := []route{
-		{"/healthcheck", http.MethodGet, r.handler.HealthCheck},
+		{"/healthcheck/version", http.MethodGet, r.handler.HealthCheckVersion},
+		{"/healthcheck/config", http.MethodGet, r.handler.HealthCheckConfig},
 
 		{"/register", http.MethodPost, r.handler.ClientFullRegister},
 
@@ -129,7 +136,7 @@ func (r *Router) setHandlers() (http.Handler, error) {
 
 	r.printRoutes(router)
 
-	return r.setupCORS(router), nil
+	return r.setupCORS(router)
 }
 
 // Start starts the service
