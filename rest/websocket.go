@@ -14,6 +14,8 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
+var deadlineForRestart *time.Time
+
 type Parser interface {
 	Parse() string
 }
@@ -41,6 +43,20 @@ func GenWSQredoCoreClientFeedURL(h *handler) string {
 	return builder.String()
 }
 
+func RestartWebSocketHandler(h *handler) {
+	h.log.Debug("Handler for RestartWebSocketHandler")
+	if deadlineForRestart == nil {
+		deadlineForRestart = new(time.Time)
+		*deadlineForRestart = time.Now()
+	} else if deadlineForRestart != nil && time.Since(*deadlineForRestart) >= time.Duration(5*time.Minute) {
+		h.log.Error("background job - trying to retry connection failed")
+		return
+	}
+	h.log.Debug("background job - trying to retry connection in next 5 seconds")
+	time.Sleep(5 * time.Second)
+	go WebSocketHandler(h)
+}
+
 func WebSocketHandler(h *handler) {
 	h.log.Debug("Handler for WebSocketHandler")
 	agentID := h.core.GetSystemAgentID()
@@ -65,19 +81,27 @@ func WebSocketHandler(h *handler) {
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
 		h.log.Errorf("cannot connect to Websocket feed at Qredo: ", err)
+		go RestartWebSocketHandler(h)
 		return
 	}
 	defer wsQredoBackedConn.Close()
 
+	deadlineForRestart = nil // everythink is working fine, deadlines should be neutralized
 	done := make(chan struct{})
 
 	h.log.Infof("Connected to Qredo websocket feed %s", url)
 	go func() {
-		defer close(done)
+		defer func() {
+			if err := recover(); err != nil {
+				h.log.Errorf("background job - web socket connection panic occurred:", err)
+			}
+			close(done)
+			go RestartWebSocketHandler(h)
+		}()
 		for {
 			var v Parser = &ActionInfo{}
 			if err := wsQredoBackedConn.ReadJSON(v); err != nil {
-				h.log.Errorf("error when reading from websocket: ", err)
+				h.log.Errorf("error when reading from websocket: %v", err)
 			}
 			h.log.Infof("background job - incoming message: %v", v.Parse())
 			var action ActionInfo
