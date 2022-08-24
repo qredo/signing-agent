@@ -2,7 +2,7 @@ base:
   qredo_api_domain: play-api.qredo.network
   qredo_api_base_path: /api/v1/p
   store_file: /volume/ccstore.db
-  auto_approve: true
+  auto_approve: false
 http:
   addr: 0.0.0.0:8007
   cors_allow_origins:

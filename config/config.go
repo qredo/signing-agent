@@ -46,7 +46,7 @@ func (c *Config) Default() {
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
 	c.Base.StoreFile = "ccstore.db"
-	c.Base.AutoApprove = true
+	c.Base.AutoApprove = false
 }
 
 // ParseConfigFile parses yaml config

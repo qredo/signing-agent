@@ -101,7 +101,7 @@ base:  # base config set
   qredo_api_domain: play-api.qredo.network  # qredo environment domain like: (play-api.qredo.network, dev.qredo.net, qa-api.qredo.net).
   qredo_api_base_path: /api/v1/p  # The base path that contain verion info of the REST interface.
   store_file: /volume/ccstore.db  # This is a store file path inside docker image.
-  auto_approve: true  # Set to true if You would like to turn on background job that will automaticly approve incoming actions (transactions).
+  auto_approve: false  # Set to true if You would like to turn on background job that will automaticly approve incoming actions (transactions).
 http:  # host http config set
   addr: 0.0.0.0:8007  # host server name e.g. agent.example.org
   cors_allow_origins:  # specify resource sharing list:
