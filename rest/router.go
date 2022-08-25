@@ -114,9 +114,6 @@ func (r *Router) setHandlers() http.Handler {
 		{"/client/action/{action_id}", http.MethodPut, r.handler.ActionApprove},
 		{"/client/action/{action_id}", http.MethodDelete, r.handler.ActionReject},
 
-		{"/client/{agent_id}/sign", http.MethodPost, r.handler.Sign},
-		{"/verify", http.MethodPost, r.handler.Verify},
-
 		{"/client/feed", defs.MethodWebsocket, r.handler.ClientFeed},
 	}
 
