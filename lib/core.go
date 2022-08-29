@@ -22,10 +22,6 @@ type AutomatedApproverClient interface {
 	// ActionReject sends a rejection to the Qredo backend for actionID
 	ActionReject(actionID string) error
 
-	// Sign uses agentID's BLS seed to sign messageHex and returns the signature
-	Sign(agentID, messageHex string) (*api.SignResponse, error)
-	// Verify verifies a signature provided with VerifyRequest
-	Verify(req *api.VerifyRequest) error
 	// SetSystemAgentID function to collect agent ID to storage, so the system will default to a single agent ID (AgentID)
 	SetSystemAgentID(agetID string) error
 	// GetSystemAgentID function to get agent ID that was stored during registration process.

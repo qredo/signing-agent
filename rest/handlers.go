@@ -90,45 +90,6 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 	return nil, h.core.ActionReject(actionID)
 }
 
-// Sign
-//
-// swagger:route POST /client/{client_id}/sign  payloads payloadSign
-//
-// Sign a payload
-//
-// Responses:
-//      200: signResponse
-func (h *handler) Sign(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	req := &api.SignRequest{}
-	err := util.DecodeRequest(req, r)
-	if err != nil {
-		return nil, err
-	}
-
-	agentID := mux.Vars(r)["agent_id"]
-	if agentID == "" {
-		return nil, defs.ErrBadRequest().WithDetail("agentID")
-	}
-
-	return h.core.Sign(agentID, req.MessageHashHex)
-}
-
-// Verify
-//
-// swagger:route POST /verify  payloads signatureVerify
-//
-// Verify a signature
-//
-func (h *handler) Verify(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
-	req := &api.VerifyRequest{}
-	err := util.DecodeRequest(req, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, h.core.Verify(req)
-}
-
 // AutoApprovalFunction
 //
 func (h *handler) AutoApproval() error {
