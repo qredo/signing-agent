@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	amclRandomSeedSize = 48
+	AMCLRandomSeedSize = 48
 )
 
 func RandomBytes(size int) ([]byte, error) {
@@ -28,7 +28,7 @@ func RandomBytes(size int) ([]byte, error) {
 
 // CreateAMCLRng creates a new AMCL RNG with a random seed
 func CreateAMCLRng() (*crypto.Rand, error) {
-	b, err := RandomBytes(amclRandomSeedSize)
+	b, err := RandomBytes(AMCLRandomSeedSize)
 	if err != nil {
 		return nil, err
 	}

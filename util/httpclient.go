@@ -3,7 +3,6 @@ package util
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -74,7 +73,7 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOK {
 		if b, err := ioutil.ReadAll(resp.Body); err == nil && len(b) > 0 {
-			fmt.Println("Response from not accepted request contain information: ", b)
+			return errors.Errorf("%v %v Status %v (%v) with body: %v", method, url, resp.StatusCode, resp.Status, b)
 		}
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
 	}
@@ -128,7 +127,7 @@ func (c *Client) RequestNoLog(method string, url string, reqData interface{}, re
 	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOK {
 		if b, err := ioutil.ReadAll(resp.Body); err == nil && len(b) > 0 {
-			fmt.Println("Response from not accepted request contain information: ", b)
+			return errors.Errorf("%v %v Status %v (%v) with body: %v", method, url, resp.StatusCode, resp.Status, b)
 		}
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
 	}
