@@ -27,7 +27,7 @@ func (h *autoApprover) ClientRegister(name string) (*api.ClientRegisterResponse,
 
 	client := &Agent{Name: name}
 
-	client.BLSSeed, err = util.RandomBytes(48)
+	client.BLSSeed, err = util.RandomBytes(util.AMCLRandomSeedSize)
 	if err != nil {
 		return nil, err
 	}

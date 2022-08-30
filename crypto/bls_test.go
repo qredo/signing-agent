@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -37,14 +36,8 @@ func Test_Smoke_Test(t *testing.T) {
 	// Generate BLS keys
 	BLSpk, BLSsk, err := BLSKeys(NewRand(SEED), nil)
 	if err != nil {
-		fmt.Println("Panicking!")
 		t.Fatal("Failed to create BLS keys")
 	}
-
-	BLSpkHex := hex.EncodeToString(BLSpk)
-	BLSskHex := hex.EncodeToString(BLSsk)
-	fmt.Printf("BLSpk : %s \n", BLSpkHex)
-	fmt.Printf("BLSsk : %s \n", BLSskHex)
 
 	// Encrypt message
 	P1, _ := hex.DecodeString(PHex)
@@ -52,17 +45,13 @@ func Test_Smoke_Test(t *testing.T) {
 	// BLS Sign a message
 	S, err := BLSSign(P1, BLSsk)
 	if err != nil {
-		fmt.Println("Panicking!")
-		panic("Failed to sign message")
+		t.Fatal("Failed to sign message")
+		return
 	}
-	SHex := hex.EncodeToString(S)
-	fmt.Printf("S : %s \n", SHex)
 
 	// BLS verify signature
 	if err := BLSVerify(P1, BLSpk, S); err != nil {
 		t.Fatal("BLS verify fail")
-	} else {
-		fmt.Println("Signature Verified")
 	}
 }
 
@@ -76,16 +65,8 @@ func TestBLS(t *testing.T) {
 	pk1, sk1, err := BLSKeys(NewRand(seed), nil)
 	assert.Equal(t, err, nil, "Should be equal")
 
-	pk1Hex := hex.EncodeToString(pk1)
-	sk1Hex := hex.EncodeToString(sk1)
-	fmt.Printf("pk1: %s \n", pk1Hex)
-	fmt.Printf("sk1: %s \n", sk1Hex)
-
 	sig1, err := BLSSign(message, sk1)
 	assert.Equal(t, nil, err, "Should be equal")
-
-	sig1Hex := hex.EncodeToString(sig1)
-	fmt.Printf("sig1: %s \n", sig1Hex)
 
 	if err := BLSVerify(message, pk1, sig1); err != nil {
 		t.Fatal("BLS verify fail")
@@ -142,14 +123,6 @@ func TestBLSADD(t *testing.T) {
 		t.Fatal("BLS verify fail")
 	}
 
-	pk12Hex := hex.EncodeToString(pk12)
-	fmt.Printf("pk12Hex: %s \n", pk12Hex)
-	fmt.Printf("pk12GoldenHex: %s \n", pk12GoldenHex)
-
-	sig12Hex := hex.EncodeToString(sig12)
-	fmt.Printf("sig12Hex: %s \n", sig12Hex)
-	fmt.Printf("sig12GoldenHex: %s \n", sig12GoldenHex)
-
 	assert.Equal(t, pk12, pk12Golden, "Should be equal")
 	assert.Equal(t, sig12, sig12Golden, "Should be equal")
 }
@@ -205,12 +178,6 @@ func Test_BLSV2(t *testing.T) {
 		if err = BLSVerify(sigHash[:], pk2, sig2); err != nil {
 			t.Errorf("(%v) invalid v2 signature: %v", i, err)
 		}
-
-		fmt.Printf("%v version 1\nsk  %x\n", i, sk1)
-		fmt.Printf("pk %x\n\n", pk1)
-
-		fmt.Printf("version 2\nsk %x\n", sk2)
-		fmt.Printf("pk %x\n\n", pk2)
 	}
 
 }

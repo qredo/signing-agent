@@ -12,7 +12,6 @@ func TestHash(t *testing.T) {
 	// Hash of block 234439.
 	blockHashStr := "14a0810ac680a3eb3f82edc878cea25ec41d6b790744e5daeef"
 	blockHash, err := NewHashFromStr(blockHashStr)
-	t.Log(blockHash)
 	if err != nil {
 		t.Errorf("NewHashFromStr: %v", err)
 	}

@@ -1,10 +1,8 @@
 package crypto
 
 import (
-	"log"
 	"math/rand"
 	"testing"
-	"time"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyz" +
@@ -88,22 +86,18 @@ func TestMerkleProofGeneratorSpeed(t *testing.T) {
 	// The time taken to complete each cycle is logged.
 	max := 512
 	for i := 1; i < max; i++ {
-		start := time.Now()
 		leaf_num := i
 		leaves, err := GenerateTreeInputs(leaf_num)
 		if err != nil {
 			t.Log(err)
 			t.Fail()
 		}
-		//t.Log(leaves[0])
 		// Create Merkle Tree
 		tree, err := BuildMerkleTreeStore(leaves)
 		if err != nil {
 			t.Log(err)
 			t.Fail()
 		}
-		elapsed1 := time.Since(start)
-		start = time.Now()
 		// Test 1: Generate and verify proof for every element of the tree
 		for j := 0; j < len(leaves); j++ {
 			proof, err := GenerateProofFromTree(tree[j], j, tree)
@@ -118,7 +112,6 @@ func TestMerkleProofGeneratorSpeed(t *testing.T) {
 			}
 			// We need to make a copy of the proof for verify
 			proof_copy, err := CopyProof(proof)
-			//t.Logf("Merkle proof for item %v : %v", i, proof_copy)
 			if err != nil {
 				// Cannot copy proof
 				t.Log(err)
@@ -132,9 +125,6 @@ func TestMerkleProofGeneratorSpeed(t *testing.T) {
 				t.Fail()
 			}
 		}
-		elapsed2 := time.Since(start)
-		log.Printf("Merkle tree of size %v \n Building tree took %s \n Generate and verify all proofs took %s",
-			leaf_num, elapsed1, elapsed2)
 	}
 }
 func TestMerkleProofGeneratorError(t *testing.T) {
