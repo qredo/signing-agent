@@ -44,12 +44,16 @@ func (e *APIError) Code() int {
 }
 
 func (e *APIError) JSON() []byte {
+	detail := e.detail
+	if detail == "" && e.wrapped != nil {
+		detail = e.wrapped.Error()
+	}
 	data, _ := json.Marshal(struct {
 		Code   int
 		Detail string
 	}{
 		Code:   e.code,
-		Detail: e.detail,
+		Detail: detail,
 	})
 
 	return data
