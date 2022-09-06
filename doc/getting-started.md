@@ -8,7 +8,7 @@ If you haven’t done so, please follow the following guide to first create an a
 
 ## Creating an account on the Play environment
 
-The first step is to visit the Play environment app at [https://play.qredo.network/](https://play.qredo.network/register). This is a special purpose sandbox environment that you can use for testing, without fear of breaking anything.
+The first step is to visit the Play environment app at [https://play.qredo.network/](https://play.qredo.network/). This is a special purpose sandbox environment that you can use for testing, without fear of breaking anything.
 
 ![Screenshot 2022-08-11 at 14.50.38.png](img/Screenshot_2022-08-11_at_14.50.38.png)
 
@@ -24,11 +24,11 @@ Next, type the same email address you used before (e.g. `user@domain`) in the re
 
 ![Screenshot 2022-08-11 at 14.21.26.png](img/Screenshot_2022-08-11_at_14.21.26.png)
 
-Then please copy the OTC code to the registration form and click Continue. Next, just click on Continue again to skip the “Download the Qredo Signing App” step so you’ll arrive to “Pair your mobile phone” step.
+Then please copy the OTC code to the registration form and click Continue. Next, just click on Continue again to skip the “Download the Qredo Signing App” step so you’ll arrive at “Pair your mobile phone” step.
 
 ![Screenshot 2022-08-11 at 14.23.54.png](img/Screenshot_2022-08-11_at_14.23.54.png)
 
-Next, we’re going to mock the mobile app pairing, again with the help of our [Qredo Mobile Demo app](https://mobile.qredo.net/#) that you used before for email validation. This time, you need to take a close-up picture of the QR code displayed in the form.
+Next, we’re going to mock the mobile app pairing, again with the help of our [Qredo Mobile Demo app](https://mobile.qredo.net/#) that you used before for email validation. First, with your mobile phone,  take a close-up picture of the QR code displayed in the form.
 
 ![Screenshot 2022-08-11 at 14.28.25.png](img/Screenshot_2022-08-11_at_14.28.25.png)
 
@@ -60,40 +60,40 @@ Click on the “Select user to authenticate” dropdown and select your user fro
 
 ## Obtaining the API key
 
-- Before continuing with the guide, it is recommended you enable Testnet Assets. To do that, you need to first click your name on the right top corner and select “Profile Settings” from the popup.
+Before continuing with the guide, it is recommended you enable Testnet Assets. To do that, click your name in the top right corner and select “Profile Settings” from the popup.
   
-    ![Screenshot 2022-06-09 at 14.18.36.png](img/Screenshot_2022-06-09_at_14.18.36.png)
+![Screenshot 2022-06-09 at 14.18.36.png](img/Screenshot_2022-06-09_at_14.18.36.png)
     
-- Next, in the **Preferences** tab enable Testnet Assets to use ETH-TESTNET and BTC-TESTNET
+Next, select **Personal Account** and then the **Preferences** tab and enable **Testnet Assets** to use ETH-TESTNET and BTC-TESTNET.
 
 ![Screenshot 2022-06-09 at 14.24.23.png](img/Screenshot_2022-06-09_at_14.24.23.png)
 
-- Next you have to setup the Play sandbox to generate API keys for the Partner API and the Signing Agent
-    - Click “Partner API” tab (top right) and setup keys for production or sandbox environments or regenerate them if needed. Once you have generated the API key, please also copy it into an empty `apiKey` file.
-    - You will also have to upload the `public.pem` key file that you’ll generate in the next section. You can come back afterwards and upload it.
+Next you have to set up the Play sandbox to generate API keys for the Partner API and the Signing Agent
+- Click **API** tab (top right), select **Partner API** and **Generate API Key** for the production or sandbox environments, or regenerate them if needed. Once you have generated the API key, please also copy it into an empty `apiKey` file.
+- You will also have to upload the `public.pem` key file that you’ll generate in the next section. You can come back afterwards and upload it.
 
 ![Screenshot 2022-06-09 at 14.26.30.png](img/Screenshot_2022-06-09_at_14.26.30.png)
 
-- Now, the Qredo Back End is ready to accept API requests.
+Now, the Qredo Back End is ready to accept API requests.
 
 # Deploying the Docker image
 
 ## Create a Docker volume for storing config data
 
-You need to create a local folder to store the database and eventually private RSA key if You want keep there (it's not required). When you run the Docker image, you must reference that local folder since it is shared between the local system and the Docker image. For this reason, we create need to the Docker volume service first. Go here to learn more about [Docker volumes](https://docs.docker.com/storage/volumes/).
+You need to create a local folder to store the database (and the private RSA key, generated later, if you want - it's not required). When you run the Docker image, you must reference that local folder since it is shared between the local system and the Docker image. For this reason, we need to create the Docker volume service first. Go here to learn more about [Docker volumes](https://docs.docker.com/storage/volumes/).
 
-At this stage, you need to create a folder and later the db will be created there automaticly (by the docker).
+At this stage, create a folder and later the db will be created there automatically (by docker).
 Configure it via `docker create volume`. For example, we will create a local folder and name it `volume`.
 In the terminal, run this command to create the folder in your home dir:
 
 `mkdir ~/volume`
 
-On the steps that follow, you will create the `private.pem` files and you can store it in the Docker volume folder that you’ve created above.
+In the steps that follow, you will create the `private.pem` files and store it in the Docker volume folder that you’ve just created.
 
 ## Config data
 
 Please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to the `volume` directory.
-Here you will find explanation, what does mean each line:
+Here you will find explanation of each line:
 
 ```yaml
 
@@ -116,9 +116,9 @@ pin: 0  # set your pin
 ```
 
 
-## Generate RSA keys for signing request on reqister step (Partner API)
+## Generate RSA keys for signing request on register step (Partner API)
 
-The following example uses the terminal (CLI) for generating the RSA key pair but you can use any preferred tool to perform this task. The Qredo Partner API works with 2048 bit RSA keys.
+The following example uses the terminal (CLI) for generating the RSA key pair, but you can use any preferred tool to perform this task. The Qredo Partner API works with 2048 bit RSA keys.
 
 1. Open a terminal and type the following commands:
 
@@ -134,13 +134,16 @@ You should see the following message:
 
 `openssl rsa -in private.pem -outform PEM -pubout -out public.pem`
 
-Copy your `private.pem` file to the local `volume` folder you create above or keep it in safe place.
+Copy your `private.pem` file to the local `volume` folder you created above or keep it in safe place.
 
 4. Generate base64 representation of this `private.pem` key
 
 `base64 /path/to/volume/private.pem`
 
 Copy your `Base64PrivateKey` token to the clipboard. You are going to use it as a part of payload data on registration endpoint.
+
+5. Upload the public.pem to the Partner API sandbox.  Go back to the (web) page where you generated the API key and click 
+**Add Public Key**.  Copy and paste in the contents of the public.pem generated above.
 
 ## Create Docker volume and run the image
 
@@ -162,7 +165,8 @@ You can now continue with testing of the Docker image.
 
 # Registering the Signing Agent Service
 
-When everything is setup properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) we can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/`.
+When everything is set up properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) you can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/` but that 
+should be changed to the address and port of the signing service you started above.  (Most likely this will be: `http://localhost:8007`.)
 
 The PartnerApp triggers the registration process by providing an agent name, partner api key and private.pem represented by base64 string to the Signing Agent service. You don't have to remember the `agentId` value, because You can call `GET https://agent.example.org/api/v1/client` endpoint to get it.
 
@@ -187,7 +191,9 @@ Once the Signing Agent registration process is complete, we can now proceed to c
 
 # Create a company
 
-To create a company, we need to call the PartnerAPI and to provide some details for the company. Please make sure to store the `company_id` you receive in the response, since you will need it later. More details in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/partnerapi/01-create-company/).
+Note: for this and all subsequent commands, replace the X-API-KEY with the apiKey you generated for the Sandbox PartnerAPI.
+
+To create a company, we need to call the PartnerAPI and to provide some details for the company. Please make sure to store the `company_id` you receive in the response, since you will need it later. More details in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#company).
 
 ```bash
 **Request:**
@@ -234,7 +240,7 @@ curl -X 'POST' \
 
 # Create a fund with a wallet and corresponding policies
 
-Here we are explicitly creating a new fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-TESTNET* wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentId` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/partnerapi/03-create-fund/).
+Here we are explicitly creating a new fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-TESTNET* wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentId` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#funds).
 
 ```bash
 **Request:**
@@ -318,7 +324,7 @@ You can now send Ropsten ETH from any account to the above address — i.e. `0x9
 
 # Whitelist addresses for withdrawal
 
-Before we can withdraw assets, we need to whitelist the external wallet address. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/partnerapi/06-perform-withdrawal/#1-whitelist-a-withdrawal-address).
+Before we can withdraw assets, we need to whitelist the external wallet address. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#addresses).
 
 ```bash
 **Request:**
@@ -340,7 +346,7 @@ curl -X 'POST' \
 
 # L1 transaction (withdraw) to external wallet
 
-Here we are requesting a withdrawal of 1000 gwei to an external wallet that we have previously whitelisted. We are providing the `company_id` as well as the `wallet_id` from which we are making the withdrawal. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/partnerapi/06-perform-withdrawal/#2-submit-withdrawal-request).
+Here we are requesting a withdrawal of 1000 gwei to an external wallet that we have previously whitelisted. We are providing the `company_id` as well as the `wallet_id` from which we are making the withdrawal. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#withdrawals).
 
 ```bash
 **Request:**
