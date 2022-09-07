@@ -172,7 +172,7 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, w http.ResponseWrit
 	}
 
 	// return local feedUrl for request approvals
-	response.FeedURL = fmt.Sprintf("ws://%s%s/client/feed", h.cfg.HTTP.Addr, pathPrefix)
+	response.FeedURL = fmt.Sprintf("ws://%s%s/client/feed", h.cfg.HTTP.Addr, PathPrefix)
 
 	// also enable auto-approval of requests
 	h.AutoApproval()

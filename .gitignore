@@ -1,7 +1,9 @@
 .DS_Store
+.idea/
 private.pem
 public.pem
 apikey
+!testdata/e2e/apikey
 out/*
 local-config.yaml
 volume/

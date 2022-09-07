@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	fixturePathRegisterClientInitResponse = "../testdata/lib/registerClientInitResponse.json"
+	FixturePathRegisterClientInitResponse = "../testdata/lib/registerClientInitResponse.json"
 )
 
 func TestClient(t *testing.T) {
@@ -76,7 +76,7 @@ func TestClient(t *testing.T) {
 			}
 
 			util.GetDoMockHTTPClientFunc = func(*http.Request) (*http.Response, error) {
-				dataFromFixture, err := os.Open(fixturePathRegisterClientInitResponse)
+				dataFromFixture, err := os.Open(FixturePathRegisterClientInitResponse)
 				assert.NoError(t, err)
 				body := ioutil.NopCloser(dataFromFixture)
 

@@ -14,6 +14,17 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
+const (
+	// Time allowed to write a message to the peer.
+	writeWait = 10 * time.Second
+
+	// Time allowed to read the next pong message from the peer.
+	PongWait = 10 * time.Second
+
+	// Send pings to peer with this period. Must be less than pongWait.
+	pingPeriod = (PongWait * 5) / 10
+)
+
 var deadlineForRestart *time.Time
 
 type Parser interface {
@@ -194,15 +205,36 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 		h.log.Errorf("cannot set websocket Partner App Connection: ", err)
 		return
 	}
-	defer wsPartnerAppConn.Close()
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		wsPartnerAppConn.Close()
+		ticker.Stop()
+	}()
+
+	wsPartnerAppConn.SetPongHandler(func(message string) error {
+		wsPartnerAppConn.SetReadDeadline(time.Now().Add(PongWait))
+		return wsPartnerAppConn.WriteControl(websocket.PingMessage, []byte(message), time.Now().Add(writeWait))
+	})
+
+	wsPartnerAppConn.SetPingHandler(func(message string) error {
+		wsPartnerAppConn.SetWriteDeadline(time.Now().Add(pingPeriod))
+		return wsPartnerAppConn.WriteControl(websocket.PongMessage, []byte(message), time.Now().Add(writeWait))
+	})
+
 	h.log.Debugf("Connected to Qredo websocket feed %s", url)
+	quitGoRoutine := make(chan bool)
 	go func() {
 		defer close(done)
+	goRoutineLoop:
 		for {
+			if quit := <-quitGoRoutine; quit {
+				h.log.Debug("terminating reading and writing on websocket conn")
+				break goRoutineLoop
+			}
 			var v Parser = &ActionInfo{}
 			if err := wsQredoBackedConn.ReadJSON(v); err != nil {
 				h.log.Errorf("error when reading from websocket: ", err)
-				return
+				break goRoutineLoop
 			}
 			h.log.Debugf("incoming message: %v", v.Parse())
 			err = wsPartnerAppConn.WriteJSON(v)
@@ -214,12 +246,19 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 
 	for {
 		select {
+		case <-ticker.C:
+			wsPartnerAppConn.SetWriteDeadline(time.Now().Add(writeWait))
+			err = wsPartnerAppConn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(pingPeriod))
+			if err != nil {
+				h.log.Debug("websocket PingMessage found broken pipe, terminating")
+				quitGoRoutine <- true
+				return
+			}
 		case <-done:
 			return
 		case <-interrupt:
 			h.log.Error("interrupt")
-
-			err := wsQredoBackedConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			err := wsPartnerAppConn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(writeWait))
 			if err != nil {
 				h.log.Error("websocket CloseMessage: ", err)
 				return
