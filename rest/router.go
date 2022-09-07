@@ -21,9 +21,20 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	pathPrefix = "/api/v1"
+const (
+	PathPrefix = "/api/v1"
+
+	PathHealthcheckVersion = "/healthcheck/version"
+	PathHealthCheckConfig  = "/healthcheck/config"
+	PathClientFullRegister = "/register"
+	PathClientsList        = "/client"
+	PathAction             = "/client/action/{action_id}"
+	PathClientFeed         = "/client/feed"
 )
+
+func WrapPathPrefix(uri string) string {
+	return strings.Join([]string{PathPrefix, uri}, "")
+}
 
 type appHandlerFunc func(ctx *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
 
@@ -96,28 +107,25 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	if err != nil {
 		return nil, err
 	}
-	rt.router = rt.setHandlers()
+	rt.router = rt.SetHandlers()
 
 	return rt, nil
 }
 
 // set all handler
-func (r *Router) setHandlers() http.Handler {
+func (r *Router) SetHandlers() http.Handler {
 
 	routes := []route{
-		{"/healthcheck/version", http.MethodGet, r.handler.HealthCheckVersion},
-		{"/healthcheck/config", http.MethodGet, r.handler.HealthCheckConfig},
-
-		{"/register", http.MethodPost, r.handler.ClientFullRegister},
-
-		{"/client", http.MethodGet, r.handler.ClientsList},
-		{"/client/action/{action_id}", http.MethodPut, r.handler.ActionApprove},
-		{"/client/action/{action_id}", http.MethodDelete, r.handler.ActionReject},
-
-		{"/client/feed", defs.MethodWebsocket, r.handler.ClientFeed},
+		{PathHealthcheckVersion, http.MethodGet, r.handler.HealthCheckVersion},
+		{PathHealthCheckConfig, http.MethodGet, r.handler.HealthCheckConfig},
+		{PathClientFullRegister, http.MethodPost, r.handler.ClientFullRegister},
+		{PathClientsList, http.MethodGet, r.handler.ClientsList},
+		{PathAction, http.MethodPut, r.handler.ActionApprove},
+		{PathAction, http.MethodDelete, r.handler.ActionReject},
+		{PathClientFeed, defs.MethodWebsocket, r.handler.ClientFeed},
 	}
 
-	router := mux.NewRouter().PathPrefix(pathPrefix).Subrouter()
+	router := mux.NewRouter().PathPrefix(PathPrefix).Subrouter()
 	for _, route := range routes {
 
 		middle := r.middleware.notProtectedMiddleware
