@@ -1,6 +1,6 @@
 FROM golang:alpine as go_builder
 
-RUN apk update &&  apk add \
+RUN apk update && apk add \
         ca-certificates \
         cmake \
         g++ \
@@ -41,28 +41,24 @@ RUN echo Building Milagro Crypt C library && \
       -D BUILD_MPIN=ON \
       -D BUILD_X509=OFF \
       -D CMAKE_INSTALL_PREFIX=$BUILD_PATH .. && \
-    make && \
-    make test && \
-    make install
+    make && make install
 
-
-
-ARG BUILD_DATE
 ARG BUILD_TYPE
-ARG BUILD_VERSION
-ARG GIT_TOKEN
+ARG BUILD_DATE
 
 ENV PROJECT_PATH=/src/gitlab.qredo.com/custody-engine/automated-approver
 
-ADD . $PROJECT_PATH
+COPY . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
+
+RUN ls -la
 
 RUN CGO_ENABLED=1 \
     GO111MODULES=on \
     go build \
       -tags debug \
       -ldflags "-w -linkmode external -extldflags '-static' -X 'main.buildDate=$BUILD_DATE' \
-                                                            -X 'main.buildVersion=$BUILD_VERSION' \
+                                                            -X 'main.buildVersion="$(git rev-list -1 --abbrev-commit HEAD)"' \
                                                             -X 'main.buildType=$BUILD_TYPE'" \
       -o automated-approver \
       gitlab.qredo.com/custody-engine/automated-approver/cmd/service
