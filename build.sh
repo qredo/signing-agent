@@ -33,6 +33,7 @@ docker_test_build() {
 
 # Build a docker image for the specified architecture and store it in a tar file
 docker_export() {
+  rm automated-approver-$1-*.tar
   docker buildx build \
       --build-arg BUILD_DATE="$BUILD_DATE" \
       --build-arg BUILD_TYPE="$BUILD_TYPE" \

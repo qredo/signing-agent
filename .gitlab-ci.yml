@@ -1,5 +1,6 @@
 stages:
   - unit-test
+  - docker
 
 Unit test:
   stage: unit-test
@@ -10,3 +11,29 @@ Unit test:
   script:
     - echo "Running Unit tests from /scripts/test_coverage.sh"
     - sh scripts/test_coverage
+
+variables:
+  KANIKO_VERSION: "debug"
+
+Build docker images:
+  stage: docker
+  when: manual
+  image:
+    name: gcr.io/kaniko-project/executor:$KANIKO_VERSION
+    entrypoint: [""]
+  tags:
+    - amd64-eks
+    - dev
+  script:
+    - /kaniko/executor
+      --context=$CI_PROJECT_DIR
+      --build-arg BUILD_TYPE="dev"
+      --build-arg BUILD_DATE="$(date -u)"
+      --dockerfile=dockerfiles/Dockerfile
+      --no-push
+      --destination=automated-approver
+      --tarPath=automated-approver-$(date +%F).tar
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - automated-approver-*.tar
