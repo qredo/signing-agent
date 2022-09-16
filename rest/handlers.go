@@ -95,12 +95,12 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 func (h *handler) AutoApproval() error {
 	// enable auto-approval only if configured
 	if !h.cfg.Base.AutoApprove {
-		h.log.Debug("Autoapproval feature not enabled in config")
+		h.log.Debug("Auto-approval feature not enabled in config")
 		return nil
 	}
 
-	h.log.Debug("Handler for AutoApproval background job")
-	go WebSocketHandler(h)
+	h.log.Debug("Handler for Auto-approval background job")
+	go AutoApproveHandler(h)
 
 	return nil
 }

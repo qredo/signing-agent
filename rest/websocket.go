@@ -15,14 +15,14 @@ import (
 )
 
 const (
-	// Time allowed to write a message to the peer.
+	// writeWait is the time allowed to write a message to the peer
 	writeWait = 10 * time.Second
 
-	// Time allowed to read the next pong message from the peer.
-	PongWait = 10 * time.Second
+	// pongWait is the time allowed to read the next pong message from the peer
+	pongWait = 10 * time.Second
 
-	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (PongWait * 5) / 10
+	// pingPeriod is the time between peer pings. Must be less than pongWait.
+	pingPeriod = (pongWait * 5) / 10
 )
 
 var deadlineForRestart *time.Time
@@ -45,17 +45,18 @@ func (a *ActionInfo) Parse() string {
 	return string(out)
 }
 
+// GenWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
 func GenWSQredoCoreClientFeedURL(h *handler) string {
 	builder := strings.Builder{}
-	builder.WriteString("wss://")
+	builder.WriteString(h.cfg.Base.WsScheme)
 	builder.WriteString(h.cfg.Base.QredoAPIDomain)
 	builder.WriteString(h.cfg.Base.QredoAPIBasePath)
 	builder.WriteString("/coreclient/feed")
 	return builder.String()
 }
 
-func RestartWebSocketHandler(h *handler) {
-	h.log.Debug("Handler for RestartWebSocketHandler")
+func restartWebSocketHandler(h *handler) {
+	h.log.Debug("Handler for restartWebSocketHandler")
 	if deadlineForRestart == nil {
 		deadlineForRestart = new(time.Time)
 		*deadlineForRestart = time.Now()
@@ -65,11 +66,14 @@ func RestartWebSocketHandler(h *handler) {
 	}
 	h.log.Debug("background job - trying to retry connection in next 5 seconds")
 	time.Sleep(5 * time.Second)
-	go WebSocketHandler(h)
+	go AutoApproveHandler(h)
 }
 
-func WebSocketHandler(h *handler) {
-	h.log.Debug("Handler for WebSocketHandler")
+// AutoApproveHandler approves ActionInfo requests read from the Qredo core client-feed websocket.  A connection to
+// the websocket is created from information contained in h.  On failure or disconnect the handler is automatically
+// restarted.
+func AutoApproveHandler(h *handler) {
+	h.log.Debug("Handler for AutoApproveHandler")
 	agentID := h.core.GetSystemAgentID()
 	if len(agentID) == 0 {
 		h.log.Info("Agent is not yet configured, skipping Websocket connection for auto-approval")
@@ -77,6 +81,7 @@ func WebSocketHandler(h *handler) {
 	}
 	url := GenWSQredoCoreClientFeedURL(h)
 
+	// a channel to receive interrupt signals
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
@@ -91,23 +96,25 @@ func WebSocketHandler(h *handler) {
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
-		h.log.Errorf("cannot connect to Websocket feed at Qredo: ", err)
-		go RestartWebSocketHandler(h)
+		h.log.Errorf("cannot connect to Websocket feed at Qredo: %v", err)
+		go restartWebSocketHandler(h)
 		return
 	}
 	defer wsQredoBackedConn.Close()
 
-	deadlineForRestart = nil // everythink is working fine, deadlines should be neutralized
+	deadlineForRestart = nil // everything is working fine, deadlines should be neutralized
 	done := make(chan struct{})
 
 	h.log.Infof("Connected to Qredo websocket feed %s", url)
+
+	// read and process (approve) ActionInfo requests received from the websocket.
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				h.log.Errorf("background job - web socket connection panic occurred:", err)
+				h.log.Errorf("background job - web socket connection panic occurred: %v", err)
 			}
 			close(done)
-			go RestartWebSocketHandler(h)
+			go restartWebSocketHandler(h)
 		}()
 		for {
 			var v Parser = &ActionInfo{}
@@ -129,10 +136,9 @@ func WebSocketHandler(h *handler) {
 			return
 		case <-interrupt:
 			h.log.Error("interrupt")
-
 			err := wsQredoBackedConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
-				h.log.Error("websocket CloseMessage: ", err)
+				h.log.Errorf("websocket CloseMessage: %v", err)
 				return
 			}
 			select {
@@ -144,7 +150,8 @@ func WebSocketHandler(h *handler) {
 	}
 }
 
-// approveActionWithRetry - Use this function to accept action (transactoin) with the repetition
+// approveActionWithRetry attempts to approve the action. It retries every intervalSeconds, giving up after
+// maxMinutes have expired.
 func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, intervalSeconds int) {
 	h.log.Debug("Handler for approveActionWithRetry")
 	tStart := time.Now()
@@ -156,10 +163,10 @@ func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, inter
 			h.log.Infof("Action [%v] approved automatically", action.ID)
 			break
 		} else {
-			h.log.Errorf("Action [%v] approval failed, error msg: %v", action.AgentID, action.ID, err)
+			h.log.Errorf("Action [%v] approval failed, for [actionID:%v]. Error msg: %v", action.AgentID, action.ID, err)
 		}
 		if time.Since(tStart) >= timeEdge {
-			// Action Approval should be skiped after maxMinutes is achieved (e.g. 5 minutes)
+			// Action approval should be abandoned after maxMinutes (e.g. 5 minutes)
 			h.log.Warnf("Auto action approve failed [actionID:%v]", action.ID)
 			break
 		}
@@ -181,7 +188,7 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 
 	zkpOnePass, err := h.core.GetAgentZKPOnePass()
 	if err != nil {
-		h.log.Errorf("cannot get zkp token: ", err)
+		h.log.Errorf("cannot get zkp token: %v", err)
 		return
 	}
 	headers := http.Header{}
@@ -189,7 +196,7 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
-		h.log.Errorf("cannot connect to websocket feed %s", url, err)
+		h.log.Errorf("cannot connect to websocket feed %s: %v", url, err)
 		return
 	}
 	defer wsQredoBackedConn.Close()
@@ -202,7 +209,7 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 	}
 	wsPartnerAppConn, err := wsPartnerAppUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		h.log.Errorf("cannot set websocket Partner App Connection: ", err)
+		h.log.Errorf("cannot set websocket Partner App Connection: %v", err)
 		return
 	}
 	ticker := time.NewTicker(pingPeriod)
@@ -212,7 +219,7 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 	}()
 
 	wsPartnerAppConn.SetPongHandler(func(message string) error {
-		wsPartnerAppConn.SetReadDeadline(time.Now().Add(PongWait))
+		wsPartnerAppConn.SetReadDeadline(time.Now().Add(pongWait))
 		return wsPartnerAppConn.WriteControl(websocket.PingMessage, []byte(message), time.Now().Add(writeWait))
 	})
 
@@ -233,13 +240,13 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 			}
 			var v Parser = &ActionInfo{}
 			if err := wsQredoBackedConn.ReadJSON(v); err != nil {
-				h.log.Errorf("error when reading from websocket: ", err)
+				h.log.Errorf("error when reading from websocket: %v", err)
 				break goRoutineLoop
 			}
 			h.log.Debugf("incoming message: %v", v.Parse())
 			err = wsPartnerAppConn.WriteJSON(v)
 			if err != nil {
-				h.log.Errorf("websocket wsPartnerAppConn WriteJSON contain error: ", err)
+				h.log.Errorf("websocket wsPartnerAppConn WriteJSON contain error: %v", err)
 			}
 		}
 	}()

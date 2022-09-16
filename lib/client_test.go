@@ -30,6 +30,7 @@ func TestClient(t *testing.T) {
 		QredoAPIDomain:   "play-api.qredo.network",
 		QredoAPIBasePath: "/api/v1/p",
 		AutoApprove:      true,
+		HttpScheme:       "http",
 	}
 	agentName := "Test name agent"
 	kv, err := util.NewFileStore(TestDataDBStoreFilePath)

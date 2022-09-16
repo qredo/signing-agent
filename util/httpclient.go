@@ -63,7 +63,6 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 	if headers != nil {
 		req.Header = headers
 	}
-	req.URL.Scheme = "http"
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "request error")

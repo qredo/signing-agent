@@ -27,6 +27,8 @@ type Base struct {
 	QredoAPIBasePath string `yaml:"qredo_api_base_path"`
 	StoreFile        string `yaml:"store_file"`
 	AutoApprove      bool   `yaml:"auto_approve"`
+	HttpScheme       string `yaml:"http_scheme"`
+	WsScheme         string `yaml:"ws_scheme"`
 }
 
 type Logging struct {
@@ -34,12 +36,13 @@ type Logging struct {
 	Level  string `yaml:"level"`
 }
 
-// Default creates configuration with default values
+// Default creates configuration with default values.
 func (c *Config) Default() {
 	c.HTTP = httpSettings{
 		Addr:             "127.0.0.1:8007",
 		CORSAllowOrigins: []string{"*"},
 	}
+	c.Base.WsScheme = "wss://"
 	c.Base.PIN = 0
 	c.Base.QredoAPIDomain = "play-api.qredo.network"
 	c.Base.QredoAPIBasePath = "/api/v1/p"
@@ -47,9 +50,10 @@ func (c *Config) Default() {
 	c.Logging.Format = "json"
 	c.Base.StoreFile = "ccstore.db"
 	c.Base.AutoApprove = false
+	c.Base.HttpScheme = "https"
 }
 
-// ParseConfigFile parses yaml config
+// Load reads and parses yaml config.
 func (c *Config) Load(fileName string) error {
 	f, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -64,7 +68,7 @@ func (c *Config) Load(fileName string) error {
 	return nil
 }
 
-// SaveConfigFile saves yaml config
+// Save saves yaml config.
 func (c *Config) Save(fileName string) error {
 	b, err := yaml.Marshal(c)
 	if err != nil {
