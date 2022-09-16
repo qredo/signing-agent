@@ -35,6 +35,7 @@ func TestAction(t *testing.T) {
 		QredoAPIDomain:   "play-api.qredo.network",
 		QredoAPIBasePath: "/api/v1/p",
 		AutoApprove:      true,
+		HttpScheme:       "http",
 	}
 
 	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
