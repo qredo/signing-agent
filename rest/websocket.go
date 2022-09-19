@@ -184,11 +184,11 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	h.log.Debug(fmt.Sprintf("connecting to %s", url))
+	h.log.Debug(fmt.Sprintf("WebSocketFeedHandler - connecting to %s", url))
 
 	zkpOnePass, err := h.core.GetAgentZKPOnePass()
 	if err != nil {
-		h.log.Errorf("cannot get zkp token: %v", err)
+		h.log.Errorf("WebSocketFeedHandler - cannot get zkp token: %v", err)
 		return
 	}
 	headers := http.Header{}
@@ -196,7 +196,7 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 
 	wsQredoBackedConn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
-		h.log.Errorf("cannot connect to websocket feed %s: %v", url, err)
+		h.log.Errorf("WebSocketFeedHandler - cannot connect to websocket feed %s: %v", url, err)
 		return
 	}
 	defer wsQredoBackedConn.Close()
@@ -209,7 +209,7 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 	}
 	wsPartnerAppConn, err := wsPartnerAppUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		h.log.Errorf("cannot set websocket Partner App Connection: %v", err)
+		h.log.Errorf("WebSocketFeedHandler - cannot set websocket Partner App Connection: %v", err)
 		return
 	}
 	ticker := time.NewTicker(pingPeriod)
@@ -228,25 +228,33 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 		return wsPartnerAppConn.WriteControl(websocket.PongMessage, []byte(message), time.Now().Add(writeWait))
 	})
 
-	h.log.Debugf("Connected to Qredo websocket feed %s", url)
-	quitGoRoutine := make(chan bool)
+	h.log.Debugf("WebSocketFeedHandler - Connected to Qredo websocket feed %s", url)
+	quitGoRoutine := make(chan bool, 1)
 	go func() {
 		defer close(done)
 	goRoutineLoop:
 		for {
-			if quit := <-quitGoRoutine; quit {
-				h.log.Debug("terminating reading and writing on websocket conn")
-				break goRoutineLoop
+			select {
+			case quit := <-quitGoRoutine:
+				if quit {
+					h.log.Debug("WebSocketFeedHandler - terminating reading and writing on websocket conn")
+					break goRoutineLoop
+				}
+			default:
 			}
+
+			h.log.Debug("WebSocketFeedHandler - waiting for incoming message")
 			var v Parser = &ActionInfo{}
+
 			if err := wsQredoBackedConn.ReadJSON(v); err != nil {
-				h.log.Errorf("error when reading from websocket: %v", err)
+				h.log.Errorf("WebSocketFeedHandler - error when reading from websocket: %v", err)
 				break goRoutineLoop
 			}
-			h.log.Debugf("incoming message: %v", v.Parse())
+
+			h.log.Debugf("WebSocketFeedHandler - incoming message: %v", v.Parse())
 			err = wsPartnerAppConn.WriteJSON(v)
 			if err != nil {
-				h.log.Errorf("websocket wsPartnerAppConn WriteJSON contain error: %v", err)
+				h.log.Errorf("WebSocketFeedHandler - websocket wsPartnerAppConn WriteJSON contain error: %v", err)
 			}
 		}
 	}()
@@ -257,17 +265,17 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 			wsPartnerAppConn.SetWriteDeadline(time.Now().Add(writeWait))
 			err = wsPartnerAppConn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(pingPeriod))
 			if err != nil {
-				h.log.Debug("websocket PingMessage found broken pipe, terminating")
+				h.log.Debug("WebSocketFeedHandler - websocket PingMessage found broken pipe, terminating")
 				quitGoRoutine <- true
 				return
 			}
 		case <-done:
 			return
 		case <-interrupt:
-			h.log.Error("interrupt")
+			h.log.Error("WebSocketFeedHandler - interrupt")
 			err := wsPartnerAppConn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(writeWait))
 			if err != nil {
-				h.log.Error("websocket CloseMessage: ", err)
+				h.log.Error("WebSocketFeedHandler - websocket CloseMessage: ", err)
 				return
 			}
 			select {

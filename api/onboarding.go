@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	maxBase64FieldSize = 4096
+	maxBase64FieldSize = 16384
 	maxStringFieldSize = 256
 )
 
