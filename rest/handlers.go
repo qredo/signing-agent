@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/copier"
@@ -18,10 +19,44 @@ import (
 )
 
 type handler struct {
-	core    lib.AutomatedApproverClient
-	cfg     config.Config
-	log     *zap.SugaredLogger
-	version *version.Version
+	core      lib.AutomatedApproverClient
+	cfg       config.Config
+	log       *zap.SugaredLogger
+	version   *version.Version
+	websocket api.WebsocketStatus
+}
+
+func NewHandler(core lib.AutomatedApproverClient, config *config.Config, log *zap.SugaredLogger, version *version.Version) *handler {
+	localFeedUrl := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, PathPrefix)
+	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base)
+
+	h := &handler{
+		core:      core,
+		cfg:       *config,
+		log:       log,
+		version:   version,
+		websocket: api.NewWebsocketStatus(ConnectionState.Closed, remoteFeedUrl, localFeedUrl),
+	}
+
+	return h
+}
+
+// genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
+func genWSQredoCoreClientFeedURL(config_base *config.Base) string {
+	builder := strings.Builder{}
+	builder.WriteString(config_base.WsScheme)
+	builder.WriteString(config_base.QredoAPIDomain)
+	builder.WriteString(config_base.QredoAPIBasePath)
+	builder.WriteString("/coreclient/feed")
+	return builder.String()
+}
+
+func (h *handler) UpdateWebsocketStatus(status string) {
+	h.websocket.ReadyState = status
+}
+
+func (h handler) GetWSQredoCoreClientFeedURL() string {
+	return h.websocket.RemoteFeedUrl
 }
 
 // HealthCheckVersion
@@ -29,7 +64,6 @@ type handler struct {
 // swagger:route GET /healthcheck/version
 //
 // Check application version.
-//
 func (h *handler) HealthCheckVersion(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 	response := h.version
@@ -41,10 +75,23 @@ func (h *handler) HealthCheckVersion(_ *defs.RequestContext, w http.ResponseWrit
 // swagger:route GET /healthcheck/config
 //
 // Check application version.
-//
 func (h *handler) HealthCheckConfig(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 	response := h.cfg
+	return response, nil
+}
+
+// HealthCheckStatus
+//
+// swagger:route GET /healthcheck/status
+//
+// Check application status.
+func (h *handler) HealthCheckStatus(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	w.Header().Set("Content-Type", "application/json")
+
+	response := api.HealthCheckStatusResponse{
+		WebsocketStatus: h.websocket,
+	}
 	return response, nil
 }
 
@@ -52,10 +99,11 @@ func (h *handler) HealthCheckConfig(_ *defs.RequestContext, w http.ResponseWrite
 //
 // swagger:route GET /client clientsList ClientsList
 //
-// Return AgentID if it's configured
+// # Return AgentID if it's configured
 //
 // Responses:
-//      200: []string
+//
+//	200: []string
 func (h *handler) ClientsList(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 	return h.core.ClientsList()
@@ -66,7 +114,6 @@ func (h *handler) ClientsList(_ *defs.RequestContext, w http.ResponseWriter, _ *
 // swagger:route PUT /client/action/{action_id}  actions actionApprove
 //
 // Approve action
-//
 func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
@@ -81,7 +128,6 @@ func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r
 // swagger:route DELETE /client/action/{action_id}  actions actionReject
 //
 // Reject action
-//
 func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
@@ -91,7 +137,6 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 }
 
 // AutoApprovalFunction
-//
 func (h *handler) AutoApproval() error {
 	// enable auto-approval only if configured
 	if !h.cfg.Base.AutoApprove {
@@ -110,7 +155,6 @@ func (h *handler) AutoApproval() error {
 // swagger:route POST /client/feed  clientFeed ClientFeed
 //
 // Get approval requests Feed (via websocket) from Qredo Backend
-//
 func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFeed endpoint")
 	WebSocketFeedHandler(h, w, r)
@@ -124,7 +168,8 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 // Client registration process (3 steps in one)
 //
 // Responses:
-//      200: ClientRegisterFinishResponse
+//
+//	200: ClientRegisterFinishResponse
 func (h *handler) ClientFullRegister(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	h.log.Debug("Handler for ClientFullRegister endpoint")
 
@@ -172,7 +217,7 @@ func (h *handler) ClientFullRegister(_ *defs.RequestContext, w http.ResponseWrit
 	}
 
 	// return local feedUrl for request approvals
-	response.FeedURL = fmt.Sprintf("ws://%s%s/client/feed", h.cfg.HTTP.Addr, PathPrefix)
+	response.FeedURL = h.websocket.LocalFeedUrl
 
 	// also enable auto-approval of requests
 	h.AutoApproval()
