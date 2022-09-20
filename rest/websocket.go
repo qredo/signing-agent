@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -44,6 +45,16 @@ func (a *ActionInfo) Parse() string {
 	return string(out)
 }
 
+// GenWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
+func GenWSQredoCoreClientFeedURL(h *handler) string {
+	builder := strings.Builder{}
+	builder.WriteString(h.cfg.Base.WsScheme)
+	builder.WriteString(h.cfg.Base.QredoAPIDomain)
+	builder.WriteString(h.cfg.Base.QredoAPIBasePath)
+	builder.WriteString("/coreclient/feed")
+	return builder.String()
+}
+
 func restartWebSocketHandler(h *handler) {
 	h.log.Debug("Handler for restartWebSocketHandler")
 	if deadlineForRestart == nil {
@@ -51,11 +62,9 @@ func restartWebSocketHandler(h *handler) {
 		*deadlineForRestart = time.Now()
 	} else if deadlineForRestart != nil && time.Since(*deadlineForRestart) >= time.Duration(5*time.Minute) {
 		h.log.Error("background job - trying to retry connection failed")
-		h.UpdateWebsocketStatus(ConnectionState.Closed)
 		return
 	}
 	h.log.Debug("background job - trying to retry connection in next 5 seconds")
-	h.UpdateWebsocketStatus(ConnectionState.Connecting)
 	time.Sleep(5 * time.Second)
 	go AutoApproveHandler(h)
 }
@@ -70,7 +79,7 @@ func AutoApproveHandler(h *handler) {
 		h.log.Info("Agent is not yet configured, skipping Websocket connection for auto-approval")
 		return
 	}
-	url := h.GetWSQredoCoreClientFeedURL()
+	url := GenWSQredoCoreClientFeedURL(h)
 
 	// a channel to receive interrupt signals
 	interrupt := make(chan os.Signal, 1)
@@ -91,16 +100,12 @@ func AutoApproveHandler(h *handler) {
 		go restartWebSocketHandler(h)
 		return
 	}
-	defer func() {
-		wsQredoBackedConn.Close()
-		h.UpdateWebsocketStatus(ConnectionState.Closed)
-	}()
+	defer wsQredoBackedConn.Close()
 
 	deadlineForRestart = nil // everything is working fine, deadlines should be neutralized
 	done := make(chan struct{})
 
 	h.log.Infof("Connected to Qredo websocket feed %s", url)
-	h.UpdateWebsocketStatus(ConnectionState.Open)
 
 	// read and process (approve) ActionInfo requests received from the websocket.
 	go func() {
@@ -175,7 +180,7 @@ func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, inter
 func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 	h.log.Debug("Handler for WebSocketFeedHandler")
 
-	url := h.GetWSQredoCoreClientFeedURL()
+	url := GenWSQredoCoreClientFeedURL(h)
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 

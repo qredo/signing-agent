@@ -218,9 +218,7 @@ func TestAutomatedApproverRegisterFlow(t *testing.T) {
 	registrationTests(servAA, payload)
 	healthcheckVersionTests(servAA)
 	healthCheckConfigTests(servAA)
-	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, rest.ConnectionState.Closed)
 	clientActionTests(servAA)
-	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, rest.ConnectionState.Open)
 	websocketTests(servAA)
 }
 
@@ -282,19 +280,6 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 	httpCfg.Value("CORSAllowOrigins").Array().Element(0).String().Equal("*")
 	httpCfg.Value("LogAllRequests").Equal(false)
 	httpCfg.Value("ProxyForwardedHeader").String().Empty()
-}
-
-// healthCheckStatusTests checks the healthcheck status endpoint (/healthcheck/status).
-func healthcheckStatusTests(e *httpexpect.Expect, host string, wsstatus string) {
-	hcStatus := e.GET(rest.WrapPathPrefix(rest.PathHealthCheckStatus)).
-		Expect().
-		Status(http.StatusOK).JSON()
-	hcStatus.Object().NotEmpty()
-	hcStatus.Object().Keys().ContainsOnly("WebSocket")
-	webSocket := hcStatus.Object().Value("WebSocket").Object()
-	webSocket.Value("ReadyState").String().Equal(wsstatus)
-	webSocket.Value("RemoteFeedUrl").String().Equal(fmt.Sprintf("ws://%s/api/v1/p/coreclient/feed", host))
-	webSocket.Value("LocalFeedUrl").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
 }
 
 // clientActionTest tests the action endpoints (/client/action/{action_id}.
