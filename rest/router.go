@@ -26,11 +26,22 @@ const (
 
 	PathHealthcheckVersion = "/healthcheck/version"
 	PathHealthCheckConfig  = "/healthcheck/config"
+	PathHealthCheckStatus  = "/healthcheck/status"
 	PathClientFullRegister = "/register"
 	PathClientsList        = "/client"
 	PathAction             = "/client/action/{action_id}"
 	PathClientFeed         = "/client/feed"
 )
+
+var ConnectionState = struct {
+	Closed     string
+	Open       string
+	Connecting string
+}{
+	Closed:     "CLOSED",
+	Open:       "OPEN",
+	Connecting: "CONNECTING",
+}
 
 func WrapPathPrefix(uri string) string {
 	return strings.Join([]string{PathPrefix, uri}, "")
@@ -77,16 +88,6 @@ type Router struct {
 }
 
 func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.Version) (*Router, error) {
-
-	rt := &Router{
-		log:        log,
-		config:     config,
-		router:     nil,
-		handler:    &handler{},
-		middleware: NewMiddleware(log, config.HTTP.ProxyForwardedHeader, config.HTTP.LogAllRequests),
-		version:    version,
-	}
-
 	var err error
 	store, err := util.NewFileStore(config.Base.StoreFile)
 	if err != nil {
@@ -98,15 +99,14 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 		return nil, errors.Wrap(err, "failed to init core")
 	}
 
-	rt.handler = &handler{
-		core:    core,
-		cfg:     *config,
-		log:     log,
-		version: version,
+	rt := &Router{
+		log:        log,
+		config:     config,
+		handler:    NewHandler(core, config, log, version),
+		middleware: NewMiddleware(log, config.HTTP.ProxyForwardedHeader, config.HTTP.LogAllRequests),
+		version:    version,
 	}
-	if err != nil {
-		return nil, err
-	}
+
 	rt.router = rt.SetHandlers()
 
 	return rt, nil
@@ -118,6 +118,7 @@ func (r *Router) SetHandlers() http.Handler {
 	routes := []route{
 		{PathHealthcheckVersion, http.MethodGet, r.handler.HealthCheckVersion},
 		{PathHealthCheckConfig, http.MethodGet, r.handler.HealthCheckConfig},
+		{PathHealthCheckStatus, http.MethodGet, r.handler.HealthCheckStatus},
 		{PathClientFullRegister, http.MethodPost, r.handler.ClientFullRegister},
 		{PathClientsList, http.MethodGet, r.handler.ClientsList},
 		{PathAction, http.MethodPut, r.handler.ActionApprove},
