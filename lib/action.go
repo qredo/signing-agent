@@ -13,7 +13,7 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func (h *autoApprover) ActionApprove(actionID string) error {
+func (h *signingAgent) ActionApprove(actionID string) error {
 	agentID := h.store.GetSystemAgentID()
 	if agentID == "" {
 		return defs.ErrNotFound().WithDetail("agentID")
@@ -71,7 +71,7 @@ func (h *autoApprover) ActionApprove(actionID string) error {
 	return nil
 }
 
-func (h *autoApprover) ActionReject(actionID string) error {
+func (h *signingAgent) ActionReject(actionID string) error {
 	zkpOnePass, err := h.GetAgentZKPOnePass()
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")

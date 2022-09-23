@@ -2,6 +2,11 @@ package e2e_test
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
+
 	"github.com/gavv/httpexpect"
 	"github.com/stretchr/testify/assert"
 	"gitlab.qredo.com/custody-engine/automated-approver/api"
@@ -9,10 +14,6 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/rest"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
 	"go.uber.org/zap"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"testing"
 )
 
 const (
@@ -60,8 +61,8 @@ func getTestHandlers(cfg config.Config) http.Handler {
 	return router.SetHandlers()
 }
 
-// TestAutomatedApproverRegisterFlow
-func TestAutomatedApproverRegisterFlow(t *testing.T) {
+// TestSigningAgentRegisterFlow
+func TestSigningAgentRegisterFlow(t *testing.T) {
 	// initialise: default config and keys needed
 	// API and Base64Private keys should be read from the environment.  Fail and return if either don't exist.
 	APIKey := getEnv("APIKEY", "")

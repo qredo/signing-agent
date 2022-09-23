@@ -19,14 +19,14 @@ import (
 )
 
 type handler struct {
-	core      lib.AutomatedApproverClient
+	core      lib.SigningAgentClient
 	cfg       config.Config
 	log       *zap.SugaredLogger
 	version   *version.Version
 	websocket api.WebsocketStatus
 }
 
-func NewHandler(core lib.AutomatedApproverClient, config *config.Config, log *zap.SugaredLogger, version *version.Version) *handler {
+func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.SugaredLogger, version *version.Version) *handler {
 	localFeedUrl := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, PathPrefix)
 	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base)
 

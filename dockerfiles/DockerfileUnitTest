@@ -64,7 +64,7 @@ RUN CGO_ENABLED=1 \
       -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/custody-engine/automated-approver/service.buildDate=$BUILD_DATE' \
                                                             -X 'gitlab.qredo.com/custody-engine/automated-approver/service.commit=$BUILD_COMMIT' \
                                                             -X 'gitlab.qredo.com/custody-engine/automated-approver/service.version=$BUILD_VERSION'" \
-      -o automated-approver \
+      -o signing-agent \
       gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 
 RUN useradd appuser

@@ -21,7 +21,7 @@ import (
 	defs "gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func (h *autoApprover) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
+func (h *signingAgent) ClientRegister(name string) (*api.ClientRegisterResponse, error) {
 
 	var err error
 
@@ -56,7 +56,7 @@ func (h *autoApprover) ClientRegister(name string) (*api.ClientRegisterResponse,
 
 }
 
-func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error) {
+func (h *signingAgent) ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error) {
 
 	pending := h.store.GetPending(ref)
 	if pending == nil {
@@ -129,8 +129,8 @@ func (h *autoApprover) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 	}, nil
 }
 
-// ClientsList - Automated approver agent can be only one
-func (h *autoApprover) ClientsList() ([]string, error) {
+// ClientsList - Signing Agent can be only one
+func (h *signingAgent) ClientsList() ([]string, error) {
 	agentID := h.store.GetSystemAgentID()
 	if len(agentID) > 0 {
 		return []string{agentID}, nil
@@ -139,7 +139,7 @@ func (h *autoApprover) ClientsList() ([]string, error) {
 	}
 }
 
-func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref, apikey, b64PrivateKey string) (*api.QredoRegisterInitResponse, error) {
+func (h *signingAgent) ClientInit(reqData *api.QredoRegisterInitRequest, ref, apikey, b64PrivateKey string) (*api.QredoRegisterInitResponse, error) {
 	reqDataBody, err := json.Marshal(reqData)
 	if err != nil {
 		return nil, err
@@ -165,15 +165,15 @@ func (h *autoApprover) ClientInit(reqData *api.QredoRegisterInitRequest, ref, ap
 	return respData, nil
 }
 
-func (h *autoApprover) SetSystemAgentID(agetID string) error {
+func (h *signingAgent) SetSystemAgentID(agetID string) error {
 	return h.store.SetSystemAgentID(agetID)
 }
 
-func (h *autoApprover) GetSystemAgentID() string {
+func (h *signingAgent) GetSystemAgentID() string {
 	return h.store.GetSystemAgentID()
 }
 
-func (h *autoApprover) GetAgentZKPOnePass() ([]byte, error) {
+func (h *signingAgent) GetAgentZKPOnePass() ([]byte, error) {
 	agentID := h.store.GetSystemAgentID()
 	if agentID == "" {
 		return nil, errors.Errorf("can not get system agent ID from the store.")
