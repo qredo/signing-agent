@@ -36,13 +36,6 @@ var (
 	testAccountCode string
 )
 
-func getEnv(key, defaultValue string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return defaultValue
-}
-
 // Default creates configuration with default values
 func testDefaultConf() config.Config {
 	var cfg config.Config
@@ -185,14 +178,15 @@ func mockQBActionFeed(w http.ResponseWriter, r *http.Request) {
 	w.Write(dataJSON)
 }
 
-// TestAutomatedApproverRegisterFlow mocks the http server and tests each of the endpoints.
-//func TestAutomatedApproverRegisterFlow(t *testing.T) {
+// TestRestAPIs  mocks the http server and tests each of the endpoints.
 func TestRestAPIs(t *testing.T) {
-	// config for mocking endpoints, test database, and other test data.
-	APIKey, err := ioutil.ReadFile(TestAPIKeyFilePath)
-	assert.NoError(t, err)
+	// API and Base64Private keys needed for the tests.  API key doesn't need to be real, but the Private
+	// key is compared with data in FixturePathRegisterClientInitResponse.
+	// defaults if not on the command line.
+	APIKey := "not a real key"
 	Base64PrivateKey, err := ioutil.ReadFile(TestBase64PrivateKeyFilePath)
 	assert.NoError(t, err)
+
 	cfg := testDefaultConf()
 	srvQB := serverMockQB(cfg.Base.QredoAPIBasePath)
 	cfg.Base.QredoAPIDomain = strings.ReplaceAll(srvQB.URL, "http://", "")

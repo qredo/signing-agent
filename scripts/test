@@ -7,7 +7,7 @@ PROJECT_DIR="$(cd "$(dirname "${0}")/.."; pwd)"
 (
   cd "$PROJECT_DIR"
 
-  go test ./... -v -shuffle=on -short=t
+  go test $(go list ./... | grep -v tests/e2e) -v -shuffle=on -short=t
 )
 
 # option:	-shuffle - Randomize the execution order of tests and benchmarks.

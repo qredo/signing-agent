@@ -9,7 +9,6 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/rest"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -17,12 +16,10 @@ import (
 )
 
 const (
-	TestDataDBStoreFilePath      = "../../testdata/test-store.db"
-	TestAPIKeyFilePath           = "../../testdata/e2e/apikey"
-	TestBase64PrivateKeyFilePath = "../../testdata/e2e/base64privatekey"
-	TestBuildVersion             = "(test-cb12berf)"
-	TestBuildType                = "test-dev"
-	TestBuildDate                = "Wed 29 Feb 2021 15:28:38 BST"
+	TestDataDBStoreFilePath = "../../testdata/test-store.db"
+	TestBuildVersion        = "(test-cb12berf)"
+	TestBuildType           = "test-dev"
+	TestBuildDate           = "Wed 29 Feb 2021 15:28:38 BST"
 )
 
 func getEnv(key, defaultValue string) string {
@@ -66,10 +63,16 @@ func getTestHandlers(cfg config.Config) http.Handler {
 // TestAutomatedApproverRegisterFlow
 func TestAutomatedApproverRegisterFlow(t *testing.T) {
 	// initialise: default config and keys needed
-	APIKey, err := ioutil.ReadFile(TestAPIKeyFilePath)
-	assert.NoError(t, err)
-	Base64PrivateKey, err := ioutil.ReadFile(TestBase64PrivateKeyFilePath)
-	assert.NoError(t, err)
+	// API and Base64Private keys should be read from the environment.  Fail and return if either don't exist.
+	APIKey := getEnv("APIKEY", "")
+	if !assert.NotEmpty(t, APIKey, "APIKEY not set in environment") {
+		return
+	}
+	Base64PrivateKey := getEnv("BASE64PKEY", "")
+	if !assert.NotEmpty(t, Base64PrivateKey, "BASE64PKEY not set in environment") {
+		return
+	}
+
 	cfg := testDefaultConf()
 	cfg.Base.WsScheme = "ws://"
 	cfg.Base.AutoApprove = true
