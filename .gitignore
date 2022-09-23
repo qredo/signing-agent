@@ -5,7 +5,6 @@ public.pem
 apikey
 apikey_local
 apikey_play
-!testdata/e2e/apikey
 out/*
 local-config.yaml
 volume/
