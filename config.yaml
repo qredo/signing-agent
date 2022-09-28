@@ -1,16 +1,25 @@
 base:
+  int: 0
   qredo_api_domain: play-api.qredo.network
   qredo_api_base_path: /api/v1/p
   store_file: /volume/ccstore.db
-  auto_approve: false
-  http_scheme: https
+  auto_approve: true
 http:
-  addr: 0.0.0.0:8007
+  addr: 127.0.0.1:8007
   cors_allow_origins:
-  - '*'
+    - '*'
   proxy_forwarded_header: ""
-  log_all_requests: true
+  log_all_requests: false
 logging:
   format: text
   level: debug
-pin: 0
+pin: 123
+redis:
+  host: redis
+  port: 6379
+  password: ""
+  db: 0
+load_balancing:
+  enable: true
+  on_lock_error_timeout_ms: 300
+  action_id_expiration_sec: 6

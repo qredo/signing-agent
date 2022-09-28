@@ -16,9 +16,11 @@ type httpSettings struct {
 
 // Config is the service configuration
 type Config struct {
-	Base    Base         `yaml:"base"`
-	HTTP    httpSettings `yaml:"http"`
-	Logging Logging      `yaml:"logging"`
+	Base          Base          `yaml:"base"`
+	HTTP          httpSettings  `yaml:"http"`
+	Logging       Logging       `yaml:"logging"`
+	Redis         Redis         `yaml:"redis"`
+	LoadBalancing LoadBalancing `yaml:"load_balancing"`
 }
 
 type Base struct {
@@ -36,6 +38,19 @@ type Logging struct {
 	Level  string `yaml:"level"`
 }
 
+type LoadBalancing struct {
+	Enable                bool `yaml:"enable"`
+	OnLockErrorTimeOutMs  int  `yaml:"on_lock_error_timeout_ms"`
+	ActionIDExpirationSec int  `yaml:"action_id_expiration_sec"`
+}
+
+type Redis struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
+}
+
 // Default creates configuration with default values.
 func (c *Config) Default() {
 	c.HTTP = httpSettings{
@@ -51,6 +66,17 @@ func (c *Config) Default() {
 	c.Base.StoreFile = "ccstore.db"
 	c.Base.AutoApprove = false
 	c.Base.HttpScheme = "https"
+	c.Redis = Redis{
+		Host:     "redis",
+		Port:     6379,
+		Password: "",
+		DB:       0,
+	}
+	c.LoadBalancing = LoadBalancing{
+		Enable:                true,
+		OnLockErrorTimeOutMs:  300,
+		ActionIDExpirationSec: 6,
+	}
 }
 
 // Load reads and parses yaml config.
