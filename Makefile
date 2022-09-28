@@ -10,7 +10,7 @@ build:
 	go build \
 	    -tags debug \
 	    -ldflags ${LDFLAGS} \
-        -o out/automated-approver \
+        -o out/signing-agent \
         gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 
 test: unittest apitest

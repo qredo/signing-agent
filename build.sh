@@ -14,7 +14,7 @@ docker_local() {
   docker build --build-arg BUILD_DATE="$BUILD_DATE" \
                 --build-arg BUILD_TYPE="$BUILD_TYPE" \
                 --build-arg BUILD_VERSION="$BUILD_VERSION" \
-                -t automated-approver:dev \
+                -t signing-agent:dev \
                 -f dockerfiles/Dockerfile .
   
   rm -rf vendor
@@ -25,7 +25,7 @@ docker_test_build() {
   docker build --build-arg BUILD_DATE="$BUILD_DATE" \
                 --build-arg BUILD_TYPE="$BUILD_TYPE" \
                 --build-arg BUILD_VERSION="$BUILD_VERSION" \
-                -t automated-approver-unittest:dev \
+                -t signing-agent-unittest:dev \
                 -f dockerfiles/DockerfileUnitTest .
   
   rm -rf vendor
@@ -33,13 +33,13 @@ docker_test_build() {
 
 # Build a docker image for the specified architecture and store it in a tar file
 docker_export() {
-  rm automated-approver-$1-*.tar
+  rm signing-agent-$1-*.tar
   docker buildx build \
       --build-arg BUILD_DATE="$BUILD_DATE" \
       --build-arg BUILD_TYPE="$BUILD_TYPE" \
       --build-arg BUILD_VERSION="$BUILD_VERSION" \
       --platform linux/$1 \
-      --output "type=docker,push=false,name=automated-approver:dev-$1,dest=automated-approver-$1-$IMAGE_DATE.tar" \
+      --output "type=docker,push=false,name=signing-agent:dev-$1,dest=signing-agent-$1-$IMAGE_DATE.tar" \
       -f dockerfiles/Dockerfile .
 }
 
@@ -62,7 +62,7 @@ local_build() {
       -ldflags "-X 'main.buildDate=$BUILD_DATE' \
                 -X 'main.buildVersion=$BUILD_VERSION' \
                 -X 'main.buildType=$BUILD_TYPE'" \
-      -o out/automated-approver \
+      -o out/signing-agent \
       gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 }
 

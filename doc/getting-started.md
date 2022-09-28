@@ -159,7 +159,7 @@ Copy your `Base64PrivateKey` token to the clipboard. You are going to use it as 
 
 3. Run the Docker image in the terminal, using the command:
 
-`docker run -p 8007:8007 -v volume_folder:/volume automated-approver:dev`
+`docker run -p 8007:8007 -v volume_folder:/volume signing-agent:dev`
 
 You can now continue with testing of the Docker image.
 

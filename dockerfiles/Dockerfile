@@ -60,7 +60,7 @@ RUN CGO_ENABLED=1 \
       -ldflags "-w -linkmode external -extldflags '-static' -X 'main.buildDate=$BUILD_DATE' \
                                                             -X 'main.buildVersion="$(git rev-list -1 --abbrev-commit HEAD)"' \
                                                             -X 'main.buildType=$BUILD_TYPE'" \
-      -o automated-approver \
+      -o signing-agent \
       gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 
 FROM alpine as certs
@@ -68,9 +68,9 @@ RUN apk add -U --no-cache ca-certificates
 
 FROM scratch
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /src/gitlab.qredo.com/custody-engine/automated-approver /automated-approver
+COPY --from=go_builder /src/gitlab.qredo.com/custody-engine/automated-approver /signing-agent
 
 VOLUME /volume
-WORKDIR /automated-approver
+WORKDIR /signing-agent
 EXPOSE 8007
-CMD ["./automated-approver", "start", "-c", "/volume/config.yaml"]
+CMD ["./signing-agent", "start", "-c", "/volume/config.yaml"]

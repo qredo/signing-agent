@@ -1,8 +1,8 @@
-# Automated Approver
+# Signing Agent
 
-The Automated Approver is an agent that can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application.
+The Signing Agent is an agent that can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application.
 
-More details on how to use the automated approver can be found in `/docs`.
+More details on how to use the Signing Agent can be found in `/docs`.
 
 ## How to build
 ```shell
@@ -28,5 +28,5 @@ will run the restAPI test.
 In order to run the e2e test, the APIKEY and BASE64PKEY (the base64 of the private.pem file) for a Qeedo account to test
 against are needed.  Ensure both the APIKEY and BASE64PKEY are set in the environment before running the e2e test.
 ```shell
-> make teste2e
+> make e2etest
 ```

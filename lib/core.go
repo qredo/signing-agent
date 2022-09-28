@@ -6,7 +6,7 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
-type AutomatedApproverClient interface {
+type SigningAgentClient interface {
 	// ClientInit starts the agent registration process
 	ClientInit(register *api.QredoRegisterInitRequest, ref, apikey, b64PrivateKey string) (*api.QredoRegisterInitResponse, error)
 	// ClientRegister starts the simplified agent registration procedure
@@ -30,15 +30,15 @@ type AutomatedApproverClient interface {
 	GetAgentZKPOnePass() ([]byte, error)
 }
 
-type autoApprover struct {
+type signingAgent struct {
 	store *Storage
 	cfg   *config.Base
 	htc   *util.Client
 }
 
-func New(cfg *config.Base, kv KVStore) (*autoApprover, error) {
+func New(cfg *config.Base, kv KVStore) (*signingAgent, error) {
 
-	return &autoApprover{
+	return &signingAgent{
 		cfg:   cfg,
 		store: NewStore(kv),
 		htc:   util.NewHTTPClient(),

@@ -20,7 +20,7 @@ var (
 )
 
 func startText() {
-	fmt.Printf("Automated approver service %v (%v) build date: %v\n\n", buildType, buildVersion, buildDate)
+	fmt.Printf("Signing Agent service %v (%v) build date: %v\n\n", buildType, buildVersion, buildDate)
 }
 
 type versionCmd struct{}

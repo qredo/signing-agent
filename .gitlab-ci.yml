@@ -31,9 +31,9 @@ Build docker images:
       --build-arg BUILD_DATE="$(date -u)"
       --dockerfile=dockerfiles/Dockerfile
       --no-push
-      --destination=automated-approver
-      --tarPath=automated-approver-$(date +%F).tar
+      --destination=signing-agent
+      --tarPath=signing-agent-$(date +%F).tar
   artifacts:
     expire_in: 1 hour
     paths:
-      - automated-approver-*.tar
+      - signing-agent-*.tar
