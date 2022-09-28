@@ -2,6 +2,10 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/go-redis/redis/v8"
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"net/http"
 	"os"
 	"strings"
@@ -99,20 +103,27 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 		return nil, errors.Wrap(err, "failed to init core")
 	}
 
+	rds := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", config.Redis.Host, config.Redis.Port),
+		Password: config.Redis.Password,
+		DB:       config.Redis.DB,
+	})
+	pool := goredis.NewPool(rds)
+	rs := redsync.New(pool)
+
 	rt := &Router{
 		log:        log,
 		config:     config,
-		handler:    NewHandler(core, config, log, version),
+		handler:    NewHandler(core, config, log, version, rds, rs),
 		middleware: NewMiddleware(log, config.HTTP.ProxyForwardedHeader, config.HTTP.LogAllRequests),
 		version:    version,
 	}
-
 	rt.router = rt.SetHandlers()
 
 	return rt, nil
 }
 
-// set all handler
+// SetHandlers set all handlers
 func (r *Router) SetHandlers() http.Handler {
 
 	routes := []route{

@@ -2,8 +2,11 @@ package rest
 
 import (
 	"fmt"
+	"github.com/go-redis/redis/v8"
+	"github.com/go-redsync/redsync/v4"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/copier"
@@ -24,9 +27,13 @@ type handler struct {
 	log       *zap.SugaredLogger
 	version   *version.Version
 	websocket api.WebsocketStatus
+	redis     *redis.Client
+	rsync     *redsync.Redsync
 }
 
-func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.SugaredLogger, version *version.Version) *handler {
+func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.SugaredLogger,
+	version *version.Version, redis *redis.Client, rsync *redsync.Redsync) *handler {
+
 	localFeedUrl := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, PathPrefix)
 	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base)
 
@@ -36,6 +43,8 @@ func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.Sug
 		log:       log,
 		version:   version,
 		websocket: api.NewWebsocketStatus(ConnectionState.Closed, remoteFeedUrl, localFeedUrl),
+		redis:     redis,
+		rsync:     rsync,
 	}
 
 	return h
@@ -55,7 +64,7 @@ func (h *handler) UpdateWebsocketStatus(status string) {
 	h.websocket.ReadyState = status
 }
 
-func (h handler) GetWSQredoCoreClientFeedURL() string {
+func (h *handler) GetWSQredoCoreClientFeedURL() string {
 	return h.websocket.RemoteFeedUrl
 }
 
@@ -97,7 +106,7 @@ func (h *handler) HealthCheckStatus(_ *defs.RequestContext, w http.ResponseWrite
 
 // ClientsList
 //
-// swagger:route GET /client clientsList ClientsList
+// swagger:route GET /client ClientsList
 //
 // # Return AgentID if it's configured
 //
@@ -118,6 +127,24 @@ func (h *handler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r
 	actionID := mux.Vars(r)["action_id"]
 	if actionID == "" {
 		return nil, defs.ErrBadRequest().WithDetail("actionID")
+	}
+
+	if h.cfg.LoadBalancing.Enable {
+		if err := h.redis.Get(rCtx, actionID).Err(); err == nil {
+			h.log.Debugf("action [%v] was already approved!", actionID)
+			return nil, nil
+		}
+		rMutex = h.rsync.NewMutex(actionID)
+		if err := rMutex.Lock(); err != nil {
+			time.Sleep(time.Duration(h.cfg.LoadBalancing.OnLockErrorTimeOutMs) * time.Millisecond)
+			return nil, err
+		}
+		defer func() {
+			if ok, err := rMutex.Unlock(); !ok || err != nil {
+				h.log.Errorf("%v action-id %v", err, actionID)
+			}
+			h.redis.Set(rCtx, actionID, 1, time.Duration(h.cfg.LoadBalancing.ActionIDExpirationSec)*time.Second)
+		}()
 	}
 
 	return nil, h.core.ActionApprove(actionID)
@@ -152,7 +179,7 @@ func (h *handler) AutoApproval() error {
 
 // ClientFeed
 //
-// swagger:route POST /client/feed  clientFeed ClientFeed
+// swagger:route POST /client/feed  ClientFeed
 //
 // Get approval requests Feed (via websocket) from Qredo Backend
 func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
@@ -163,7 +190,7 @@ func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *h
 
 // ClientFullRegister
 //
-// swagger:route POST /client/register  clientFullRegister ClientFullRegister
+// swagger:route POST /client/register ClientFullRegister
 //
 // Client registration process (3 steps in one)
 //

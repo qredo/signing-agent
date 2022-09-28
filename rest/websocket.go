@@ -1,9 +1,11 @@
 package rest
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/go-redsync/redsync/v4"
 	"net/http"
 	"os"
 	"os/signal"
@@ -25,6 +27,8 @@ const (
 )
 
 var deadlineForRestart *time.Time
+var rMutex *redsync.Mutex
+var rCtx = context.Background()
 
 type Parser interface {
 	Parse() string
@@ -120,6 +124,13 @@ func AutoApproveHandler(h *handler) {
 			var action ActionInfo
 			err = json.Unmarshal([]byte(v.Parse()), &action)
 			if action.ExpireTime > time.Now().Unix() {
+				if h.cfg.LoadBalancing.Enable {
+					if err := h.redis.Get(rCtx, action.ID).Err(); err == nil {
+						h.log.Debugf("action [%v] was already approved!", action.ID)
+						continue
+					}
+					rMutex = h.rsync.NewMutex(action.ID)
+				}
 				go approveActionWithRetry(h, action, 5, 5)
 			}
 		}
@@ -148,6 +159,19 @@ func AutoApproveHandler(h *handler) {
 // approveActionWithRetry attempts to approve the action. It retries every intervalSeconds, giving up after
 // maxMinutes have expired.
 func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, intervalSeconds int) {
+	if h.cfg.LoadBalancing.Enable {
+		if err := rMutex.Lock(); err != nil {
+			time.Sleep(time.Duration(h.cfg.LoadBalancing.OnLockErrorTimeOutMs) * time.Millisecond)
+			return
+		}
+		defer func() {
+			if ok, err := rMutex.Unlock(); !ok || err != nil {
+				h.log.Errorf("%v action [%v]", err, action.ID)
+			}
+			h.redis.Set(rCtx, action.ID, 1, time.Duration(h.cfg.LoadBalancing.ActionIDExpirationSec)*time.Second)
+		}()
+	}
+
 	h.log.Debug("Handler for approveActionWithRetry")
 	tStart := time.Now()
 	baseInc := intervalSeconds
