@@ -14,3 +14,4 @@ volume/
 *.zip
 *.tar
 incubator-milagro-crypto-c
+config.yaml

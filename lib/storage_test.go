@@ -10,7 +10,8 @@ import (
 )
 
 func TestStorage(t *testing.T) {
-	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
+	kv := util.NewFileStore(TestDataDBStoreFilePath)
+	err := kv.Init()
 	defer func() {
 		err = os.Remove(TestDataDBStoreFilePath)
 		assert.NoError(t, err)

@@ -48,7 +48,8 @@ type httpRequest struct {
 }
 
 func main() {
-	store, err := util.NewFileStore("examplestore.db")
+	store := util.NewFileStore("examplestore.db")
+	err := store.Init()
 	if err != nil {
 		panic(errors.Wrap(err, "file store init"))
 	}

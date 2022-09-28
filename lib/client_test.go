@@ -33,7 +33,8 @@ func TestClient(t *testing.T) {
 		HttpScheme:       "http",
 	}
 	agentName := "Test name agent"
-	kv, err := util.NewFileStore(TestDataDBStoreFilePath)
+	kv := util.NewFileStore(TestDataDBStoreFilePath)
+	err = kv.Init()
 	assert.NoError(t, err)
 	defer func() {
 		err = os.Remove(TestDataDBStoreFilePath)

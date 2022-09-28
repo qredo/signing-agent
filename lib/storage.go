@@ -6,23 +6,16 @@ import (
 	"errors"
 
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
 var agentIDString = "AgentID"
 
-// KVStore is an interface to a simple key-value store used by the core lib
-type KVStore interface {
-	// Get returns the data for given key. If key is not found, return nil, defs.KVErrNotFound
-	Get(key string) ([]byte, error)
-	Set(key string, data []byte) error
-	Del(key string) error
-}
-
 type Storage struct {
-	kv KVStore
+	kv util.KVStore
 }
 
-func NewStore(store KVStore) *Storage {
+func NewStore(store util.KVStore) *Storage {
 	s := &Storage{
 		kv: store,
 	}

@@ -1,9 +1,20 @@
 base:
-  int: 0
   qredo_api_domain: play-api.qredo.network
   qredo_api_base_path: /api/v1/p
+  auto_approve: false
+  http_scheme: https
+  store_type: file # oci/aws/az/file
   store_file: /volume/ccstore.db
-  auto_approve: true
+  store_oci:
+    compartment: ocid1.tenancy.oc1...
+    vault: ocid1.vault.oc1...
+    secret_encryption_key: ocid1.key.oc1...
+    config_secret: automated_approver_config
+  store_aws: ""
+  # ...
+  store_az: ""
+  # ...
+  pin: 0
 http:
   addr: 127.0.0.1:8007
   cors_allow_origins:
@@ -13,7 +24,6 @@ http:
 logging:
   format: text
   level: debug
-pin: 123
 redis:
   host: redis
   port: 6379
