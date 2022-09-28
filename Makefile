@@ -27,3 +27,11 @@ e2etest:
 	@echo "environment variable for APIKEY and BASE64PKEY are needed for e2e tests"
 	go test ./tests/e2e -v -shuffle=on -short=t
 
+update-packages:
+	@echo "updating all go packages"
+	go get -u ./...
+	go mod tidy
+
+test-all:
+	@echo "running all tests"
+	go test ./... -v -count=1
