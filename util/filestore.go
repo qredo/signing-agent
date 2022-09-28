@@ -9,17 +9,13 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
-func NewFileStore(fileName string) (*FileStore, error) {
+func NewFileStore(fileName string) KVStore {
 	fs := &FileStore{
 		fileName: fileName,
 		data:     map[string][]byte{},
 	}
 
-	if err := fs.init(); err != nil {
-		return nil, err
-	}
-
-	return fs, nil
+	return fs
 }
 
 type FileStore struct {
@@ -28,7 +24,7 @@ type FileStore struct {
 	data     map[string][]byte
 }
 
-func (s *FileStore) init() error {
+func (s *FileStore) Init() error {
 	s.Lock()
 	defer s.Unlock()
 

@@ -93,9 +93,16 @@ type Router struct {
 
 func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.Version) (*Router, error) {
 	var err error
-	store, err := util.NewFileStore(config.Base.StoreFile)
+
+	log.Infof("Using %s store", config.Base.StoreType)
+	store := util.CreateStore(config.Base)
+	if store == nil {
+		log.Panicf("unsupported store type: %s", config.Base.StoreType)
+	}
+
+	err = store.Init()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create default file store")
+		return nil, errors.Wrap(err, "failed to init store")
 	}
 
 	core, err := lib.New(&config.Base, store)

@@ -191,3 +191,31 @@ signResponse {
 }
 ```
 
+<br/>
+
+### Oracle Cloud Vault Storage
+
+<br/>
+
+config:
+```yaml
+base:
+  ...
+  store_type: oci
+  store_oci:
+    vault: ocid1.vault....
+    secret_encryption_key: ocid1.key....
+    compartment: ocid1.tenancy....
+    config_secret: automated_approver_config
+  ...
+```
+
+- Setup an API key on Oracle Cloud
+- Download the config file for the api key, fill in the correct private key path
+- Either put the file in its default location of ~/.oci/config or 
+  put it in a custom location and set env var OCI_CONFIG_FILE to the full path including the filename
+- Create a vault and copy the OCID to the config file for the vault setting
+- Create an encryption key (AES or RSA) in the vault, copy it's OCID to the config secret_encryption_key setting
+- Copy the compartment OCID from the compartment where the vault was created
+- Set a secret name where the signing agent will store its configuration and keys
+- Start the signing agent and register an agent using the API

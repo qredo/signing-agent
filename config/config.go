@@ -7,13 +7,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type httpSettings struct {
-	Addr                 string   `yaml:"addr"`
-	CORSAllowOrigins     []string `yaml:"cors_allow_origins"`
-	ProxyForwardedHeader string   `yaml:"proxy_forwarded_header"`
-	LogAllRequests       bool     `yaml:"log_all_requests"`
-}
-
 // Config is the service configuration
 type Config struct {
 	Base          Base          `yaml:"base"`
@@ -24,13 +17,29 @@ type Config struct {
 }
 
 type Base struct {
-	PIN              int    `yaml:"int"`
-	QredoAPIDomain   string `yaml:"qredo_api_domain"`
-	QredoAPIBasePath string `yaml:"qredo_api_base_path"`
-	StoreFile        string `yaml:"store_file"`
-	AutoApprove      bool   `yaml:"auto_approve"`
-	HttpScheme       string `yaml:"http_scheme"`
-	WsScheme         string `yaml:"ws_scheme"`
+	PIN              int       `yaml:"pin"`
+	QredoAPIDomain   string    `yaml:"qredo_api_domain"`
+	QredoAPIBasePath string    `yaml:"qredo_api_base_path"`
+	AutoApprove      bool      `yaml:"auto_approve"`
+	HttpScheme       string    `yaml:"http_scheme"`
+	WsScheme         string    `yaml:"ws_scheme"`
+	StoreType        string    `default:"file" yaml:"store_type"`
+	StoreFile        string    `yaml:"store_file"`
+	StoreOci         OciConfig `yaml:"store_oci"`
+}
+
+type OciConfig struct {
+	Compartment         string `yaml:"compartment"`
+	Vault               string `yaml:"vault"`
+	SecretEncryptionKey string `yaml:"secret_encryption_key"`
+	ConfigSecret        string `yaml:"config_secret"`
+}
+
+type httpSettings struct {
+	Addr                 string   `yaml:"addr"`
+	CORSAllowOrigins     []string `yaml:"cors_allow_origins"`
+	ProxyForwardedHeader string   `yaml:"proxy_forwarded_header"`
+	LogAllRequests       bool     `yaml:"log_all_requests"`
 }
 
 type Logging struct {
@@ -63,9 +72,10 @@ func (c *Config) Default() {
 	c.Base.QredoAPIBasePath = "/api/v1/p"
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
-	c.Base.StoreFile = "ccstore.db"
 	c.Base.AutoApprove = false
 	c.Base.HttpScheme = "https"
+	c.Base.StoreType = "file"
+	c.Base.StoreFile = "ccstore.db"
 	c.Redis = Redis{
 		Host:     "redis",
 		Port:     6379,
@@ -73,7 +83,7 @@ func (c *Config) Default() {
 		DB:       0,
 	}
 	c.LoadBalancing = LoadBalancing{
-		Enable:                true,
+		Enable:                false,
 		OnLockErrorTimeOutMs:  300,
 		ActionIDExpirationSec: 6,
 	}

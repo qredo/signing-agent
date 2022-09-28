@@ -36,8 +36,7 @@ type signingAgent struct {
 	htc   *util.Client
 }
 
-func New(cfg *config.Base, kv KVStore) (*signingAgent, error) {
-
+func New(cfg *config.Base, kv util.KVStore) (*signingAgent, error) {
 	return &signingAgent{
 		cfg:   cfg,
 		store: NewStore(kv),
