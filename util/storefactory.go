@@ -10,6 +10,8 @@ func CreateStore(cfg config.Base) KVStore {
 		return NewFileStore(cfg.StoreFile)
 	case "oci":
 		return NewOciStore(cfg.StoreOci)
+	case "aws":
+		return NewAWSStore(cfg.StoreAWS)
 	default:
 		return nil
 	}
