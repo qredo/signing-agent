@@ -5,6 +5,7 @@ go 1.19
 replace github.com/btcsuite/btcd => github.com/qredo/btcd v0.21.2
 
 require (
+	github.com/aws/aws-sdk-go v1.44.107
 	github.com/btcsuite/btcd v0.21.0-beta
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/go-playground/validator/v10 v10.11.1
@@ -23,6 +24,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+require github.com/jmespath/go-jmespath v0.4.0 // indirect
 
 require (
 	github.com/ajg/form v1.5.1 // indirect

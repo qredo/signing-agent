@@ -193,6 +193,11 @@ signResponse {
 
 <br/>
 
+## Cloud-based configuration storage
+
+An alternative to storing the signing-agent configuration on-premises in a file, is to use secure cloud-based storage.
+The following cloud-based solutions are supported.
+
 ### Oracle Cloud Vault Storage
 
 <br/>
@@ -212,10 +217,33 @@ base:
 
 - Setup an API key on Oracle Cloud
 - Download the config file for the api key, fill in the correct private key path
-- Either put the file in its default location of ~/.oci/config or 
+- Either put the file in its default location of ~/.oci/config or
   put it in a custom location and set env var OCI_CONFIG_FILE to the full path including the filename
 - Create a vault and copy the OCID to the config file for the vault setting
 - Create an encryption key (AES or RSA) in the vault, copy it's OCID to the config secret_encryption_key setting
 - Copy the compartment OCID from the compartment where the vault was created
 - Set a secret name where the signing agent will store its configuration and keys
 - Start the signing agent and register an agent using the API
+
+<br/>
+
+### AWS Cloud Secrets Manager Storage
+In order to use AWS for configuration storage, set the `storage_type` to `aws` and provide the AWS Region and the
+name of the Secrets Manager secret.  For example, the config should look something like the following:
+```yaml
+base:
+  ...
+  store_type: aws
+  store_aws:
+    region: eu-west-2
+    config_secret: signingAgentConfig
+  ...
+```
+The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be setup in advance. To do this,
+on the AWS console:
+1. create a KMS customer-managed key to be used to encrypt the Secrets Manager secret
+2. create the Secrets Manager secret, naming it and including the KMS key from step 1
+3. update the Signing Agent's configuration file with the AWS region and secret name
+ 
+Start the Signing Agent and register the agent using the API.
+

@@ -26,6 +26,7 @@ type Base struct {
 	StoreType        string    `default:"file" yaml:"store_type"`
 	StoreFile        string    `yaml:"store_file"`
 	StoreOci         OciConfig `yaml:"store_oci"`
+	StoreAWS         AWSConfig `yaml:"store_aws"`
 }
 
 type OciConfig struct {
@@ -33,6 +34,12 @@ type OciConfig struct {
 	Vault               string `yaml:"vault"`
 	SecretEncryptionKey string `yaml:"secret_encryption_key"`
 	ConfigSecret        string `yaml:"config_secret"`
+}
+
+// AWSConfig based signing-agent config.. Note: this is used if Base StoreType is aws.
+type AWSConfig struct {
+	Region     string `yaml:"region"`
+	SecretName string `yaml:"secret_name"`
 }
 
 type httpSettings struct {
