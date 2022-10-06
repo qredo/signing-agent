@@ -1,4 +1,4 @@
-FROM golang:alpine as go_builder
+FROM golang:alpine
 
 RUN apk update && apk add \
         ca-certificates \
@@ -48,29 +48,4 @@ ARG BUILD_DATE
 
 ENV PROJECT_PATH=/src/gitlab.qredo.com/custody-engine/signing-agent
 
-COPY . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
-
-RUN ls -la
-
-RUN CGO_ENABLED=1 \
-    GO111MODULES=on \
-    go build \
-      -tags debug \
-      -ldflags "-w -linkmode external -extldflags '-static' -X 'main.buildDate=$BUILD_DATE' \
-                                                            -X 'main.buildVersion="$(git rev-list -1 --abbrev-commit HEAD)"' \
-                                                            -X 'main.buildType=$BUILD_TYPE'" \
-      -o signing-agent \
-      gitlab.qredo.com/custody-engine/signing-agent/cmd/service
-
-FROM alpine as certs
-RUN apk add -U --no-cache ca-certificates
-
-FROM scratch
-COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /src/gitlab.qredo.com/custody-engine/signing-agent /signing-agent
-
-VOLUME /volume
-WORKDIR /signing-agent
-EXPOSE 8007
-CMD ["./signing-agent", "start", "-c", "/volume/config.yaml"]
