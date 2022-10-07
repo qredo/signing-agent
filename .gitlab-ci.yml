@@ -1,6 +1,12 @@
 stages:
+  - internal_secret_detection
   - unit-test
   - docker
+
+include:
+  - project: 'devops/gitlab-ci-templates'
+    ref: master
+    file: .gitlab-ci.yml
 
 Unit test:
   stage: unit-test
