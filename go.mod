@@ -17,6 +17,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jinzhu/copier v0.3.5
+	github.com/mkideal/cli v0.2.7
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.0
 	github.com/test-go/testify v1.1.4
@@ -26,7 +27,13 @@ require (
 )
 
 require (
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/labstack/gommon v0.3.0 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mkideal/expr v0.1.0 // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+)
+
+require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -43,10 +50,10 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/imkira/go-interpol v1.0.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.12.2 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/mattn/go-colorable v0.1.2 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/oracle/oci-go-sdk/v65 v65.23.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect

@@ -28,6 +28,9 @@ type SigningAgentClient interface {
 	GetSystemAgentID() string
 	// GetAgentZKPOnePass function to generate Zero Knowladge Proof one password (for auth header).
 	GetAgentZKPOnePass() ([]byte, error)
+
+	// ReadAction connect to qredo web socket stream by given feed url and return Feed object
+	ReadAction(feedUrl string) *Feed
 }
 
 type signingAgent struct {
