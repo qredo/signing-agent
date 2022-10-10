@@ -1,10 +1,10 @@
 package util
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"strings"
 	"sync"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,6 +14,12 @@ import (
 
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+)
+
+// SecretNotInitialised is used to identify an uninitialised AWS secret.
+const (
+	SecretNotInitialised string = "initialise me"
+	SecretInitialised    string = "{}"
 )
 
 type AWSStore struct {
@@ -41,12 +47,11 @@ func (s *AWSStore) Get(key string) ([]byte, error) {
 
 	secretData, err := s.getSecret(s.secretName)
 	if err != nil {
-		fmt.Println("error returned from getSecret:", err)
 		return nil, err
 	}
 
-	var cfg map[string][]byte = make(map[string][]byte)
-	if len(secretData) > 0 {
+	cfg := make(map[string][]byte)
+	if len(secretData) > 0 && !strings.Contains(string(secretData), SecretInitialised) {
 		err = json.Unmarshal(secretData, &cfg)
 		if err != nil {
 			return nil, err
@@ -70,8 +75,8 @@ func (s *AWSStore) Set(key string, data []byte) error {
 		return err
 	}
 
-	var cfg map[string][]byte = make(map[string][]byte)
-	if len(secretData) > 0 {
+	cfg := make(map[string][]byte)
+	if len(secretData) > 0 && !strings.Contains(string(secretData), SecretInitialised) {
 		err = json.Unmarshal(secretData, &cfg)
 		if err != nil {
 			s.lock.RUnlock()
@@ -140,7 +145,7 @@ func (s *AWSStore) Init() error {
 	s.svc = secretsmanager.New(sess, aws.NewConfig().WithRegion(s.region))
 
 	// check connection
-	_, err = s.getSecret(s.secretName)
+	err = s.initConnection(s.secretName)
 	if err != nil {
 		return errors.Wrap(err, "cannot initialise AWS store")
 	}
@@ -151,6 +156,26 @@ func (s *AWSStore) Init() error {
 // getSecret reads the secret with name from AWS.  Various sanity checks on AWS access, returning errors.
 // The secret should be binary and base64 encoded.  The decoded []byte is returned.
 func (s *AWSStore) getSecret(name string) ([]byte, error) {
+	result, err := s.readSecret(name)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypts secret using the associated KMS key.
+	// We're expecting a binary. Check and return an error if a string is found.
+	var decodedBinarySecretBytes []byte
+	if result.SecretString != nil {
+		return nil, fmt.Errorf("string returned, expected []byte")
+	} else {
+		decodedBinarySecretBytes = result.SecretBinary
+	}
+
+	return decodedBinarySecretBytes, nil
+}
+
+// readSecret reads the secret with name from AWS.
+// The secret should be binary and base64 encoded.  The decoded []byte is returned.
+func (s *AWSStore) readSecret(name string) (*secretsmanager.GetSecretValueOutput, error) {
 	input := &secretsmanager.GetSecretValueInput{
 		SecretId:     aws.String(name),
 		VersionStage: aws.String("AWSCURRENT"), // VersionStage defaults to AWSCURRENT if unspecified
@@ -181,36 +206,41 @@ func (s *AWSStore) getSecret(name string) ([]byte, error) {
 		return nil, err
 	}
 
-	// Decrypts secret using the associated KMS key.
-	// We're expecting a binary. Check and return an error if a string is found.
-	var decodedBinarySecretBytes []byte
-	if result.SecretString != nil {
-		return nil, fmt.Errorf("string returned, expected []byte")
-	} else {
-		decodedBinarySecretBytes = make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
-		_, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return decodedBinarySecretBytes, nil
+	return result, nil
 }
 
 // setSecret base64 encodes the data and stores it in the named secret.
 func (s *AWSStore) setSecret(name string, data []byte) error {
 
-	dst := make([]byte, base64.StdEncoding.EncodedLen(len(data)))
-	base64.StdEncoding.Encode(dst, data)
-
 	input := &secretsmanager.UpdateSecretInput{
-		SecretBinary: dst,
+		SecretBinary: data,
 		SecretId:     aws.String(name),
 	}
 
 	_, err := s.svc.UpdateSecret(input)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "secret not updated")
+	}
+
+	return nil
+}
+
+// initConnection checks the AWS connection and that the named secret can be read. If the secret value is the
+// string SecretNotInitialised, the secret is initialised to SecretInitialised. The process of initialising the
+// secret changes its type from string to binary.
+func (s *AWSStore) initConnection(name string) error {
+	result, err := s.readSecret(name)
+	if err != nil {
+		return errors.Wrap(err, "cannot initial AWS connection")
+	}
+
+	if result.SecretString != nil {
+		if *result.SecretString != SecretNotInitialised {
+			str := fmt.Sprintf("secret '%s' not expected - set to '%s' to reinitialise", *result.SecretString, SecretNotInitialised)
+			return errors.New(str)
+		}
+		bytes, _ := json.Marshal(SecretInitialised)
+		return s.setSecret(name, bytes)
 	}
 
 	return nil
