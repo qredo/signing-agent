@@ -41,7 +41,7 @@ func testDefaultConf() config.Config {
 	var cfg config.Config
 	cfg.Default()
 	cfg.Logging.Level = "debug"
-	cfg.Base.StoreFile = TestDataDBStoreFilePath
+	cfg.Store.FileConfig = TestDataDBStoreFilePath
 	cfg.Base.HttpScheme = "http"
 	return cfg
 }
@@ -190,7 +190,7 @@ func TestRestAPIs(t *testing.T) {
 	cfg := testDefaultConf()
 	srvQB := serverMockQB(cfg.Base.QredoAPIBasePath)
 	cfg.Base.QredoAPIDomain = strings.ReplaceAll(srvQB.URL, "http://", "")
-	cfg.Base.WsScheme = "ws://"
+	cfg.Base.WsScheme = "ws"
 	cfg.Base.AutoApprove = true
 	handlers := getTestHandlers(cfg)
 	server := httptest.NewServer(handlers)
@@ -280,7 +280,11 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 	baseCfg.Value("PIN").Equal(0)
 	baseCfg.Value("QredoAPIBasePath").String().Equal("/api/v1/p")
 	baseCfg.Value("QredoAPIDomain").NotNull()
-	baseCfg.Value("StoreFile").String().Equal(TestDataDBStoreFilePath)
+
+	hcConfig.Object().Keys().Contains("Store")
+	storeCfg := hcConfig.Object().Value("Store").Object()
+	storeCfg.Value("Type").Equal("file")
+	storeCfg.Value("FileConfig").Equal(TestDataDBStoreFilePath)
 
 	hcConfig.Object().Keys().Contains("HTTP")
 	httpCfg := hcConfig.Object().Value("HTTP").Object()
