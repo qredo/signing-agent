@@ -193,9 +193,9 @@ signResponse {
 
 <br/>
 
-## Cloud-based configuration storage
+## Cloud-based agent key storage
 
-An alternative to storing the signing-agent configuration on-premises in a file, is to use secure cloud-based storage.
+An alternative to storing the signing-agent keys and agent data on-premises in a file, is to use secure cloud-based storage.
 The following cloud-based solutions are supported.
 
 ### Oracle Cloud Vault Storage
@@ -228,7 +228,7 @@ base:
 <br/>
 
 ### AWS Cloud Secrets Manager Storage
-In order to use AWS for configuration storage, set the `storage_type` to `aws` and provide the AWS Region and the
+In order to use AWS for key and agent data storage, set the `storage_type` to `aws` and provide the AWS Region and the
 name of the Secrets Manager secret.  For example, the config should look something like the following:
 ```yaml
 base:
@@ -243,6 +243,10 @@ The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be
 on the AWS console:
 1. create a KMS customer-managed key to be used to encrypt the Secrets Manager secret
 2. create the Secrets Manager secret, naming it and including the KMS key from step 1
+   - Select `Other type of secret`
+   - Select `Paintext` and enter `initialise me`
+   - From Encryption key drop, select the key created in step 1
+   - Name the secret and optionally add a desciption
 3. update the Signing Agent's configuration file with the AWS region and secret name
  
 Start the Signing Agent and register the agent using the API.

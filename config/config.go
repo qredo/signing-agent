@@ -36,7 +36,7 @@ type OciConfig struct {
 	ConfigSecret        string `yaml:"config_secret"`
 }
 
-// AWSConfig based signing-agent config.. Note: this is used if Base StoreType is aws.
+// AWSConfig based signing-agent config. Used when Base StoreType is aws.
 type AWSConfig struct {
 	Region     string `yaml:"region"`
 	SecretName string `yaml:"secret_name"`

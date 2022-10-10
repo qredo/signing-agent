@@ -102,12 +102,12 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 
 	err = store.Init()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to init store")
+		return nil, errors.Wrap(err, "failed to initialise store")
 	}
 
 	core, err := lib.New(&config.Base, store)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to init core")
+		return nil, errors.Wrap(err, "failed to initialise core")
 	}
 
 	rds := redis.NewClient(&redis.Options{
