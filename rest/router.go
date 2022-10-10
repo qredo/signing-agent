@@ -3,12 +3,13 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"github.com/go-redsync/redsync/v4"
-	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/go-redis/redis/v8"
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 
 	"github.com/pkg/errors"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
@@ -94,10 +95,10 @@ type Router struct {
 func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.Version) (*Router, error) {
 	var err error
 
-	log.Infof("Using %s store", config.Base.StoreType)
-	store := util.CreateStore(config.Base)
+	log.Infof("Using %s store", config.Store.Type)
+	store := util.CreateStore(config)
 	if store == nil {
-		log.Panicf("unsupported store type: %s", config.Base.StoreType)
+		log.Panicf("unsupported store type: %s", config.Store.Type)
 	}
 
 	err = store.Init()

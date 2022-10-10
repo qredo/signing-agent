@@ -11,8 +11,10 @@ import (
 
 func Test_StoreFactory_CreateStore_Creates_file_store(t *testing.T) {
 	// Arrange
-	cfg := config.Base{
-		StoreType: "file",
+	cfg := &config.Config{
+		Store: config.Store{
+			Type: "file",
+		},
 	}
 
 	// Act
@@ -25,8 +27,10 @@ func Test_StoreFactory_CreateStore_Creates_file_store(t *testing.T) {
 
 func Test_StoreFactory_CreateStore_Creates_oci_store(t *testing.T) {
 	// Arrange
-	cfg := config.Base{
-		StoreType: "oci",
+	cfg := &config.Config{
+		Store: config.Store{
+			Type: "oci",
+		},
 	}
 
 	// Act
@@ -39,8 +43,10 @@ func Test_StoreFactory_CreateStore_Creates_oci_store(t *testing.T) {
 
 func Test_StoreFactory_CreateStore_Creates_aws_store(t *testing.T) {
 	// Arrange
-	cfg := config.Base{
-		StoreType: "aws",
+	cfg := &config.Config{
+		Store: config.Store{
+			Type: "aws",
+		},
 	}
 
 	// Act

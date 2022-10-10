@@ -4,14 +4,14 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
 )
 
-func CreateStore(cfg config.Base) KVStore {
-	switch cfg.StoreType {
+func CreateStore(cfg *config.Config) KVStore {
+	switch cfg.Store.Type {
 	case "file":
-		return NewFileStore(cfg.StoreFile)
+		return NewFileStore(cfg.Store.FileConfig)
 	case "oci":
-		return NewOciStore(cfg.StoreOci)
+		return NewOciStore(cfg.Store.OciConfig)
 	case "aws":
-		return NewAWSStore(cfg.StoreAWS)
+		return NewAWSStore(cfg.Store.AwsConfig)
 	default:
 		return nil
 	}

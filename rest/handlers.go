@@ -2,23 +2,22 @@ package rest
 
 import (
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"github.com/go-redsync/redsync/v4"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/go-redis/redis/v8"
+	"github.com/go-redsync/redsync/v4"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
 
 	"gitlab.qredo.com/custody-engine/automated-approver/api"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
-
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
+	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
 type handler struct {
@@ -54,6 +53,7 @@ func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.Sug
 func genWSQredoCoreClientFeedURL(config_base *config.Base) string {
 	builder := strings.Builder{}
 	builder.WriteString(config_base.WsScheme)
+	builder.WriteString("://")
 	builder.WriteString(config_base.QredoAPIDomain)
 	builder.WriteString(config_base.QredoAPIBasePath)
 	builder.WriteString("/coreclient/feed")

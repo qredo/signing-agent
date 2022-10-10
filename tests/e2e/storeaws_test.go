@@ -13,7 +13,7 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
-func createAWSConfig() config.Base {
+func createAWSConfig() *config.Config {
 	pwd, _ := os.Getwd()
 	f, err := os.ReadFile(pwd + "/../../testdata/e2e/aws_config.yaml")
 	if err != nil {
@@ -29,11 +29,13 @@ func createAWSConfig() config.Base {
 		log.Fatalf("error unmarshaling test config file: %v", err)
 	}
 
-	cfg := config.Base{
-		StoreType: "aws",
-		StoreAWS: config.AWSConfig{
-			Region:     testCfg.Region,
-			SecretName: testCfg.SecretName,
+	cfg := &config.Config{
+		Store: config.Store{
+			Type: "aws",
+			AwsConfig: config.AWSConfig{
+				Region:     testCfg.Region,
+				SecretName: testCfg.SecretName,
+			},
 		},
 	}
 

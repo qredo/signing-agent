@@ -14,19 +14,23 @@ type Config struct {
 	Logging       Logging       `yaml:"logging"`
 	Redis         Redis         `yaml:"redis"`
 	LoadBalancing LoadBalancing `yaml:"load_balancing"`
+	Store         Store         `yaml:"store"`
 }
 
 type Base struct {
-	PIN              int       `yaml:"pin"`
-	QredoAPIDomain   string    `yaml:"qredo_api_domain"`
-	QredoAPIBasePath string    `yaml:"qredo_api_base_path"`
-	AutoApprove      bool      `yaml:"auto_approve"`
-	HttpScheme       string    `yaml:"http_scheme"`
-	WsScheme         string    `yaml:"ws_scheme"`
-	StoreType        string    `default:"file" yaml:"store_type"`
-	StoreFile        string    `yaml:"store_file"`
-	StoreOci         OciConfig `yaml:"store_oci"`
-	StoreAWS         AWSConfig `yaml:"store_aws"`
+	PIN              int    `yaml:"pin"`
+	QredoAPIDomain   string `yaml:"qredo_api_domain"`
+	QredoAPIBasePath string `yaml:"qredo_api_base_path"`
+	AutoApprove      bool   `yaml:"auto_approve"`
+	HttpScheme       string `yaml:"http_scheme"`
+	WsScheme         string `yaml:"ws_scheme"`
+}
+
+type Store struct {
+	Type       string    `default:"file" yaml:"type"`
+	FileConfig string    `yaml:"file"`
+	OciConfig  OciConfig `yaml:"oci"`
+	AwsConfig  AWSConfig `yaml:"aws"`
 }
 
 type OciConfig struct {
@@ -73,16 +77,16 @@ func (c *Config) Default() {
 		Addr:             "127.0.0.1:8007",
 		CORSAllowOrigins: []string{"*"},
 	}
-	c.Base.WsScheme = "wss://"
+	c.Base.WsScheme = "wss"
 	c.Base.PIN = 0
 	c.Base.QredoAPIDomain = "play-api.qredo.network"
 	c.Base.QredoAPIBasePath = "/api/v1/p"
-	c.Logging.Level = "info"
-	c.Logging.Format = "json"
 	c.Base.AutoApprove = false
 	c.Base.HttpScheme = "https"
-	c.Base.StoreType = "file"
-	c.Base.StoreFile = "ccstore.db"
+	c.Logging.Level = "info"
+	c.Logging.Format = "json"
+	c.Store.Type = "file"
+	c.Store.FileConfig = "ccstore.db"
 	c.Redis = Redis{
 		Host:     "redis",
 		Port:     6379,

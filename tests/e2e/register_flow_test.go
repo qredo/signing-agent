@@ -35,7 +35,7 @@ func testDefaultConf() config.Config {
 	var cfg config.Config
 	cfg.Default()
 	cfg.Logging.Level = "debug"
-	cfg.Base.StoreFile = TestDataDBStoreFilePath
+	cfg.Store.FileConfig = TestDataDBStoreFilePath
 	return cfg
 }
 
@@ -75,7 +75,7 @@ func TestSigningAgentRegisterFlow(t *testing.T) {
 	}
 
 	cfg := testDefaultConf()
-	cfg.Base.WsScheme = "ws://"
+	cfg.Base.WsScheme = "ws"
 	cfg.Base.AutoApprove = true
 	handlers := getTestHandlers(cfg)
 

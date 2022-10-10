@@ -61,14 +61,15 @@ RUN CGO_ENABLED=1 \
                                                             -X 'main.buildVersion="$(git rev-list -1 --abbrev-commit HEAD)"' \
                                                             -X 'main.buildType=$BUILD_TYPE'" \
       -o signing-agent \
-      gitlab.qredo.com/custody-engine/signing-agent/cmd/service
+      gitlab.qredo.com/custody-engine/automated-approver/cmd/service
 
 FROM alpine as certs
 RUN apk add -U --no-cache ca-certificates
 
 FROM scratch
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /src/gitlab.qredo.com/custody-engine/signing-agent /signing-agent
+COPY --from=go_builder /src/gitlab.qredo.com/custody-engine/signing-agent/signing-agent /signing-agent/signing-agent
+COPY --from=go_builder /src/gitlab.qredo.com/custody-engine/signing-agent/config-template.yaml /signing-agent/config-template.yaml
 
 VOLUME /volume
 WORKDIR /signing-agent

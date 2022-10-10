@@ -15,7 +15,7 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
-func createOciConfig() config.Base {
+func createOciConfig() *config.Config {
 	pwd, _ := os.Getwd()
 	os.Setenv("OCI_CONFIG_FILE", pwd+"/../../testdata/e2e/oci_config")
 
@@ -23,27 +23,29 @@ func createOciConfig() config.Base {
 	vault := os.Getenv("OCI_VAULT")
 	encryptionkey := os.Getenv("OCI_ENC_KEY")
 
-	cfg := config.Base{
-		StoreType: "oci",
-		StoreOci: config.OciConfig{
-			Compartment:         compartment,
-			Vault:               vault,
-			SecretEncryptionKey: encryptionkey,
-			ConfigSecret:        "e2e-" + strconv.FormatInt(time.Now().Unix(), 10),
+	cfg := &config.Config{
+		Store: config.Store{
+			Type: "oci",
+			OciConfig: config.OciConfig{
+				Compartment:         compartment,
+				Vault:               vault,
+				SecretEncryptionKey: encryptionkey,
+				ConfigSecret:        "e2e-" + strconv.FormatInt(time.Now().Unix(), 10),
+			},
 		},
 	}
 
 	return cfg
 }
 
-func deleteSecret(t *testing.T, cfg config.Base) {
+func deleteSecret(t *testing.T, cfg *config.Config) {
 	vaults_client, err := vault.NewVaultsClientWithConfigurationProvider(common.DefaultConfigProvider())
 	require.Nil(t, err)
 
 	list_response, err := vaults_client.ListSecrets(context.Background(), vault.ListSecretsRequest{
-		CompartmentId: &cfg.StoreOci.Compartment,
-		VaultId:       &cfg.StoreOci.Vault,
-		Name:          &cfg.StoreOci.ConfigSecret,
+		CompartmentId: &cfg.Store.OciConfig.Compartment,
+		VaultId:       &cfg.Store.OciConfig.Vault,
+		Name:          &cfg.Store.OciConfig.ConfigSecret,
 	})
 	require.Nil(t, err)
 

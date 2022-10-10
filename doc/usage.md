@@ -204,15 +204,15 @@ The following cloud-based solutions are supported.
 
 config:
 ```yaml
-base:
-  ...
-  store_type: oci
-  store_oci:
+...
+store:
+  type: oci
+  oci:
     vault: ocid1.vault....
     secret_encryption_key: ocid1.key....
     compartment: ocid1.tenancy....
     config_secret: automated_approver_config
-  ...
+...
 ```
 
 - Setup an API key on Oracle Cloud
@@ -231,13 +231,13 @@ base:
 In order to use AWS for configuration storage, set the `storage_type` to `aws` and provide the AWS Region and the
 name of the Secrets Manager secret.  For example, the config should look something like the following:
 ```yaml
-base:
-  ...
-  store_type: aws
-  store_aws:
+...
+store:
+  type: aws
+  aws:
     region: eu-west-2
     config_secret: signingAgentConfig
-  ...
+...
 ```
 The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be setup in advance. To do this,
 on the AWS console:
