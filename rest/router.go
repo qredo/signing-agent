@@ -112,9 +112,9 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	}
 
 	rds := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", config.Redis.Host, config.Redis.Port),
-		Password: config.Redis.Password,
-		DB:       config.Redis.DB,
+		Addr:     fmt.Sprintf("%s:%d", config.LoadBalancing.RedisConfig.Host, config.LoadBalancing.RedisConfig.Port),
+		Password: config.LoadBalancing.RedisConfig.Password,
+		DB:       config.LoadBalancing.RedisConfig.DB,
 	})
 	pool := goredis.NewPool(rds)
 	rs := redsync.New(pool)
@@ -123,7 +123,7 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 		log:        log,
 		config:     config,
 		handler:    NewHandler(core, config, log, version, rds, rs),
-		middleware: NewMiddleware(log, config.HTTP.ProxyForwardedHeader, config.HTTP.LogAllRequests),
+		middleware: NewMiddleware(log, config.HTTP.LogAllRequests),
 		version:    version,
 	}
 	rt.router = rt.SetHandlers()
@@ -175,9 +175,6 @@ func (r *Router) Start() error {
 // StartHTTPListener starts the HTTP listener
 func (r *Router) StartHTTPListener(errChan chan error) {
 	r.log.Infof("CORS policy: %s", strings.Join(r.config.HTTP.CORSAllowOrigins, ","))
-	if r.config.HTTP.ProxyForwardedHeader != "" {
-		r.log.Info("Use Proxy forwarded-for header: %s", r.config.HTTP.ProxyForwardedHeader)
-	}
 	r.log.Infof("Starting listener on %v", r.config.HTTP.Addr)
 
 	err := r.handler.AutoApproval()

@@ -12,7 +12,6 @@ type Config struct {
 	Base          Base          `yaml:"base"`
 	HTTP          httpSettings  `yaml:"http"`
 	Logging       Logging       `yaml:"logging"`
-	Redis         Redis         `yaml:"redis"`
 	LoadBalancing LoadBalancing `yaml:"load_balancing"`
 	Store         Store         `yaml:"store"`
 }
@@ -47,10 +46,9 @@ type AWSConfig struct {
 }
 
 type httpSettings struct {
-	Addr                 string   `yaml:"addr"`
-	CORSAllowOrigins     []string `yaml:"cors_allow_origins"`
-	ProxyForwardedHeader string   `yaml:"proxy_forwarded_header"`
-	LogAllRequests       bool     `yaml:"log_all_requests"`
+	Addr             string   `yaml:"addr"`
+	CORSAllowOrigins []string `yaml:"cors_allow_origins"`
+	LogAllRequests   bool     `yaml:"log_all_requests"`
 }
 
 type Logging struct {
@@ -59,12 +57,13 @@ type Logging struct {
 }
 
 type LoadBalancing struct {
-	Enable                bool `yaml:"enable"`
-	OnLockErrorTimeOutMs  int  `yaml:"on_lock_error_timeout_ms"`
-	ActionIDExpirationSec int  `yaml:"action_id_expiration_sec"`
+	Enable                bool        `yaml:"enable"`
+	OnLockErrorTimeOutMs  int         `yaml:"on_lock_error_timeout_ms"`
+	ActionIDExpirationSec int         `yaml:"action_id_expiration_sec"`
+	RedisConfig           RedisConfig `yaml:"redis"`
 }
 
-type Redis struct {
+type RedisConfig struct {
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
 	Password string `yaml:"password"`
@@ -87,16 +86,16 @@ func (c *Config) Default() {
 	c.Logging.Format = "json"
 	c.Store.Type = "file"
 	c.Store.FileConfig = "ccstore.db"
-	c.Redis = Redis{
-		Host:     "redis",
-		Port:     6379,
-		Password: "",
-		DB:       0,
-	}
 	c.LoadBalancing = LoadBalancing{
 		Enable:                false,
 		OnLockErrorTimeOutMs:  300,
 		ActionIDExpirationSec: 6,
+		RedisConfig: RedisConfig{
+			Host:     "redis",
+			Port:     6379,
+			Password: "",
+			DB:       0,
+		},
 	}
 }
 

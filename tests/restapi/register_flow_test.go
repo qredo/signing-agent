@@ -291,7 +291,19 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 	httpCfg.Value("Addr").String().Equal("127.0.0.1:8007")
 	httpCfg.Value("CORSAllowOrigins").Array().Element(0).String().Equal("*")
 	httpCfg.Value("LogAllRequests").Equal(false)
-	httpCfg.Value("ProxyForwardedHeader").String().Empty()
+
+	hcConfig.Object().Keys().Contains("LoadBalancing")
+	lbConfig := hcConfig.Object().Value("LoadBalancing").Object()
+	lbConfig.Value("Enable").Equal(false)
+	lbConfig.Value("OnLockErrorTimeOutMs").Equal(300)
+	lbConfig.Value("ActionIDExpirationSec").Equal(6)
+
+	lbConfig.Keys().Contains("RedisConfig")
+	redisConfig := lbConfig.Value("RedisConfig").Object()
+	redisConfig.Value("Host").Equal("redis")
+	redisConfig.Value("Port").Equal(6379)
+	redisConfig.Value("Password").Equal("")
+	redisConfig.Value("DB").Equal(0)
 }
 
 // healthCheckStatusTests checks the healthcheck status endpoint (/healthcheck/status).

@@ -9,20 +9,19 @@ http:
   addr: 0.0.0.0:8007
   cors_allow_origins:
     - '*'
-  proxy_forwarded_header: ""
   log_all_requests: false
 logging:
   format: text
   level: debug
-redis:
-  host: redis
-  port: 6379
-  password: ""
-  db: 0
 load_balancing:
-  enable: true
+  enable: false
   on_lock_error_timeout_ms: 300
   action_id_expiration_sec: 6
+  redis:
+    host: redis
+    port: 6379
+    password: ""
+    db: 0
 store: 
   type: file # oci/aws/az/file
   file: /volume/ccstore.db
