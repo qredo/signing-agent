@@ -17,6 +17,8 @@ type Handler func(message []byte)
 
 type ErrHandler func(err error)
 
+type ServeCB func(string, Handler, ErrHandler) (chan struct{}, chan struct{}, error)
+
 type WsActionInfoEvent struct {
 	ID         string `json:"id"`
 	AgentID    string `json:"coreClientID"`
@@ -28,19 +30,27 @@ type WsActionInfoEvent struct {
 
 type WsActionInfoHandler func(event *WsActionInfoEvent)
 
-func NewFeed(feedUrl string, agent SigningAgentClient) *Feed {
-	return &Feed{
+func NewFeed(feedUrl string, agent SigningAgentClient, serveFu ServeCB) *feed {
+	fd := &feed{
 		feedUrl: feedUrl,
 		agent:   agent,
 	}
+
+	// sets default Serve function if not provided
+	fd.servFu = serveFu
+	if fd.servFu == nil {
+		fd.servFu = fd.Serve
+	}
+	return fd
 }
 
-type Feed struct {
+type feed struct {
 	agent   SigningAgentClient
 	feedUrl string
+	servFu  ServeCB
 }
 
-func (f *Feed) ActionEvent(handler WsActionInfoHandler, errHandler ErrHandler) (doneCH, stopCH chan struct{}, err error) {
+func (f *feed) ActionEvent(handler WsActionInfoHandler, errHandler ErrHandler) (doneCH, stopCH chan struct{}, err error) {
 	wsHandler := func(message []byte) {
 		event := &WsActionInfoEvent{}
 		if err := json.Unmarshal(message, &event); err != nil {
@@ -49,10 +59,10 @@ func (f *Feed) ActionEvent(handler WsActionInfoHandler, errHandler ErrHandler) (
 		}
 		handler(event)
 	}
-	return f.serve(f.feedUrl, wsHandler, errHandler)
+	return f.servFu(f.feedUrl, wsHandler, errHandler)
 }
 
-func (f *Feed) keepAlive(con *websocket.Conn, timeout time.Duration) {
+func (f *feed) keepAlive(con *websocket.Conn, timeout time.Duration) {
 	tk := time.NewTicker(timeout)
 	lastResponse := time.Now()
 	con.SetPongHandler(func(msg string) error {
@@ -76,7 +86,7 @@ func (f *Feed) keepAlive(con *websocket.Conn, timeout time.Duration) {
 	}()
 }
 
-func (f *Feed) serve(url string, handler Handler, errHandler ErrHandler) (doneCH, stopCH chan struct{}, err error) {
+func (f *feed) Serve(url string, handler Handler, errHandler ErrHandler) (doneCH, stopCH chan struct{}, err error) {
 	if len(f.agent.GetSystemAgentID()) == 0 {
 		return nil, nil, errors.New("cannot get agent-id")
 	}
@@ -123,6 +133,6 @@ func (f *Feed) serve(url string, handler Handler, errHandler ErrHandler) (doneCH
 	return
 }
 
-func (h *signingAgent) ReadAction(feedUrl string) *Feed {
-	return NewFeed(feedUrl, h)
+func (h *signingAgent) ReadAction(feedUrl string, cb ServeCB) *feed {
+	return NewFeed(feedUrl, h, cb)
 }

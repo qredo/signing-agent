@@ -252,7 +252,7 @@ func (d *Demo) Withdraw(companyID, walletID, address string, amount int64) (*New
 
 func (d *Demo) ReadAction(feedUrl string) error {
 	fmt.Println("ReadAction")
-	feed := d.Agent.ReadAction(feedUrl)
+	feed := d.Agent.ReadAction(feedUrl, nil)
 	doneCH, stopCH, err := feed.ActionEvent(
 		func(event *lib.WsActionInfoEvent) {
 			fmt.Printf("event %+v", event)

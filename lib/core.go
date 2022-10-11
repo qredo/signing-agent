@@ -30,7 +30,7 @@ type SigningAgentClient interface {
 	GetAgentZKPOnePass() ([]byte, error)
 
 	// ReadAction connect to qredo web socket stream by given feed url and return Feed object
-	ReadAction(feedUrl string) *Feed
+	ReadAction(string, ServeCB) *feed
 }
 
 type signingAgent struct {
