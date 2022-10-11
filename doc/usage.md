@@ -1,6 +1,8 @@
+# Usage guide for the Signing Agent
+
 [TOC]
 
-# Introduction
+## Introduction
 
 The Signing Agent is an agent that can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application. We recommend deploying the service on premise, on the customer’s infrastructure. We also recommend that every Signing Agent instance be used to manage a unique agent ID, and that multiple instances be deployed (preferably on different cloud infrastructures) in order to meet a multiple signer threshold such as 2 or 3 out of 5. The Signing Agent uses a dedicated subset of the Qredo Server APIs, called the Partner API, to perform its functions. It can also be used to create a programmable approver service that listens to incoming approval requests over Websockets, and is then able to perform automated custody.
 
@@ -10,9 +12,58 @@ In a nutshell, it works just like the phone app but without the human element. T
 - **withdrawal** - a transaction where assets in a Qredo wallet move to a wallet outside the Qredo Network (BTC, ETH, etc.): a L2 to L1 transaction).
 - **atomic swap** - a transfer out transaction where you offer a certain amount of an asset in exchange for a (transfer in) certain amount of another asset. (e.g. exchange 100000000 ETH qweis for 735601 satoshis). Both parties that participate have a transfer out transaction that undergoes custody with their approvers. This transaction type is discussed in more detail in the [Atomic swaps](https://developers.qredo.com/partner-api/how-tos/atomic-swap/) section of the Qredo documentation portal.
 
-# Using Signing Agent as a Service
+## Cloud-based storage for secrets
 
-As mentioned above, the Signing Agent is a standalone component of the Qredo ecosystem. Everyone who intends to run an Signing Agent must first register it on the Qredo network. Below is a step-by-step explanation of the registration process, which involves the *PartnerAPP* (e.g. Banco Hipotecario), the *signing-agent-service* (e.g. Signing Agent running on Banco Hipotecario’s infrastructure), and *QredoBE* (e.g. our Qredo back-end).
+An alternative to storing the signing-agent configuration on-premises in a file, is to use secure cloud-based storage. The following cloud-based solutions are supported.
+
+### Oracle Cloud Vault Storage
+
+In the YAML configuration file:
+
+```yaml
+
+store:
+  oci:
+    vault: ocid1.vault....
+    secret_encryption_key: ocid1.key....
+    compartment: ocid1.tenancy....
+    config_secret: automated_approver_config
+  ...
+```
+
+- Setup an API key on Oracle Cloud
+- Download the config file for the api key, fill in the correct private key path
+- Either put the file in its default location of ~/.oci/config or
+  put it in a custom location and set env var OCI_CONFIG_FILE to the full path including the filename
+- Create a vault and copy the OCID to the config file for the vault setting
+- Create an encryption key (AES or RSA) in the vault, copy it's OCID to the config secret_encryption_key setting
+- Copy the compartment OCID from the compartment where the vault was created
+- Set a secret name where the signing agent will store its configuration and keys
+- Start the signing agent and register an agent using the API
+
+### AWS Cloud Secrets Manager Storage
+
+In order to use AWS for configuration storage, set the `storage_type` to `aws` and provide the AWS Region and the name of the Secrets Manager secret. For example, your YAML config should look something like the following:
+
+```yaml
+store:
+  aws:
+    region: eu-west-2
+    config_secret: signingAgentConfig
+  ...
+```
+
+The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be setup in advance. To do this, on the AWS console:
+
+1. Create a KMS customer-managed key to be used to encrypt the Secrets Manager secret
+2. Create the Secrets Manager secret, naming it and including the KMS key from step 1
+3. Update the Signing Agent's configuration file with the AWS region and secret name
+
+Start the Signing Agent and register the agent using the API.
+
+## Using Signing Agent as a Service
+
+As mentioned above, the Signing Agent is a standalone component of the Qredo ecosystem. Everyone who intends to run an Signing Agent must first register it on the Qredo network. Below is a step-by-step explanation of the registration process, which involves the *PartnerAPP* (e.g. your app), the *signing-agent-service* (e.g. Signing Agent running on your infrastructure), and *QredoBE* (e.g. our Qredo back-end).
 
 ```mermaid
 sequenceDiagram
@@ -25,7 +76,7 @@ autonumber
 ```
 
 1. The *PartnerApp* triggers the registration process by providing its client name, parther APIKey and Base64PrivateKey  to the *signing-agent-service*.
-2. *signing-agent-service* generates BLS and EC keys. 
+2. *signing-agent-service* generates BLS and EC keys.
 3. The *signing-agent-service* can now register itself to the partner API on the *QredoBE*, by sending the `client name`, `BLS`, and `EC` public keys. The *QredoBE* is returning ClientID, CLientSecret that will be responsible for authentication.
 4. The `agentId` and a `feedURL` is returned by the *QredoBE* to the *signing-agent-service*. This feed is used by the *signing-agent-service* to keep a communication channel open with the *QredoBE*.
 5. The `agentId` and a `feedURL` is also passed along to the *PartnerApp* so that the latter can monitor for new actions that need to be approved in case the service is not configured for auto-approval.
@@ -42,7 +93,7 @@ Request:
 
 ```json
 {
-  "name": "string", 
+  "name": "string",
   "APIKey": "string",
   "Base64PrivateKey": "string"
 }
@@ -57,9 +108,7 @@ Response (clientRegisterResponse):
 }
 ```
 
-
-
-# Using Signing Agent as a Library
+## Using Signing Agent as a Library
 
 There are times when the Signing Agent benefits from being tightly coupled with an application or a service. In this case, it can be imported as a Go package directly into that application.
 
@@ -69,11 +118,12 @@ There are times when the Signing Agent benefits from being tightly coupled with 
 sequenceDiagram
   autonumber
   PartnerAPP->>PartnerAPP:ClientRegister('client_name')
-
+  
   rect rgb(200, 150, 255)
   note right of PartnerAPP: inside the Signing Agent lib
   PartnerAPP->>PartnerAPP: Generate BLS and EC Keys
   end
+
   PartnerAPP->>QredoBE: ClientInit(reqDataInit, RefID, APIKey, Base64PrivateKey) reqDataInit: {name, BLS & EC PubKeys}
   QredoBE->>QredoBE: Create New MFA ID, New IDDoc
   QredoBE->>PartnerAPP:{ClientSecret, ClientID, unsigned IDDoc, AccountCode}
@@ -88,9 +138,9 @@ sequenceDiagram
   QredoBE->>PartnerAPP: {feedURL}
 ```
 
-# Approving a transaction
+## Approving a transaction
 
-Prerequisites: 
+Prerequisites:
 
 - a Signing Agent service instance has been installed and configured
 - a signing-agent has been created with id `agentID`
@@ -110,7 +160,7 @@ Steps:
 
 After that sequence, the transaction should be complete.
 
-### Using the library to approve a transaction
+## Using the library to approve a transaction
 
 ```mermaid
 sequenceDiagram
@@ -134,9 +184,7 @@ sequenceDiagram
   end
 ```
 
-
-
-### Data Models
+## Data Models
 
 ```Go
 ClientRegisterFinishRequest {
@@ -190,64 +238,3 @@ signResponse {
     signer_id   string
 }
 ```
-
-<br/>
-
-## Cloud-based agent key storage
-
-An alternative to storing the signing-agent keys and agent data on-premises in a file, is to use secure cloud-based storage.
-The following cloud-based solutions are supported.
-
-### Oracle Cloud Vault Storage
-
-<br/>
-
-config:
-```yaml
-...
-store:
-  type: oci
-  oci:
-    vault: ocid1.vault....
-    secret_encryption_key: ocid1.key....
-    compartment: ocid1.tenancy....
-    config_secret: automated_approver_config
-...
-```
-
-- Setup an API key on Oracle Cloud
-- Download the config file for the api key, fill in the correct private key path
-- Either put the file in its default location of ~/.oci/config or
-  put it in a custom location and set env var OCI_CONFIG_FILE to the full path including the filename
-- Create a vault and copy the OCID to the config file for the vault setting
-- Create an encryption key (AES or RSA) in the vault, copy it's OCID to the config secret_encryption_key setting
-- Copy the compartment OCID from the compartment where the vault was created
-- Set a secret name where the signing agent will store its configuration and keys
-- Start the signing agent and register an agent using the API
-
-<br/>
-
-### AWS Cloud Secrets Manager Storage
-In order to use AWS for key and agent data storage, set the `storage_type` to `aws` and provide the AWS Region and the
-name of the Secrets Manager secret.  For example, the config should look something like the following:
-```yaml
-...
-store:
-  type: aws
-  aws:
-    region: eu-west-2
-    config_secret: signingAgentConfig
-...
-```
-The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be setup in advance. To do this,
-on the AWS console:
-1. create a KMS customer-managed key to be used to encrypt the Secrets Manager secret
-2. create the Secrets Manager secret, naming it and including the KMS key from step 1
-   - Select `Other type of secret`
-   - Select `Paintext` and enter `initialise me`
-   - From Encryption key drop, select the key created in step 1
-   - Name the secret and optionally add a desciption
-3. update the Signing Agent's configuration file with the AWS region and secret name
- 
-Start the Signing Agent and register the agent using the API.
-
