@@ -16,21 +16,19 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewMiddleware(log *zap.SugaredLogger, proxyForwardedHeader string, logAllRequests bool) *Middleware {
+func NewMiddleware(log *zap.SugaredLogger, logAllRequests bool) *Middleware {
 	l := log.Desugar()
 	ll := l.WithOptions(zap.AddCallerSkip(1)).Sugar()
 	mw := &Middleware{
-		log:                  ll,
-		proxyForwardedHeader: proxyForwardedHeader,
-		logAllRequests:       logAllRequests,
+		log:            ll,
+		logAllRequests: logAllRequests,
 	}
 	return mw
 }
 
 type Middleware struct {
-	log                  *zap.SugaredLogger
-	proxyForwardedHeader string
-	logAllRequests       bool
+	log            *zap.SugaredLogger
+	logAllRequests bool
 }
 
 func (m *Middleware) sessionMiddleware(next appHandlerFunc) appHandlerFunc {
