@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"strings"
 	"sync"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -19,7 +18,6 @@ import (
 // SecretNotInitialised is used to identify an uninitialised AWS secret.
 const (
 	SecretNotInitialised string = "initialise me"
-	SecretInitialised    string = "{}"
 )
 
 type AWSStore struct {
@@ -51,7 +49,7 @@ func (s *AWSStore) Get(key string) ([]byte, error) {
 	}
 
 	cfg := make(map[string][]byte)
-	if len(secretData) > 0 && !strings.Contains(string(secretData), SecretInitialised) {
+	if len(secretData) > 0 {
 		err = json.Unmarshal(secretData, &cfg)
 		if err != nil {
 			return nil, err
@@ -76,7 +74,7 @@ func (s *AWSStore) Set(key string, data []byte) error {
 	}
 
 	cfg := make(map[string][]byte)
-	if len(secretData) > 0 && !strings.Contains(string(secretData), SecretInitialised) {
+	if len(secretData) > 0 {
 		err = json.Unmarshal(secretData, &cfg)
 		if err != nil {
 			s.lock.RUnlock()
@@ -154,7 +152,7 @@ func (s *AWSStore) Init() error {
 }
 
 // getSecret reads the secret with name from AWS.  Various sanity checks on AWS access, returning errors.
-// The secret should be binary and base64 encoded.  The decoded []byte is returned.
+// The secret should be binary.  The secret is returned as []byte.
 func (s *AWSStore) getSecret(name string) ([]byte, error) {
 	result, err := s.readSecret(name)
 	if err != nil {
@@ -209,7 +207,7 @@ func (s *AWSStore) readSecret(name string) (*secretsmanager.GetSecretValueOutput
 	return result, nil
 }
 
-// setSecret base64 encodes the data and stores it in the named secret.
+// setSecret stores data in the named secret.
 func (s *AWSStore) setSecret(name string, data []byte) error {
 
 	input := &secretsmanager.UpdateSecretInput{
@@ -231,7 +229,7 @@ func (s *AWSStore) setSecret(name string, data []byte) error {
 func (s *AWSStore) initConnection(name string) error {
 	result, err := s.readSecret(name)
 	if err != nil {
-		return errors.Wrap(err, "cannot initial AWS connection")
+		return errors.Wrap(err, "cannot initialise AWS connection")
 	}
 
 	if result.SecretString != nil {
@@ -239,7 +237,14 @@ func (s *AWSStore) initConnection(name string) error {
 			str := fmt.Sprintf("secret '%s' not expected - set to '%s' to reinitialise", *result.SecretString, SecretNotInitialised)
 			return errors.New(str)
 		}
-		bytes, _ := json.Marshal(SecretInitialised)
+
+		// initialises the secret to json {}
+		cfg := make(map[string][]byte)
+		bytes, err := json.Marshal(cfg)
+		if err != nil {
+			return err
+		}
+
 		return s.setSecret(name, bytes)
 	}
 
