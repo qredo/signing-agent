@@ -51,6 +51,14 @@ type WithdrawT struct {
 	Amount    int64  `cli:"amount,am" usage:"amount"`
 }
 
+type CreateFundT struct {
+	cli.Helper
+	CompanyID       string `cli:"company-id,cid" usage:"company id"`
+	MemberID        string `cli:"member-id,mid" usage:"member id"`
+	FundName        string `cli:"fund-name,fn" usage:"fund name"`
+	FundDescription string `cli:"fund-description,fd" usage:"fund description"`
+}
+
 func NewDCli() *dCli {
 
 	demo, _ := NewDemo("play-api.qredo.network", "/api/v1/p", APIKey, PrivateKey)
@@ -113,6 +121,14 @@ func NewDCli() *dCli {
 		Fn:      dCli.withdraw,
 	}
 
+	var createFund = &cli.Command{
+		Aliases: []string{"cf"},
+		Name:    "create-fund",
+		Desc:    "create fund and wallets by given arguments",
+		Argv:    func() interface{} { return new(CreateFundT) },
+		Fn:      dCli.createFund,
+	}
+
 	dCli.registerCmd = register
 	dCli.ccCmd = cc
 	dCli.addWhitelistCmd = addWhitelist
@@ -120,6 +136,7 @@ func NewDCli() *dCli {
 	dCli.readActionCmd = readAction
 	dCli.approveActionCmd = approveAction
 	dCli.withdrawCmd = withdraw
+	dCli.createFundCmd = createFund
 
 	return dCli
 }
@@ -132,7 +149,8 @@ type dCli struct {
 	readActionCmd    *cli.Command
 	approveActionCmd *cli.Command
 	withdrawCmd      *cli.Command
-	demo             *Demo
+	createFundCmd    *cli.Command
+	demo             *SaCli
 }
 
 func (d *dCli) register(ctx *cli.Context) error {
@@ -225,6 +243,22 @@ func (d *dCli) withdraw(ctx *cli.Context) error {
 		return err
 	}
 	fmt.Printf("[ok] status %v tx-id %s\n", tResp.Status, tResp.TxID)
+
+	return nil
+}
+
+func (d *dCli) createFund(ctx *cli.Context) error {
+	argv, ok := ctx.Argv().(*CreateFundT)
+	if !ok {
+		return errors.New("cannot cast CreateFundT")
+	}
+
+	fResp, err := d.demo.CreateFund(argv.CompanyID, argv.FundName, argv.FundDescription, argv.MemberID)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("[ok] fund-id %s, custodygroup-withdraw %s, custodygroup-tx %s\n",
+		fResp.FundID, fResp.CustodygroupWithdraw, fResp.CustodygroupTx)
 
 	return nil
 }

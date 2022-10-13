@@ -1,0 +1,27 @@
+#!/bin/bash
+
+local_build() {
+  go mod tidy
+  go build \
+      -o sa-cli \
+      gitlab.qredo.com/custody-engine/automated-approver/cmd/sa-cli
+}
+
+if [ -n "$1" ]; then
+  case $1 in
+    docker)
+      docker_local
+      ;;
+    docker_amd64)
+      docker_export amd64
+      ;;
+    docker_arm64)
+      docker_export arm64
+      ;;
+    docker_multiarch)
+      docker_export_allarch
+      ;;
+  esac
+else
+  local_build
+fi
