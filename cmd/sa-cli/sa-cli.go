@@ -15,10 +15,13 @@ import (
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
-type Demo struct {
+type SaCli struct {
 	Agent            lib.SigningAgentClient
 	QredoAPIDomain   string
 	QredoAPIBasePath string
@@ -26,7 +29,7 @@ type Demo struct {
 	PrivateKey       string
 }
 
-func NewDemo(domain, basePath, apiKey, privateKey string) (*Demo, error) {
+func NewDemo(domain, basePath, apiKey, privateKey string) (*SaCli, error) {
 	store := util.NewFileStore("demo.db")
 	if err := store.Init(); err != nil {
 		return nil, errors.Wrap(err, "file store init")
@@ -44,17 +47,17 @@ func NewDemo(domain, basePath, apiKey, privateKey string) (*Demo, error) {
 		return nil, err
 	}
 
-	demo := &Demo{
+	demo := &SaCli{
 		Agent:            agent,
 		QredoAPIDomain:   cfg.QredoAPIDomain,
 		QredoAPIBasePath: cfg.QredoAPIBasePath,
 		PartnerAPIKey:    apiKey,
-		PrivateKey:       PrivateKey,
+		PrivateKey:       privateKey,
 	}
 	return demo, nil
 }
 
-func (d *Demo) Register(name string) (*ClientRegisterResponse, error) {
+func (d *SaCli) Register(name string) (*ClientRegisterResponse, error) {
 	clRegResp, err := d.Agent.ClientRegister("demo-agent")
 	if err != nil {
 		return nil, errors.Wrap(err, "client register")
@@ -112,14 +115,14 @@ func (d *Demo) Register(name string) (*ClientRegisterResponse, error) {
 	return resp, nil
 }
 
-func (d *Demo) Approve(actionID string) error {
+func (d *SaCli) Approve(actionID string) error {
 	if err := d.Agent.ActionApprove(actionID); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (d *Demo) CreateCompany(name, city, country, domain, ref string) (*CreateCompanyResponse, error) {
+func (d *SaCli) CreateCompany(name, city, country, domain, ref string) (*CreateCompanyResponse, error) {
 	reqCC := &CreateCompanyRequest{}
 	reqCC.Name = name
 	reqCC.City = city
@@ -139,7 +142,7 @@ func (d *Demo) CreateCompany(name, city, country, domain, ref string) (*CreateCo
 	return ResCC, nil
 }
 
-func (d *Demo) AddTrustedparty(companyID, agentId string) error {
+func (d *SaCli) AddTrustedparty(companyID, agentId string) error {
 	reqAtp := &AddTrustedPartyRequest{Address: agentId}
 
 	header := http.Header{}
@@ -153,7 +156,7 @@ func (d *Demo) AddTrustedparty(companyID, agentId string) error {
 	return nil
 }
 
-func (d *Demo) CreateFund(companyID, fundName, fundDesc, memberID string) (*AddFundResponse, error) {
+func (d *SaCli) CreateFund(companyID, fundName, fundDesc, memberID string) (*AddFundResponse, error) {
 	reqAF := &AddFundRequest{
 		FundName:        fundName,
 		FundDescription: fundDesc,
@@ -193,7 +196,7 @@ func (d *Demo) CreateFund(companyID, fundName, fundDesc, memberID string) (*AddF
 	return fRes, nil
 }
 
-func (d *Demo) AddWhitelist(companyID, fundID, address string) error {
+func (d *SaCli) AddWhitelist(companyID, fundID, address string) error {
 	reqAWL := &AddWhitelistRequest{
 		Address: address,
 		Asset:   "ETH-TESTNET",
@@ -211,7 +214,7 @@ func (d *Demo) AddWhitelist(companyID, fundID, address string) error {
 	return nil
 }
 
-func (d *Demo) GetDepositList(companyID, fundID string) (*DepositAddressListResponse, error) {
+func (d *SaCli) GetDepositList(companyID, fundID string) (*DepositAddressListResponse, error) {
 	header := http.Header{}
 	header.Add("x-api-key", d.PartnerAPIKey)
 
@@ -224,7 +227,7 @@ func (d *Demo) GetDepositList(companyID, fundID string) (*DepositAddressListResp
 	return respDa, nil
 }
 
-func (d *Demo) Withdraw(companyID, walletID, address string, amount int64) (*NewTransactionResponse, error) {
+func (d *SaCli) Withdraw(companyID, walletID, address string, amount int64) (*NewTransactionResponse, error) {
 	reqWD := &NewWithdrawRequest{
 		WalletID: walletID,
 		Address:  address,
@@ -250,29 +253,34 @@ func (d *Demo) Withdraw(companyID, walletID, address string, amount int64) (*New
 	return resTx, nil
 }
 
-func (d *Demo) ReadAction(feedUrl string) error {
-	fmt.Println("ReadAction")
+func (d *SaCli) ReadAction(feedUrl string) error {
 	feed := d.Agent.ReadAction(feedUrl, nil)
 	doneCH, stopCH, err := feed.ActionEvent(
-		func(event *lib.WsActionInfoEvent) {
-			fmt.Printf("event %+v", event)
+		func(e *lib.WsActionInfoEvent) {
+			fmt.Printf("action: id %s, status %v, type %v, agent-id %v\n", e.ID, e.Status, e.Type, e.AgentID)
 		},
 		func(err error) {
-			fmt.Printf("err %+v", err)
+			fmt.Printf("err: %+v", err)
 		},
 	)
-
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
 
-	stopCH <- struct{}{}
-	<-doneCH
+	// handle signal interrupt
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		stopCH <- struct{}{}
+		<-doneCH
+		os.Exit(1)
+	}()
 
 	return nil
 }
 
-func (d *Demo) sign(body []byte, timestamp, url string) (string, error) {
+func (d *SaCli) sign(body []byte, timestamp, url string) (string, error) {
 	if len(d.PrivateKey) == 0 {
 		return "", errors.New("the private key was empty")
 	}

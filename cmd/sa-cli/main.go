@@ -34,8 +34,9 @@ func main() {
 		cli.Tree(dCli.readActionCmd),
 		cli.Tree(dCli.approveActionCmd),
 		cli.Tree(dCli.withdrawCmd),
+		cli.Tree(dCli.createFundCmd),
 	).Run(os.Args[1:]); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
