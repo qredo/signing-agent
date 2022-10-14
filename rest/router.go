@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/go-redis/redis/v8"
@@ -12,23 +11,24 @@ import (
 	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 
 	"github.com/pkg/errors"
+	"gitlab.qredo.com/custody-engine/automated-approver/autoapprover"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"gitlab.qredo.com/custody-engine/automated-approver/websocket"
 
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 
 	"github.com/gorilla/context"
-
 	"github.com/gorilla/handlers"
+
 	"github.com/gorilla/mux"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+	rest_handlers "gitlab.qredo.com/custody-engine/automated-approver/rest/handlers"
 	"go.uber.org/zap"
 )
 
 const (
-	PathPrefix = "/api/v1"
-
 	PathHealthcheckVersion = "/healthcheck/version"
 	PathHealthCheckConfig  = "/healthcheck/config"
 	PathHealthCheckStatus  = "/healthcheck/status"
@@ -38,58 +38,14 @@ const (
 	PathClientFeed         = "/client/feed"
 )
 
-var ConnectionState = struct {
-	Closed     string
-	Open       string
-	Connecting string
-}{
-	Closed:     "CLOSED",
-	Open:       "OPEN",
-	Connecting: "CONNECTING",
-}
-
-func WrapPathPrefix(uri string) string {
-	return strings.Join([]string{PathPrefix, uri}, "")
-}
-
-type appHandlerFunc func(ctx *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error)
-
-func (a appHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
-	ctx := &defs.RequestContext{}
-
-	resp, err := a(ctx, w, r)
-
-	if strings.ToLower(r.Header.Get("connection")) == "upgrade" &&
-		strings.ToLower(r.Header.Get("upgrade")) == "websocket" {
-		if err != nil {
-			var apiErr *defs.APIError
-
-			if !errors.As(err, &apiErr) {
-				apiErr = defs.ErrInternal().Wrap(err)
-			}
-
-			context.Set(r, "error", apiErr)
-		}
-		return
-	}
-
-	FormatJSONResp(w, r, resp, err)
-}
-
-type route struct {
-	path    string
-	method  string
-	handler appHandlerFunc
-}
-
 type Router struct {
-	log        *zap.SugaredLogger
-	config     *config.Config
-	router     http.Handler
-	handler    *handler
-	middleware *Middleware
-	version    *version.Version
+	log                 *zap.SugaredLogger
+	config              *config.Config
+	router              http.Handler
+	handler             *handler
+	middleware          *Middleware
+	version             *version.Version
+	signingAgentHandler *rest_handlers.SigningAgentHandler
 }
 
 func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.Version) (*Router, error) {
@@ -120,15 +76,26 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	rs := redsync.New(pool)
 
 	rt := &Router{
-		log:        log,
-		config:     config,
-		handler:    NewHandler(core, config, log, version, rds, rs),
-		middleware: NewMiddleware(log, config.HTTP.LogAllRequests),
-		version:    version,
+		log:                 log,
+		config:              config,
+		handler:             NewHandler(core, config, log, version, rds, rs),
+		middleware:          NewMiddleware(log, config.HTTP.LogAllRequests),
+		version:             version,
+		signingAgentHandler: NewAgentHandler(core, log, config, autoapprover.NewAutoApproval(core, log, config, rds, rs)),
 	}
+
 	rt.router = rt.SetHandlers()
 
 	return rt, nil
+}
+
+func NewAgentHandler(core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApproval) *rest_handlers.SigningAgentHandler {
+	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme)
+	dialer := websocket.NewDefaultDialer()
+	serverConn := websocket.NewServerConnection(dialer, remoteFeedUrl, log, core, &config.Websocket)
+	feedHub := websocket.NewFeedHub(serverConn, log)
+
+	return rest_handlers.NewSigningAgentHandler(feedHub, core, log, config, autoApprover)
 }
 
 // SetHandlers set all handlers
@@ -138,14 +105,14 @@ func (r *Router) SetHandlers() http.Handler {
 		{PathHealthcheckVersion, http.MethodGet, r.handler.HealthCheckVersion},
 		{PathHealthCheckConfig, http.MethodGet, r.handler.HealthCheckConfig},
 		{PathHealthCheckStatus, http.MethodGet, r.handler.HealthCheckStatus},
-		{PathClientFullRegister, http.MethodPost, r.handler.ClientFullRegister},
+		{PathClientFullRegister, http.MethodPost, r.signingAgentHandler.RegisterAgent},
 		{PathClientsList, http.MethodGet, r.handler.ClientsList},
 		{PathAction, http.MethodPut, r.handler.ActionApprove},
 		{PathAction, http.MethodDelete, r.handler.ActionReject},
 		{PathClientFeed, defs.MethodWebsocket, r.handler.ClientFeed},
 	}
 
-	router := mux.NewRouter().PathPrefix(PathPrefix).Subrouter()
+	router := mux.NewRouter().PathPrefix(defs.PathPrefix).Subrouter()
 	for _, route := range routes {
 
 		middle := r.middleware.notProtectedMiddleware
@@ -177,11 +144,7 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 	r.log.Infof("CORS policy: %s", strings.Join(r.config.HTTP.CORSAllowOrigins, ","))
 	r.log.Infof("Starting listener on %v", r.config.HTTP.Addr)
 
-	err := r.handler.AutoApproval()
-	if err != nil {
-		r.log.Infof("Cannot start server. Error: %s", err.Error())
-		os.Exit(1)
-	}
+	r.signingAgentHandler.StartAgent()
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
 }
@@ -248,4 +211,8 @@ func FormatJSONResp(w http.ResponseWriter, r *http.Request, v interface{}, err e
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+}
+
+func (r *Router) Stop() {
+	r.signingAgentHandler.StopAgent()
 }

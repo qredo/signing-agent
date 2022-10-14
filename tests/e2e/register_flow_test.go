@@ -75,8 +75,8 @@ func TestSigningAgentRegisterFlow(t *testing.T) {
 	}
 
 	cfg := testDefaultConf()
-	cfg.Base.WsScheme = "ws"
-	cfg.Base.AutoApprove = true
+	cfg.Websocket.WsScheme = "wss"
+	cfg.AutoApprove.Enabled = true
 	handlers := getTestHandlers(cfg)
 
 	// local server and expect e2e engine

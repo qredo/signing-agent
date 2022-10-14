@@ -9,16 +9,17 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/pkg/errors"
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/pkg/errors"
+	"gitlab.qredo.com/custody-engine/automated-approver/api"
+	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/lib"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
 type SaCli struct {
@@ -39,7 +40,6 @@ func NewDemo(domain, basePath, apiKey, privateKey string) (*SaCli, error) {
 		QredoAPIDomain:   domain,
 		QredoAPIBasePath: basePath,
 		HttpScheme:       "https",
-		WsScheme:         "wss://",
 	}
 
 	agent, err := lib.New(&cfg, store)

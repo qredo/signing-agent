@@ -4,10 +4,16 @@
 base:
   qredo_api_domain: play-api.qredo.network
   qredo_api_base_path: /api/v1/p
-  auto_approve: false
   http_scheme: https
-  ws_scheme: wss
   pin: 0
+auto_approval:
+  enabled: false
+  retry_interval_max_sec: 300
+  retry_interval_sec: 5
+websocket:
+  ws_scheme: wss
+  reconnect_timeout_sec: 300
+  reconnect_interval_sec: 5
 http:
   addr: 0.0.0.0:8007
   cors_allow_origins:
@@ -42,10 +48,18 @@ store:
 
 - **qredo_api_domain:** the domain of the api you want to use
 - **qredo_api_base_path:** base path for the api urls, ex. scheme://domain/base_path
-- **auto_approve:** activate the automatic approval of every transaction that is received
 - **http_scheme:** the scheme to use for the api connection, ex. http or https
-- **ws_scheme:** the scheme to use for the web socket feed connection, ex. ws or wss
 - **pin:** the pin number to use to provide a zero knowledge proof token for communication with the partner api
+
+## Auto approval
+- **enabled:** activate the automatic approval of every transaction that is received
+- **retry_interval_max_sec:** the approve action maximum interval in seconds
+- **retry_interval_sec:** the approve action retry interval in seconds
+
+## Websocket
+- **ws_scheme:** the scheme to use for the web socket feed connection, ex. ws or wss
+- **reconnect_timeout_sec:** the reconnect timeout in seconds
+- **reconnect_interval_sec:** the reconnect interval in seconds
 
 ## HTTP
 

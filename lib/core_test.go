@@ -13,9 +13,9 @@ const (
 	TestDataDBStoreFilePath = "../testdata/test-store.db"
 )
 
-func NewMock(cfg *config.Base, kv util.KVStore) (*signingAgent, error) {
+func NewMock(cfg *config.Config, kv util.KVStore) (*signingAgent, error) {
 	return &signingAgent{
-		cfg:   cfg,
+		cfg:   &cfg.Base,
 		store: NewStore(kv),
 		htc:   util.NewHTTPMockClient(),
 	}, nil
@@ -26,15 +26,19 @@ func TestCreateSigningAgentClient(t *testing.T) {
 		"Create a signingAgent",
 		func(t *testing.T) {
 			var (
-				cfg *config.Base
+				cfg *config.Config
 				kv  util.KVStore
 				err error
 			)
-			cfg = &config.Base{
-				PIN:              1234,
-				QredoAPIDomain:   "play-api.qredo.network",
-				QredoAPIBasePath: "/api/v1/p",
-				AutoApprove:      true,
+			cfg = &config.Config{
+				Base: config.Base{
+					PIN:              1234,
+					QredoAPIDomain:   "play-api.qredo.network",
+					QredoAPIBasePath: "/api/v1/p",
+				},
+				AutoApprove: config.AutoApprove{
+					Enabled: true,
+				},
 			}
 
 			kv = util.NewFileStore(TestDataDBStoreFilePath)
@@ -43,6 +47,6 @@ func TestCreateSigningAgentClient(t *testing.T) {
 
 			core, err := NewMock(cfg, kv)
 			assert.NoError(t, err)
-			assert.Equal(t, core.cfg.PIN, cfg.PIN)
+			assert.Equal(t, core.cfg.PIN, cfg.Base.PIN)
 		})
 }

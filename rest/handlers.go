@@ -33,15 +33,15 @@ type handler struct {
 func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.SugaredLogger,
 	version *version.Version, redis *redis.Client, rsync *redsync.Redsync) *handler {
 
-	localFeedUrl := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, PathPrefix)
-	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base)
+	localFeedUrl := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix)
+	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme)
 
 	h := &handler{
 		core:      core,
 		cfg:       *config,
 		log:       log,
 		version:   version,
-		websocket: api.NewWebsocketStatus(ConnectionState.Closed, remoteFeedUrl, localFeedUrl),
+		websocket: api.NewWebsocketStatus(defs.ConnectionState.Closed, remoteFeedUrl, localFeedUrl),
 		redis:     redis,
 		rsync:     rsync,
 	}
@@ -50,9 +50,9 @@ func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.Sug
 }
 
 // genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
-func genWSQredoCoreClientFeedURL(config_base *config.Base) string {
+func genWSQredoCoreClientFeedURL(config_base *config.Base, ws_scheme string) string {
 	builder := strings.Builder{}
-	builder.WriteString(config_base.WsScheme)
+	builder.WriteString(ws_scheme)
 	builder.WriteString("://")
 	builder.WriteString(config_base.QredoAPIDomain)
 	builder.WriteString(config_base.QredoAPIBasePath)
@@ -166,7 +166,7 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 // AutoApprovalFunction
 func (h *handler) AutoApproval() error {
 	// enable auto-approval only if configured
-	if !h.cfg.Base.AutoApprove {
+	if !h.cfg.AutoApprove.Enabled {
 		h.log.Debug("Auto-approval feature not enabled in config")
 		return nil
 	}
