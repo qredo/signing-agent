@@ -22,16 +22,21 @@ const (
 
 func TestClient(t *testing.T) {
 	var (
-		cfg *config.Base
+		cfg *config.Config
 		err error
 	)
-	cfg = &config.Base{
-		PIN:              1234,
-		QredoAPIDomain:   "play-api.qredo.network",
-		QredoAPIBasePath: "/api/v1/p",
-		AutoApprove:      true,
-		HttpScheme:       "http",
+	cfg = &config.Config{
+		Base: config.Base{
+			PIN:              1234,
+			QredoAPIDomain:   "play-api.qredo.network",
+			QredoAPIBasePath: "/api/v1/p",
+			HttpScheme:       "http",
+		},
+		AutoApprove: config.AutoApprove{
+			Enabled: true,
+		},
 	}
+
 	agentName := "Test name agent"
 	kv := util.NewFileStore(TestDataDBStoreFilePath)
 	err = kv.Init()

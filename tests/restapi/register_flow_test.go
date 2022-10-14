@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gitlab.qredo.com/custody-engine/automated-approver/api"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
 	"go.uber.org/zap"
@@ -190,8 +191,16 @@ func TestRestAPIs(t *testing.T) {
 	cfg := testDefaultConf()
 	srvQB := serverMockQB(cfg.Base.QredoAPIBasePath)
 	cfg.Base.QredoAPIDomain = strings.ReplaceAll(srvQB.URL, "http://", "")
-	cfg.Base.WsScheme = "ws"
-	cfg.Base.AutoApprove = true
+	cfg.AutoApprove = config.AutoApprove{
+		Enabled:          true,
+		RetryIntervalMax: 300,
+		RetryInterval:    5,
+	}
+	cfg.Websocket = config.WebSocketConf{
+		ReconnectTimeOut:  200,
+		ReconnectInterval: 15,
+		WsScheme:          "ws",
+	}
 	handlers := getTestHandlers(cfg)
 	server := httptest.NewServer(handlers)
 	defer func() {
@@ -212,9 +221,10 @@ func TestRestAPIs(t *testing.T) {
 	registrationTests(servAA, payload)
 	healthcheckVersionTests(servAA)
 	healthCheckConfigTests(servAA)
-	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, rest.ConnectionState.Closed)
+	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Closed)
 	clientActionTests(servAA)
-	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, rest.ConnectionState.Open)
+	//TODO - disabled for now, healthcheck end point will be updated
+	//	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Open)
 	websocketTests(servAA)
 }
 
@@ -276,10 +286,20 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 
 	hcConfig.Object().Keys().Contains("Base")
 	baseCfg := hcConfig.Object().Value("Base").Object()
-	baseCfg.Value("AutoApprove").Equal(true)
 	baseCfg.Value("PIN").Equal(0)
 	baseCfg.Value("QredoAPIBasePath").String().Equal("/api/v1/p")
 	baseCfg.Value("QredoAPIDomain").NotNull()
+
+	hcConfig.Object().Keys().Contains("AutoApprove")
+	autoApprove := hcConfig.Object().Value("AutoApprove").Object()
+	autoApprove.Value("Enabled").Equal(true)
+	autoApprove.Value("RetryIntervalMax").Equal(300)
+	autoApprove.Value("RetryInterval").Equal(5)
+
+	hcConfig.Object().Keys().Contains("Websocket")
+	websocket := hcConfig.Object().Value("Websocket").Object()
+	websocket.Value("ReconnectTimeOut").Equal(200)
+	websocket.Value("ReconnectInterval").Equal(15)
 
 	hcConfig.Object().Keys().Contains("Store")
 	storeCfg := hcConfig.Object().Value("Store").Object()

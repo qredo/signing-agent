@@ -10,21 +10,31 @@ import (
 // Config is the service configuration
 type Config struct {
 	Base          Base          `yaml:"base"`
-	HTTP          httpSettings  `yaml:"http"`
+	HTTP          HttpSettings  `yaml:"http"`
 	Logging       Logging       `yaml:"logging"`
 	LoadBalancing LoadBalancing `yaml:"load_balancing"`
 	Store         Store         `yaml:"store"`
+	AutoApprove   AutoApprove   `yaml:"auto_approval"`
+	Websocket     WebSocketConf `yaml:"websocket"`
 }
 
 type Base struct {
 	PIN              int    `yaml:"pin"`
 	QredoAPIDomain   string `yaml:"qredo_api_domain"`
 	QredoAPIBasePath string `yaml:"qredo_api_base_path"`
-	AutoApprove      bool   `yaml:"auto_approve"`
 	HttpScheme       string `yaml:"http_scheme"`
-	WsScheme         string `yaml:"ws_scheme"`
 }
 
+type AutoApprove struct {
+	Enabled          bool `yaml:"enabled"`
+	RetryIntervalMax int  `yaml:"retry_interval_max_sec"`
+	RetryInterval    int  `yaml:"retry_interval_sec"`
+}
+type WebSocketConf struct {
+	WsScheme          string `yaml:"ws_scheme"`
+	ReconnectTimeOut  int    `yaml:"reconnect_timeout_sec"`
+	ReconnectInterval int    `yaml:"reconnect_interval_sec"`
+}
 type Store struct {
 	Type       string    `default:"file" yaml:"type"`
 	FileConfig string    `yaml:"file"`
@@ -45,7 +55,7 @@ type AWSConfig struct {
 	SecretName string `yaml:"config_secret"`
 }
 
-type httpSettings struct {
+type HttpSettings struct {
 	Addr             string   `yaml:"addr"`
 	CORSAllowOrigins []string `yaml:"cors_allow_origins"`
 	LogAllRequests   bool     `yaml:"log_all_requests"`
@@ -72,15 +82,24 @@ type RedisConfig struct {
 
 // Default creates configuration with default values.
 func (c *Config) Default() {
-	c.HTTP = httpSettings{
+	c.HTTP = HttpSettings{
 		Addr:             "127.0.0.1:8007",
 		CORSAllowOrigins: []string{"*"},
 	}
-	c.Base.WsScheme = "wss"
+
 	c.Base.PIN = 0
 	c.Base.QredoAPIDomain = "play-api.qredo.network"
 	c.Base.QredoAPIBasePath = "/api/v1/p"
-	c.Base.AutoApprove = false
+	c.AutoApprove = AutoApprove{
+		Enabled:          false,
+		RetryIntervalMax: 300,
+		RetryInterval:    5,
+	}
+	c.Websocket = WebSocketConf{
+		ReconnectTimeOut:  300,
+		ReconnectInterval: 5,
+		WsScheme:          "wss",
+	}
 	c.Base.HttpScheme = "https"
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"

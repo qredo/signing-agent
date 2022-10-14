@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"gitlab.qredo.com/custody-engine/automated-approver/rest"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
+	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"go.uber.org/zap"
 
 	"github.com/jessevdk/go-flags"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"go.uber.org/zap"
 )
 
 var (
@@ -43,8 +45,7 @@ func (c *startCmd) Execute([]string) error {
 		os.Exit(1)
 	}
 
-	setCtrlC()
-	log := logger(&cfg.Logging)
+	log := util.NewLogger(&cfg.Logging)
 	log.Info("Loaded config file from " + c.ConfigFile)
 
 	ver := version.DefaultVersion()
@@ -64,9 +65,12 @@ func (c *startCmd) Execute([]string) error {
 		os.Exit(1)
 	}
 
+	setCtrlC(router)
+
 	if err = router.Start(); err != nil {
 		log.Error("HTTP Listener error", "err", err)
 	}
+
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		os.Exit(1)
@@ -134,12 +138,13 @@ func logger(cfg *config.Logging) *zap.SugaredLogger {
 	return l.Sugar()
 }
 
-func setCtrlC() {
+func setCtrlC(router *rest.Router) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
 	go func() {
-		for range sigChan {
-			os.Exit(0)
-		}
+		<-sigChan
+		router.Stop()
+		time.Sleep(2 * time.Second) //wait for everything to close properly
+		os.Exit(0)
 	}()
 }

@@ -68,6 +68,14 @@ type QredoRegisterInitRequest struct {
 	ECPublicKey  string `json:"ecPublicKey"`
 }
 
+func NewQredoRegisterInitRequest(name, blsPublicKey, ecPublicKey string) *QredoRegisterInitRequest {
+	return &QredoRegisterInitRequest{
+		Name:         name,
+		BLSPublicKey: blsPublicKey,
+		ECPublicKey:  ecPublicKey,
+	}
+}
+
 type QredoRegisterInitResponse struct {
 	ID           string `json:"id"`
 	ClientID     string `json:"clientID"`

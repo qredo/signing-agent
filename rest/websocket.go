@@ -5,13 +5,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/go-redsync/redsync/v4"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/go-redsync/redsync/v4"
+
 	"github.com/gorilla/websocket"
+	"gitlab.qredo.com/custody-engine/automated-approver/autoapprover"
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 )
 
@@ -30,24 +32,6 @@ var deadlineForRestart *time.Time
 var rMutex *redsync.Mutex
 var rCtx = context.Background()
 
-type Parser interface {
-	Parse() string
-}
-
-type ActionInfo struct {
-	ID         string `json:"id"`
-	AgentID    string `json:"coreClientID"`
-	Type       string `json:"type"`
-	Status     string `json:"status"`
-	Timestamp  int64  `json:"timestamp"`
-	ExpireTime int64  `json:"expireTime"`
-}
-
-func (a *ActionInfo) Parse() string {
-	out, _ := json.Marshal(a)
-	return string(out)
-}
-
 func restartWebSocketHandler(h *handler) {
 	h.log.Debug("Handler for restartWebSocketHandler")
 	if deadlineForRestart == nil {
@@ -55,11 +39,11 @@ func restartWebSocketHandler(h *handler) {
 		*deadlineForRestart = time.Now()
 	} else if deadlineForRestart != nil && time.Since(*deadlineForRestart) >= time.Duration(5*time.Minute) {
 		h.log.Error("background job - trying to retry connection failed")
-		h.UpdateWebsocketStatus(ConnectionState.Closed)
+		h.UpdateWebsocketStatus(defs.ConnectionState.Closed)
 		return
 	}
 	h.log.Debug("background job - trying to retry connection in next 5 seconds")
-	h.UpdateWebsocketStatus(ConnectionState.Connecting)
+	h.UpdateWebsocketStatus(defs.ConnectionState.Connecting)
 	time.Sleep(5 * time.Second)
 	go AutoApproveHandler(h)
 }
@@ -97,14 +81,14 @@ func AutoApproveHandler(h *handler) {
 	}
 	defer func() {
 		wsQredoBackedConn.Close()
-		h.UpdateWebsocketStatus(ConnectionState.Closed)
+		h.UpdateWebsocketStatus(defs.ConnectionState.Closed)
 	}()
 
 	deadlineForRestart = nil // everything is working fine, deadlines should be neutralized
 	done := make(chan struct{})
 
 	h.log.Infof("Connected to Qredo websocket feed %s", url)
-	h.UpdateWebsocketStatus(ConnectionState.Open)
+	h.UpdateWebsocketStatus(defs.ConnectionState.Open)
 
 	// read and process (approve) ActionInfo requests received from the websocket.
 	go func() {
@@ -116,12 +100,12 @@ func AutoApproveHandler(h *handler) {
 			go restartWebSocketHandler(h)
 		}()
 		for {
-			var v Parser = &ActionInfo{}
+			var v autoapprover.Parser = &autoapprover.ActionInfo{}
 			if err := wsQredoBackedConn.ReadJSON(v); err != nil {
 				h.log.Errorf("error when reading from websocket: %v", err)
 			}
 			h.log.Infof("background job - incoming message: %v", v.Parse())
-			var action ActionInfo
+			var action autoapprover.ActionInfo
 			err = json.Unmarshal([]byte(v.Parse()), &action)
 			if action.ExpireTime > time.Now().Unix() {
 				if h.cfg.LoadBalancing.Enable {
@@ -158,7 +142,7 @@ func AutoApproveHandler(h *handler) {
 
 // approveActionWithRetry attempts to approve the action. It retries every intervalSeconds, giving up after
 // maxMinutes have expired.
-func approveActionWithRetry(h *handler, action ActionInfo, maxMinutes int, intervalSeconds int) {
+func approveActionWithRetry(h *handler, action autoapprover.ActionInfo, maxMinutes int, intervalSeconds int) {
 	if h.cfg.LoadBalancing.Enable {
 		if err := rMutex.Lock(); err != nil {
 			time.Sleep(time.Duration(h.cfg.LoadBalancing.OnLockErrorTimeOutMs) * time.Millisecond)
@@ -263,7 +247,7 @@ func WebSocketFeedHandler(h *handler, w http.ResponseWriter, r *http.Request) {
 			}
 
 			h.log.Debug("WebSocketFeedHandler - waiting for incoming message")
-			var v Parser = &ActionInfo{}
+			var v autoapprover.Parser = &autoapprover.ActionInfo{}
 
 			if err := wsQredoBackedConn.ReadJSON(v); err != nil {
 				h.log.Errorf("WebSocketFeedHandler - error when reading from websocket: %v", err)

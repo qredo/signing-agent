@@ -1,10 +1,16 @@
 base:
   qredo_api_domain: play-api.qredo.network
   qredo_api_base_path: /api/v1/p
-  auto_approve: false
   http_scheme: https
-  ws_scheme: wss
   pin: 0
+auto_approval:
+  enabled: false
+  retry_interval_max_sec: 300
+  retry_interval_sec: 5
+websocket:
+  ws_scheme: wss
+  reconnect_timeout_sec: 300
+  reconnect_interval_sec: 5
 http:
   addr: 0.0.0.0:8007
   cors_allow_origins:
