@@ -58,7 +58,7 @@ type (
 func TestActionAutoApprove(t *testing.T) {
 
 	cfg := createTestConfig()
-	cfg.Base.AutoApprove = true
+	cfg.AutoApprove.Enabled = true
 	server := getTestServer(cfg)
 
 	defer func() {
