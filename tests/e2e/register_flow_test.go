@@ -46,8 +46,8 @@ func createTestConfig() config.Config {
 	cfg.Default()
 	cfg.Logging.Level = "debug"
 	cfg.Store.FileConfig = TestDataDBStoreFilePath
-	cfg.Base.WsScheme = "wss"
-	cfg.Base.AutoApprove = true
+	cfg.Websocket.WsScheme = "wss"
+	cfg.AutoApprove.Enabled = true
 	cfg.Base.QredoAPIDomain = TestQredoAPIDomain
 	return cfg
 }
