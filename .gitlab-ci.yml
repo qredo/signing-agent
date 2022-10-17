@@ -1,6 +1,7 @@
 stages:
   - internal_secret_detection
   - unit-test
+  - e2e-test
   - docker
 
 include:
@@ -11,12 +12,23 @@ include:
 Unit test:
   stage: unit-test
   image: golang:1.18.1
+  when: manual
   tags:
     - amd64-eks
     - dev
   script:
     - echo "Running Unit tests from /scripts/test_coverage.sh"
     - sh scripts/test_coverage
+
+
+E2E test:
+  stage: e2e-test
+  image: golang:1.18.1
+  tags:
+    - custody
+  script:
+    - echo "Running Unit tests from /scripts/e2e_test"
+    - sh scripts/e2e_test
 
 variables:
   KANIKO_VERSION: "debug"
