@@ -57,9 +57,14 @@ The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be
 
 1. Create a KMS customer-managed key to be used to encrypt the Secrets Manager secret
 2. Create the Secrets Manager secret, naming it and including the KMS key from step 1
+   - Select `Other type of secret`
+   - Select `Plaintext` and enter `initialise me`
+   - From the Encryption key drop-down, select the key created in step 1
+   - Name the secret and optionally add a description
 3. Update the Signing Agent's configuration file with the AWS region and secret name
 
-Start the Signing Agent and register the agent using the API.
+Start the Signing Agent and register the agent using the API. (Note: starting the Agent converts the secret's type
+from plaintext to binary.)
 
 ## Using Signing Agent as a Service
 

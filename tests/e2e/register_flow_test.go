@@ -75,7 +75,7 @@ func getTestServer(cfg config.Config) *httptest.Server {
 	return httptest.NewServer(router.SetHandlers())
 }
 
-// TestRegisterNewSigningAgent will test registering a new agent and that
+// TestRegisterNewSigningAgent tests initialising a new agent and checks if the agentID can be looked up.
 func TestRegisterNewSigningAgent(t *testing.T) {
 
 	cfg := createTestConfig()
