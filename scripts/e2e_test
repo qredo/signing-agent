@@ -37,7 +37,7 @@ PROJECT_DIR="$(cd "$(dirname "${0}")/.."; pwd)"
     make test && \
     make install
 
-	echo "Testinge2e test"
+	echo "Running e2e test"
 	cd "$PROJECT_DIR"
         go test -v tests/e2e/storeaws_test.go
 )

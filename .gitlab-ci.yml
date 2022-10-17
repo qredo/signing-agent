@@ -12,7 +12,6 @@ include:
 Unit test:
   stage: unit-test
   image: golang:1.18.1
-  when: manual
   tags:
     - amd64-eks
     - dev
