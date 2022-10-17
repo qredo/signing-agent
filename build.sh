@@ -16,7 +16,7 @@ docker_local() {
                 --build-arg BUILD_VERSION="$BUILD_VERSION" \
                 -t signing-agent:dev \
                 -f dockerfiles/Dockerfile .
-  
+
   rm -rf vendor
 }
 
@@ -27,13 +27,15 @@ docker_test_build() {
                 --build-arg BUILD_VERSION="$BUILD_VERSION" \
                 -t signing-agent-unittest:dev \
                 -f dockerfiles/DockerfileUnitTest .
-  
+
   rm -rf vendor
 }
 
 # Build a docker image for the specified architecture and store it in a tar file
 docker_export() {
-  rm signing-agent-$1-*.tar
+  if test -f signing-agent-$1-*.tar; then
+      rm signing-agent-$1-*.tar
+  fi
   docker buildx build \
       --build-arg BUILD_DATE="$BUILD_DATE" \
       --build-arg BUILD_TYPE="$BUILD_TYPE" \
@@ -41,6 +43,17 @@ docker_export() {
       --platform linux/$1 \
       --output "type=docker,push=false,name=signing-agent:dev-$1,dest=signing-agent-$1-$IMAGE_DATE.tar" \
       -f dockerfiles/Dockerfile .
+}
+
+# Build a CLI docker image for the specified architecture and store it in a tar file
+docker_export_cli() {
+  if test -f sa-cli-$1-*.tar; then
+      rm sa-cli-$1-*.tar
+  fi
+  docker buildx build \
+      --platform linux/$1 \
+      --output "type=docker,push=false,name=sa-cli:dev-$1,dest=sa-cli-$1-$IMAGE_DATE.tar" \
+      -f dockerfiles/DockerfileCLI .
 }
 
 # Build docker images for all supported architectures
@@ -52,6 +65,21 @@ docker_export_allarch() {
       docker_export $arch
   done
   rm -rf vendor
+}
+
+# Build CLI docker images for all supported architectures
+docker_export_cli_allarch() {
+  for arch in amd64 arm64 ; do
+      docker_export_cli $arch
+  done
+  rm -rf vendor
+}
+
+local_cli_build() {
+  go mod tidy
+  go build \
+      -o sa-cli \
+      gitlab.qredo.com/custody-engine/automated-approver/cmd/sa-cli
 }
 
 # Build a the Go binary to run in the local environment
@@ -79,6 +107,12 @@ if [ -n "$1" ]; then
       ;;
     docker_multiarch)
       docker_export_allarch
+      ;;
+    local_cli)
+      local_cli_build
+      ;;
+    docker_export_cli_allarch)
+      docker_export_cli_allarch
       ;;
     docker_unittest)
       docker_test_build
