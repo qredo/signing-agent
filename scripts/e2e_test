@@ -40,4 +40,5 @@ PROJECT_DIR="$(cd "$(dirname "${0}")/.."; pwd)"
 	echo "Running e2e test"
 	cd "$PROJECT_DIR"
         go test -v tests/e2e/storeaws_test.go
+        go test -v tests/e2e/register_flow_test.go tests/e2e/action_autoapprove_test.go
 )

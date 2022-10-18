@@ -24,9 +24,9 @@ const (
 	AgentID2 = "43CQtjpeSH1DeMSWQTPc3de2GWLsTAMcvGePYS6wKibn" // additional member added to policy
 
 	// payloads for Qredo BE provided via templates
-	TestCreateCompany = "../../testdata/e2e/createcompany.templ"
-	TestCreateFund    = "../../testdata/e2e/createfund.templ"
-	TestTrustedParty  = "../../testdata/e2e/trustedparty.templ"
+	TestCreateCompany = "../../testdata/e2e/createCompany.templ"
+	TestCreateFund    = "../../testdata/e2e/createFund.templ"
+	TestTrustedParty  = "../../testdata/e2e/trustedParty.templ"
 	TestUpdatePolicy  = "../../testdata/e2e/updatePolicy.templ"
 )
 
@@ -130,9 +130,12 @@ func TestActionAutoApprove(t *testing.T) {
 }
 
 func createCompany() (string, error) {
-	tmpl, _ := template.ParseFiles(TestCreateCompany)
+	tmpl, err := template.ParseFiles(TestCreateCompany)
+	if err != nil {
+		return "", fmt.Errorf("cannot parse template: %v", err)
+	}
 	var tpl bytes.Buffer
-	if err := tmpl.Execute(&tpl, nil); err != nil {
+	if err = tmpl.Execute(&tpl, nil); err != nil {
 		return "", err
 	}
 
@@ -149,9 +152,13 @@ func createCompany() (string, error) {
 }
 
 func createFund(agentID string, companyID string) (string, error) {
-	tmpl, _ := template.ParseFiles(TestCreateFund)
+	tmpl, err := template.ParseFiles(TestCreateFund)
+	if err != nil {
+		return "", fmt.Errorf("cannot parse template: %v", err)
+	}
+
 	var tpl bytes.Buffer
-	if err := tmpl.Execute(&tpl, agentID); err != nil {
+	if err = tmpl.Execute(&tpl, agentID); err != nil {
 		return "", err
 	}
 
@@ -162,7 +169,7 @@ func createFund(agentID string, companyID string) (string, error) {
 	}
 
 	path := fmt.Sprintf("/company/%s/fund", companyID)
-	err := doBackEndCall(http.MethodPost, path, &tpl, &f)
+	err = doBackEndCall(http.MethodPost, path, &tpl, &f)
 	if err != nil {
 		return "", fmt.Errorf("cannot create fund: %v", err)
 	}
@@ -189,9 +196,13 @@ func getWallets(companyID string, fundID string) ([]Wallets, error) {
 }
 
 func trustedParty(agentID string, companyID string) error {
-	tmpl, _ := template.ParseFiles(TestTrustedParty)
+	tmpl, err := template.ParseFiles(TestTrustedParty)
+	if err != nil {
+		return fmt.Errorf("cannot parse template: %v", err)
+	}
+
 	var tpl bytes.Buffer
-	if err := tmpl.Execute(&tpl, agentID); err != nil {
+	if err = tmpl.Execute(&tpl, agentID); err != nil {
 		return err
 	}
 
@@ -218,9 +229,13 @@ func updatePolicy(policyID string, members string, companyID string, fundID stri
 	}
 	pol := Policy{policyID, members}
 
-	tmpl, _ := template.ParseFiles(TestUpdatePolicy)
+	tmpl, err := template.ParseFiles(TestUpdatePolicy)
+	if err != nil {
+		return fmt.Errorf("cannot parse template: %v", err)
+	}
+
 	var tpl bytes.Buffer
-	if err := tmpl.Execute(&tpl, pol); err != nil {
+	if err = tmpl.Execute(&tpl, pol); err != nil {
 		return err
 	}
 
