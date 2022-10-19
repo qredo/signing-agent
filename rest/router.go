@@ -12,9 +12,9 @@ import (
 
 	"github.com/pkg/errors"
 	"gitlab.qredo.com/custody-engine/automated-approver/autoapprover"
+	"gitlab.qredo.com/custody-engine/automated-approver/hub"
 	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
-	"gitlab.qredo.com/custody-engine/automated-approver/websocket"
 
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 
@@ -81,7 +81,7 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 		handler:             NewHandler(core, config, log, version, rds, rs),
 		middleware:          NewMiddleware(log, config.HTTP.LogAllRequests),
 		version:             version,
-		signingAgentHandler: NewAgentHandler(core, log, config, autoapprover.NewAutoApproval(core, log, config, rds, rs)),
+		signingAgentHandler: NewAgentHandler(core, log, config, autoapprover.NewAutoApprover(core, log, config, rds, rs)),
 	}
 
 	rt.router = rt.SetHandlers()
@@ -89,13 +89,14 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	return rt, nil
 }
 
-func NewAgentHandler(core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApproval) *rest_handlers.SigningAgentHandler {
+func NewAgentHandler(core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApprover) *rest_handlers.SigningAgentHandler {
 	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme)
-	dialer := websocket.NewDefaultDialer()
-	serverConn := websocket.NewServerConnection(dialer, remoteFeedUrl, log, core, &config.Websocket)
-	feedHub := websocket.NewFeedHub(serverConn, log)
+	dialer := hub.NewDefaultDialer()
+	serverConn := hub.NewWebsocketSource(dialer, remoteFeedUrl, log, core, &config.Websocket)
+	feedHub := hub.NewFeedHub(serverConn, log)
+	upgrader := hub.NewDefaultUpgrader(config.Websocket.ReadBufferSize, config.Websocket.WriteBufferSize)
 
-	return rest_handlers.NewSigningAgentHandler(feedHub, core, log, config, autoApprover)
+	return rest_handlers.NewSigningAgentHandler(feedHub, core, log, config, autoApprover, upgrader)
 }
 
 // SetHandlers set all handlers
@@ -109,7 +110,7 @@ func (r *Router) SetHandlers() http.Handler {
 		{PathClientsList, http.MethodGet, r.handler.ClientsList},
 		{PathAction, http.MethodPut, r.handler.ActionApprove},
 		{PathAction, http.MethodDelete, r.handler.ActionReject},
-		{PathClientFeed, defs.MethodWebsocket, r.handler.ClientFeed},
+		{PathClientFeed, defs.MethodWebsocket, r.signingAgentHandler.ClientFeed},
 	}
 
 	router := mux.NewRouter().PathPrefix(defs.PathPrefix).Subrouter()

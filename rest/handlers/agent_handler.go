@@ -3,40 +3,53 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/jinzhu/copier"
 	"gitlab.qredo.com/custody-engine/automated-approver/api"
 	"gitlab.qredo.com/custody-engine/automated-approver/autoapprover"
+	"gitlab.qredo.com/custody-engine/automated-approver/clientfeed"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+	"gitlab.qredo.com/custody-engine/automated-approver/hub"
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
-	"gitlab.qredo.com/custody-engine/automated-approver/websocket"
 	"go.uber.org/zap"
 )
 
+type newClientFeedFunc func(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister clientfeed.UnregisterFunc, config *config.WebSocketConf) clientfeed.ClientFeed
+
 type SigningAgentHandler struct {
-	feedHub      websocket.FeedHub
-	log          *zap.SugaredLogger
-	core         lib.SigningAgentClient
-	config       *config.AutoApprove
-	localFeed    string
-	decode       func(interface{}, *http.Request) error
-	autoApprover *autoapprover.AutoApproval
+	feedHub           hub.FeedHub
+	log               *zap.SugaredLogger
+	core              lib.SigningAgentClient
+	config            *config.AutoApprove
+	websocketConfig   *config.WebSocketConf
+	localFeed         string
+	decode            func(interface{}, *http.Request) error
+	autoApprover      *autoapprover.AutoApprover
+	upgrader          hub.WebsocketUpgrader
+	newClientFeedFunc newClientFeedFunc //function used by the feed clients to unregister themselves from the hub and stop receiving data
 }
 
-func NewSigningAgentHandler(feedHub websocket.FeedHub, core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApproval) *SigningAgentHandler {
+// NewSigningAgentHandler instantiates and returns a new SigningAgentHandler object.
+func NewSigningAgentHandler(feedHub hub.FeedHub, core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApprover, upgrader hub.WebsocketUpgrader) *SigningAgentHandler {
 	return &SigningAgentHandler{
-		feedHub:      feedHub,
-		log:          log,
-		core:         core,
-		config:       &config.AutoApprove,
-		localFeed:    fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix),
-		decode:       util.DecodeRequest,
-		autoApprover: autoApprover,
+		feedHub:           feedHub,
+		log:               log,
+		core:              core,
+		config:            &config.AutoApprove,
+		localFeed:         fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix),
+		decode:            util.DecodeRequest,
+		autoApprover:      autoApprover,
+		upgrader:          upgrader,
+		websocketConfig:   &config.Websocket,
+		newClientFeedFunc: clientfeed.NewClientFeed,
 	}
 }
 
+// StartAgent is running the feed hub if the agent is registered.
+// It also makes sure the auto approver is registered to the hub and is listening for incoming actions, if enabled in the config
 func (h *SigningAgentHandler) StartAgent() {
 	agentID := h.core.GetSystemAgentID()
 	if len(agentID) == 0 {
@@ -58,11 +71,13 @@ func (h *SigningAgentHandler) StartAgent() {
 	go h.autoApprover.Listen()
 }
 
+// StopAgent is called to stop the feed hub on request, by ex: when the service is stopped
 func (h *SigningAgentHandler) StopAgent() {
 	h.feedHub.Stop()
 	h.log.Info("feed hub stopped")
 }
 
+// RegisterAgent handles the registration and starting of a new agent
 func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -76,6 +91,40 @@ func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.Respo
 		h.StartAgent()
 		return response, nil
 	}
+}
+
+// ClientFeed provides a way to open a websocket connection to receive data send through the websocket connection with the Qredo back end
+func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	hubRunning := h.feedHub.IsRunning()
+
+	if hubRunning {
+		clientFeed := h.newClientFeed(w, r)
+		if clientFeed != nil {
+			var wg sync.WaitGroup
+			wg.Add(1)
+
+			go clientFeed.Start(&wg)
+			wg.Wait() //wait for the client to set up the conn handling
+
+			h.feedHub.RegisterClient(clientFeed.GetFeedClient())
+			go clientFeed.Listen()
+			h.log.Info("handler: connected to feed, listening ...")
+		}
+	} else {
+		h.log.Debugf("handler: failed to connect, hub not running")
+	}
+
+	return nil, nil
+}
+
+func (h *SigningAgentHandler) newClientFeed(w http.ResponseWriter, r *http.Request) clientfeed.ClientFeed {
+	conn, err := h.upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		h.log.Errorf("handler: failed to upgrade connection, err: %v", err)
+		return nil
+	}
+
+	return h.newClientFeedFunc(conn, h.log, h.feedHub.UnregisterClient, h.websocketConfig)
 }
 
 func (h *SigningAgentHandler) register(r *http.Request) (interface{}, error) {

@@ -200,6 +200,7 @@ func TestRestAPIs(t *testing.T) {
 		ReconnectTimeOut:  200,
 		ReconnectInterval: 15,
 		WsScheme:          "ws",
+		PingPeriod:        10,
 	}
 	handlers := getTestHandlers(cfg)
 	server := httptest.NewServer(handlers)

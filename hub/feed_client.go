@@ -1,4 +1,4 @@
-package websocket
+package hub
 
 type FeedClient struct {
 	Feed       chan []byte

@@ -1,4 +1,4 @@
-package websocket
+package hub
 
 import (
 	"sync"
@@ -11,7 +11,7 @@ import (
 	"go.uber.org/goleak"
 )
 
-type mockServerConnection struct {
+type mockSourceConnection struct {
 	ConnectCalled       bool
 	ListenCalled        bool
 	DisconnectCalled    bool
@@ -21,104 +21,107 @@ type mockServerConnection struct {
 	RxMessages          chan []byte
 }
 
-func (m *mockServerConnection) Connect() bool {
+func (m *mockSourceConnection) Connect() bool {
 	m.ConnectCalled = true
 	return m.NextConnect
 }
 
-func (m *mockServerConnection) Disconnect() {
+func (m *mockSourceConnection) Disconnect() {
 	m.DisconnectCalled = true
 
 }
 
-func (m *mockServerConnection) Listen(wg *sync.WaitGroup) {
+func (m *mockSourceConnection) Listen(wg *sync.WaitGroup) {
 	m.ListenCalled = true
 	wg.Done()
 }
 
-func (m *mockServerConnection) GetFeedUrl() string {
+func (m *mockSourceConnection) GetFeedUrl() string {
 	return ""
 }
 
-func (m *mockServerConnection) GetReadyState() string {
+func (m *mockSourceConnection) GetReadyState() string {
 	m.GetReadyStateCalled = true
 	return m.NextReadyState
 }
 
-func (m *mockServerConnection) GetChannel() chan []byte {
+func (m *mockSourceConnection) GetSendChannel() chan []byte {
 	return m.RxMessages
 }
 
 func TestFeedHub_Run_fails_to_connect(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
-	mockServerConn := &mockServerConnection{}
-	feedHub := NewFeedHub(mockServerConn, util.NewTestLogger())
+	mockSourceConn := &mockSourceConnection{}
+	feedHub := NewFeedHub(mockSourceConn, util.NewTestLogger())
 
 	//Act
 	res := feedHub.Run()
 
 	//Assert
 	assert.False(t, res)
-	assert.True(t, mockServerConn.ConnectCalled)
+	assert.True(t, mockSourceConn.ConnectCalled)
+	assert.False(t, feedHub.IsRunning())
 }
 
 func TestFeedHub_Run_connects_and_listens(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
-	mockServerConn := &mockServerConnection{
+	mockSourceConn := &mockSourceConnection{
 		NextConnect: true,
 		RxMessages:  make(chan []byte),
 	}
-	feedHub := NewFeedHub(mockServerConn, util.NewTestLogger())
+	feedHub := NewFeedHub(mockSourceConn, util.NewTestLogger())
 
 	//Act
 	res := feedHub.Run()
 
 	//Assert
 	assert.True(t, res)
-	assert.True(t, mockServerConn.ConnectCalled)
-	assert.True(t, mockServerConn.ListenCalled)
+	assert.True(t, mockSourceConn.ConnectCalled)
+	assert.True(t, mockSourceConn.ListenCalled)
+	assert.True(t, feedHub.IsRunning())
 
-	close(mockServerConn.RxMessages)
+	close(mockSourceConn.RxMessages)
 }
 
 func TestFeedHub_Stop_not_connected(t *testing.T) {
 	//Arrange
-	mockServerConn := &mockServerConnection{
+	mockSourceConn := &mockSourceConnection{
 		NextConnect: true,
 	}
-	feedHub := NewFeedHub(mockServerConn, util.NewTestLogger())
+	feedHub := NewFeedHub(mockSourceConn, util.NewTestLogger())
 
 	//Act
 	feedHub.Stop()
 
 	//Assert
-	assert.True(t, mockServerConn.GetReadyStateCalled)
-	assert.False(t, mockServerConn.DisconnectCalled)
+	assert.True(t, mockSourceConn.GetReadyStateCalled)
+	assert.False(t, mockSourceConn.DisconnectCalled)
 }
 
 func TestFeedHub_Stop_connected(t *testing.T) {
 	//Arrange
-	mockServerConn := &mockServerConnection{
+	mockSourceConn := &mockSourceConnection{
 		NextConnect:    true,
 		NextReadyState: defs.ConnectionState.Open,
 	}
-	feedHub := NewFeedHub(mockServerConn, util.NewTestLogger())
+	feedHub := NewFeedHub(mockSourceConn, util.NewTestLogger())
 
 	//Act
 	feedHub.Stop()
 
 	//Assert
-	assert.True(t, mockServerConn.GetReadyStateCalled)
-	assert.True(t, mockServerConn.DisconnectCalled)
+	assert.True(t, mockSourceConn.GetReadyStateCalled)
+	assert.True(t, mockSourceConn.DisconnectCalled)
 }
 
 func TestFeedHub_Register_Unregister_client(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
-	feedHub := &websocketFeedHub{
+	feedHub := &feedHubImpl{
 		clients: make(map[*FeedClient]bool),
+		log:     util.NewTestLogger(),
 	}
 	client := &FeedClient{
 		Feed: make(chan []byte),
@@ -137,7 +140,7 @@ func TestFeedHub_removes_unlistening_client(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
 	client := NewFeedClient(false)
-	feedHub := &websocketFeedHub{
+	feedHub := &feedHubImpl{
 		log:       util.NewTestLogger(),
 		clients:   map[*FeedClient]bool{&client: true},
 		broadcast: make(chan []byte),
