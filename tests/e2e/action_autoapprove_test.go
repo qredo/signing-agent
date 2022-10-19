@@ -2,7 +2,14 @@ package e2e_test
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/rsa"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -267,8 +274,23 @@ func doBackEndCall(method string, path string, data *bytes.Buffer, respData inte
 	} else {
 		req, err = http.NewRequest(method, addr, data)
 	}
+	if err != nil {
+		return err
+	}
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-api-key", APIKey)
+
+	timestamp := fmt.Sprintf("%v", time.Now().Unix())
+	req.Header.Set("x-timestamp", timestamp)
+
+	signature, err := signRequest(req.URL.String(), timestamp, data)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("x-sign", signature)
+
 	client := http.Client{
 		Timeout: 2 * time.Second,
 	}
@@ -292,4 +314,47 @@ func doBackEndCall(method string, path string, data *bytes.Buffer, respData inte
 	}
 
 	return nil
+}
+
+// Generates a signature for a partner api request
+func signRequest(uri, timestamp string, body *bytes.Buffer) (string, error) {
+	rsa_key, err := loadRsaKey()
+	if err != nil {
+		return "", err
+	}
+
+	h := sha256.New()
+	h.Write([]byte(timestamp))
+	h.Write([]byte(uri))
+	if body != nil {
+		h.Write(body.Bytes())
+	}
+	dgst := h.Sum(nil)
+	signature, err := rsa.SignPKCS1v15(nil, rsa_key, crypto.SHA256, dgst)
+	if err != nil {
+		return "", err
+	}
+
+	return base64.RawURLEncoding.EncodeToString(signature), nil
+}
+
+// Loads private rsa key from env var
+func loadRsaKey() (*rsa.PrivateKey, error) {
+	rsa_key_b64 := os.Getenv("BASE64PKEY")
+	if rsa_key_b64 == "" {
+		return nil, errors.New("BASE64PKEY not set in environment")
+	}
+
+	rsa_key_pem, err := base64.StdEncoding.DecodeString(rsa_key_b64)
+	if err != nil {
+		return nil, err
+	}
+
+	block, _ := pem.Decode([]byte(rsa_key_pem))
+	rsa_key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return rsa_key, nil
 }
