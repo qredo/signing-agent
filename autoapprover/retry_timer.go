@@ -9,7 +9,7 @@ type retryTimer struct {
 	retryInterval int
 }
 
-func NewRetryTimer(retry int, retryMax int) *retryTimer {
+func newRetryTimer(retry int, retryMax int) *retryTimer {
 	return &retryTimer{
 		start:         time.Now(),
 		baseInc:       retry,

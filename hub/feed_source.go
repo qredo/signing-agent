@@ -1,4 +1,4 @@
-package websocket
+package hub
 
 import (
 	"encoding/hex"
@@ -13,9 +13,19 @@ import (
 	"go.uber.org/zap"
 )
 
-type websocketServerConn struct {
-	dialer               webSocketDialer
-	conn                 socketConnection
+// Source has an underlying websocket connection used to receive messages. It will send these messages to an outbound channel
+type Source interface {
+	Connect() bool
+	Disconnect()
+	Listen(wg *sync.WaitGroup)
+	GetFeedUrl() string
+	GetReadyState() string
+	GetSendChannel() chan []byte
+}
+
+type websocketSource struct {
+	dialer               WebsocketDialer
+	conn                 WebsocketConnection
 	log                  *zap.SugaredLogger
 	core                 lib.SigningAgentClient
 	feedUrl              string
@@ -26,8 +36,9 @@ type websocketServerConn struct {
 	rxMessages           chan []byte
 }
 
-func NewServerConnection(dialer webSocketDialer, feedUrl string, log *zap.SugaredLogger, core lib.SigningAgentClient, config *config.WebSocketConf) serverConnection {
-	return &websocketServerConn{
+// NewWebsocketSource returns a Source object that's an instance of websocketSource
+func NewWebsocketSource(dialer WebsocketDialer, feedUrl string, log *zap.SugaredLogger, core lib.SigningAgentClient, config *config.WebSocketConf) Source {
+	return &websocketSource{
 		log:                  log,
 		core:                 core,
 		feedUrl:              feedUrl,
@@ -40,16 +51,18 @@ func NewServerConnection(dialer webSocketDialer, feedUrl string, log *zap.Sugare
 	}
 }
 
-func (w *websocketServerConn) Connect() bool {
+// Connect is trying to establish a websocket connection which will be used as a source
+// It tries to reconnect at each interval defined in the configuration
+func (w *websocketSource) Connect() bool {
 	w.readyState = defs.ConnectionState.Connecting
 
 	startTime := time.Now()
 	for time.Since(startTime) < w.reconnectIntervalMax {
 		if err := w.dial(); err == nil {
-			w.log.Infof("connected to feed %v", w.feedUrl)
+			w.log.Infof("WebsocketSource: connected to feed %v", w.feedUrl)
 			return true
 		} else {
-			w.log.Errorf("cannot connect to feed: %v, retry connection in %v", err, w.reconnectInterval)
+			w.log.Errorf("WebsocketSource: cannot connect to feed: %v, retry connection in %v", err, w.reconnectInterval)
 			time.Sleep(w.reconnectInterval)
 		}
 	}
@@ -58,7 +71,9 @@ func (w *websocketServerConn) Connect() bool {
 	return false
 }
 
-func (w *websocketServerConn) Listen(wg *sync.WaitGroup) {
+// Listen is receiving messages from the underlying websocket connection and sends them to the outbound channel
+// In case of a reading or connectivity issue it tries to reconnect
+func (w *websocketSource) Listen(wg *sync.WaitGroup) {
 	defer func() {
 		w.conn.Close()
 		close(w.rxMessages)
@@ -74,7 +89,7 @@ func (w *websocketServerConn) Listen(wg *sync.WaitGroup) {
 				return
 			}
 			//either connection issue or issue reading the message
-			w.log.Errorf("unexpected connection error: %v", err)
+			w.log.Errorf("WebsocketSource: unexpected connection error: %v", err)
 			if !w.Connect() {
 				return
 			}
@@ -85,31 +100,35 @@ func (w *websocketServerConn) Listen(wg *sync.WaitGroup) {
 
 }
 
-func (w *websocketServerConn) Disconnect() {
-	w.log.Infof("disconnecting from feed %v", w.feedUrl)
+// Disconnect is closing the websocket upon request and signals the reconnect should not happen
+func (w *websocketSource) Disconnect() {
+	w.log.Infof("WebsocketSource: disconnecting from feed %v", w.feedUrl)
 	if err := w.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")); err != nil {
-		w.log.Errorf("error on send CloseMessage, error: %v", err)
+		w.log.Errorf("WebsocketSource: error on send CloseMessage, error: %v", err)
 	}
 	w.shouldReconnect = false
 	w.readyState = defs.ConnectionState.Closed
 }
 
-func (w *websocketServerConn) GetFeedUrl() string {
+// GetFeedUrl returns the websocket url
+func (w *websocketSource) GetFeedUrl() string {
 	return w.feedUrl
 }
 
-func (w *websocketServerConn) GetReadyState() string {
+// GetReadyState returns the status of the websocket connection
+func (w *websocketSource) GetReadyState() string {
 	return w.readyState
 }
 
-func (w *websocketServerConn) GetChannel() chan []byte {
+// GetSendChannel returns the outbound channel
+func (w *websocketSource) GetSendChannel() chan []byte {
 	return w.rxMessages
 }
 
-func (w *websocketServerConn) dial() error {
+func (w *websocketSource) dial() error {
 	headers, err := w.genConnectHeaders()
 	if err != nil {
-		w.log.Errorf("failed to generate dial headers: %v", err)
+		w.log.Errorf("WebsocketSource: failed to generate dial headers: %v", err)
 		return err
 	}
 
@@ -123,7 +142,7 @@ func (w *websocketServerConn) dial() error {
 	return err
 }
 
-func (w *websocketServerConn) genConnectHeaders() (http.Header, error) {
+func (w *websocketSource) genConnectHeaders() (http.Header, error) {
 	zkpOnePass, err := w.core.GetAgentZKPOnePass()
 	if err != nil {
 		return nil, err

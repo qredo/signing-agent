@@ -11,38 +11,38 @@ import (
 	"github.com/go-redsync/redsync/v4"
 	"github.com/test-go/testify/assert"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/automated-approver/hub"
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 	"gitlab.qredo.com/custody-engine/automated-approver/util"
-	"gitlab.qredo.com/custody-engine/automated-approver/websocket"
 	"go.uber.org/goleak"
 )
 
-func TestAutoApproval_Listen_fails_to_unmarshal(t *testing.T) {
+func TestAutoApprover_Listen_fails_to_unmarshal(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
 	mock_core := &lib.MockSigningAgentClient{}
-	autoApproval := &AutoApproval{
+	sut := &AutoApprover{
 		core:       mock_core,
-		FeedClient: websocket.NewFeedClient(true),
+		FeedClient: hub.NewFeedClient(true),
 		log:        util.NewTestLogger(),
 	}
-	defer close(autoApproval.Feed)
-	go autoApproval.Listen()
+	defer close(sut.Feed)
+	go sut.Listen()
 
 	//Act
-	autoApproval.Feed <- []byte("")
+	sut.Feed <- []byte("")
 	<-time.After(time.Second) //give it time to finish
 
 	//Assert
-	assert.NotNil(t, autoApproval.lastError)
-	assert.Equal(t, "unexpected end of JSON input", autoApproval.lastError.Error())
+	assert.NotNil(t, sut.lastError)
+	assert.Equal(t, "unexpected end of JSON input", sut.lastError.Error())
 	assert.False(t, mock_core.ActionApproveCalled)
 }
 
-func TestAutoApproval_handleMessage_action_expired(t *testing.T) {
+func TestAutoApprover_handleMessage_action_expired(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
-	autoApproval := &AutoApproval{
+	sut := &AutoApprover{
 		log: util.NewTestLogger(),
 	}
 	bytes, _ := json.Marshal(ActionInfo{
@@ -50,29 +50,32 @@ func TestAutoApproval_handleMessage_action_expired(t *testing.T) {
 	})
 
 	//Act
-	autoApproval.handleMessage(bytes)
+	sut.handleMessage(bytes)
 
 	//Assert
-	assert.Nil(t, autoApproval.lastError)
+	assert.Nil(t, sut.lastError)
 }
 
-func TestAutoApproval_shouldHandleAction_cached(t *testing.T) {
+func TestAutoApprover_shouldHandleAction_cached(t *testing.T) {
 	//Arrange
 	cacheMock := &mockCache{
 		NextStringCmd: redis.NewStringCmd(context.Background()),
 	}
-	sut := NewAutoApproval(nil, util.NewTestLogger(), &config.Config{LoadBalancing: config.LoadBalancing{Enable: true}}, cacheMock, nil)
+	sut := NewAutoApprover(nil, util.NewTestLogger(), &config.Config{LoadBalancing: config.LoadBalancing{Enable: true}}, cacheMock, nil)
+	bytes, _ := json.Marshal(ActionInfo{
+		ID:         "actionid",
+		ExpireTime: time.Now().Add(time.Minute).Unix(),
+	})
 
 	//Act
-	res := sut.shouldHandleAction("actionid")
+	sut.handleMessage(bytes)
 
 	//Assert
-	assert.False(t, res)
 	assert.True(t, cacheMock.GetCalled)
 	assert.Equal(t, "actionid", cacheMock.LastKey)
 }
 
-func TestAutoApproval_shouldHandleAction_gets_mutex(t *testing.T) {
+func TestAutoApprover_shouldHandleAction_gets_mutex(t *testing.T) {
 	//Arrange
 	syncMock := &mockSync{
 		NextMutex: &redsync.Mutex{},
@@ -83,8 +86,8 @@ func TestAutoApproval_shouldHandleAction_gets_mutex(t *testing.T) {
 		NextStringCmd: stringCmd,
 	}
 
-	sut := &AutoApproval{
-		loadBalancing: &config.LoadBalancing{
+	sut := &AutoApprover{
+		cfgLoadBalancing: &config.LoadBalancing{
 			Enable: true,
 		},
 		sync:  syncMock,
@@ -103,14 +106,14 @@ func TestAutoApproval_shouldHandleAction_gets_mutex(t *testing.T) {
 	assert.NotNil(t, sut.mutex)
 }
 
-func TestAutoApproval_handleAction_lock_error(t *testing.T) {
+func TestAutoApprover_handleAction_lock_error(t *testing.T) {
 	//Arrange
 	mutexMock := &mockMutex{
 		NextLockError: errors.New("some lock error"),
 	}
 
-	sut := &AutoApproval{
-		loadBalancing: &config.LoadBalancing{
+	sut := &AutoApprover{
+		cfgLoadBalancing: &config.LoadBalancing{
 			Enable: true,
 		},
 		mutex: mutexMock,
@@ -125,7 +128,7 @@ func TestAutoApproval_handleAction_lock_error(t *testing.T) {
 	assert.True(t, mutexMock.LockCalled)
 }
 
-func TestAutoApproval_handleAction_unlock_error(t *testing.T) {
+func TestAutoApprover_handleAction_unlock_error(t *testing.T) {
 	//Arrange
 	stringCmd := redis.NewStringCmd(context.Background())
 	stringCmd.SetErr(errors.New("some error"))
@@ -137,15 +140,15 @@ func TestAutoApproval_handleAction_unlock_error(t *testing.T) {
 		NextUnlockError: errors.New("some unlock error"),
 	}
 
-	sut := &AutoApproval{
+	sut := &AutoApprover{
 		log: util.NewTestLogger(),
-		loadBalancing: &config.LoadBalancing{
+		cfgLoadBalancing: &config.LoadBalancing{
 			Enable: true,
 		},
-		autoApproval: &config.AutoApprove{},
-		cache:        cacheMock,
-		mutex:        mutexMock,
-		core:         &lib.MockSigningAgentClient{},
+		cfgAutoApproval: &config.AutoApprove{},
+		cache:           cacheMock,
+		mutex:           mutexMock,
+		core:            &lib.MockSigningAgentClient{},
 	}
 
 	//Act
@@ -162,14 +165,14 @@ func TestAutoApproval_handleAction_unlock_error(t *testing.T) {
 	assert.True(t, mutexMock.UnlockCalled)
 }
 
-func TestAutoApproval_approveAction_times_out(t *testing.T) {
+func TestAutoApprover_approveAction_times_out(t *testing.T) {
 	//Arrange
 	coreMock := &lib.MockSigningAgentClient{
 		NextError: errors.New("some error"),
 	}
-	sut := &AutoApproval{
+	sut := &AutoApprover{
 		core: coreMock,
-		autoApproval: &config.AutoApprove{
+		cfgAutoApproval: &config.AutoApprove{
 			RetryIntervalMax: 2,
 			RetryInterval:    1,
 		},

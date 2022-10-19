@@ -14,6 +14,11 @@ websocket:
   ws_scheme: wss
   reconnect_timeout_sec: 300
   reconnect_interval_sec: 5
+  ping_period_sec: 5
+	pong_wait_sec: 10
+	write_wait_sec: 10
+  read_buffer_size: 512
+  write_buffer_size: 1024
 http:
   addr: 0.0.0.0:8007
   cors_allow_origins:
@@ -60,6 +65,11 @@ store:
 - **ws_scheme:** the scheme to use for the web socket feed connection, ex. ws or wss
 - **reconnect_timeout_sec:** the reconnect timeout in seconds
 - **reconnect_interval_sec:** the reconnect interval in seconds
+- **ping_period_sec:** the ping period for the ping handler in seconds
+- **pong_wait_sec:** the pong wait for the pong handler in seconds
+- **write_wait_sec:** the write wait in seconds
+- **read_buffer_size:** the websocket upgrader read buffer size in bytes
+- **write_buffer_size:** the websocket upgrader write buffer size in bytes
 
 ## HTTP
 

@@ -34,6 +34,11 @@ type WebSocketConf struct {
 	WsScheme          string `yaml:"ws_scheme"`
 	ReconnectTimeOut  int    `yaml:"reconnect_timeout_sec"`
 	ReconnectInterval int    `yaml:"reconnect_interval_sec"`
+	PingPeriod        int    `yaml:"ping_period_sec"`
+	PongWait          int    `yaml:"pong_wait_sec"`
+	WriteWait         int    `yaml:"write_wait_sec"`
+	ReadBufferSize    int    `yaml:"read_buffer_size"`
+	WriteBufferSize   int    `yaml:"write_buffer_size"`
 }
 type Store struct {
 	Type       string    `default:"file" yaml:"type"`
@@ -99,6 +104,11 @@ func (c *Config) Default() {
 		ReconnectTimeOut:  300,
 		ReconnectInterval: 5,
 		WsScheme:          "wss",
+		PingPeriod:        5,
+		PongWait:          10,
+		WriteWait:         10,
+		ReadBufferSize:    512,
+		WriteBufferSize:   1024,
 	}
 	c.Base.HttpScheme = "https"
 	c.Logging.Level = "info"

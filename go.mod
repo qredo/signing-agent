@@ -5,7 +5,7 @@ go 1.19
 replace github.com/btcsuite/btcd => github.com/qredo/btcd v0.21.2
 
 require (
-	github.com/aws/aws-sdk-go v1.44.114
+	github.com/aws/aws-sdk-go v1.44.118
 	github.com/btcsuite/btcd v0.23.2
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/go-playground/validator/v10 v10.11.1
@@ -31,7 +31,7 @@ require (
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mkideal/expr v0.1.0 // indirect
-	golang.org/x/term v0.0.0-20220919170432-7a66f970e087 // indirect
+	golang.org/x/term v0.0.0-20221017184919-83659145692c // indirect
 )
 
 require (
@@ -74,7 +74,7 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
-	golang.org/x/sys v0.0.0-20221010170243-090e33056c14 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -1,4 +1,4 @@
-package websocket
+package hub
 
 import (
 	"sync"
@@ -14,15 +14,15 @@ import (
 	"go.uber.org/goleak"
 )
 
-func TestWebsocketServerConn_Connect_retries_on_fail_to_get__ZKPOnePass(t *testing.T) {
+func TestWebsocketSource_Connect_retries_on_fail_to_get__ZKPOnePass(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
 
-	mock_dialer := &mockWebSocketDialer{}
+	mock_dialer := &mockWebsocketDialer{}
 	mock_core := &lib.MockSigningAgentClient{
 		NextError: errors.New("some error"),
 	}
-	sut := NewServerConnection(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	sut := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := sut.Connect()
@@ -35,17 +35,17 @@ func TestWebsocketServerConn_Connect_retries_on_fail_to_get__ZKPOnePass(t *testi
 	assert.Equal(t, 3, mock_core.Counter)
 }
 
-func TestWebsocketServerConn_Connects(t *testing.T) {
+func TestWebsocketSource_Connects(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
 
-	mock_dialer := &mockWebSocketDialer{
+	mock_dialer := &mockWebsocketDialer{
 		NextConn: &websocket.Conn{},
 	}
 	mock_core := &lib.MockSigningAgentClient{
 		NextZKPOnePass: []byte("zkp"),
 	}
-	sut := NewServerConnection(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	sut := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := sut.Connect()
@@ -60,17 +60,17 @@ func TestWebsocketServerConn_Connects(t *testing.T) {
 	assert.Equal(t, defs.ConnectionState.Open, sut.GetReadyState())
 }
 
-func TestWebsocketServerConn_retries_on_dial_error(t *testing.T) {
+func TestWebsocketSource_retries_on_dial_error(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
-	mock_dialer := &mockWebSocketDialer{
+	mock_dialer := &mockWebsocketDialer{
 		NextConn:  &websocket.Conn{},
 		NextError: errors.New("some error"),
 	}
 	mock_core := &lib.MockSigningAgentClient{
 		NextZKPOnePass: []byte("zkp"),
 	}
-	conn := NewServerConnection(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	conn := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := conn.Connect()
@@ -85,9 +85,9 @@ func TestWebsocketServerConn_retries_on_dial_error(t *testing.T) {
 	assert.Equal(t, defs.ConnectionState.Closed, conn.GetReadyState())
 }
 
-func TestWebsocketServerConn_GetFeedUrl(t *testing.T) {
+func TestWebsocketSource_GetFeedUrl(t *testing.T) {
 	//Arrange
-	sut := NewServerConnection(nil, "feed", nil, nil, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	sut := NewWebsocketSource(nil, "feed", nil, nil, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := sut.GetFeedUrl()
@@ -96,12 +96,12 @@ func TestWebsocketServerConn_GetFeedUrl(t *testing.T) {
 	assert.Equal(t, "feed", res)
 }
 
-func TestWebsocketServerConn_Disconnect(t *testing.T) {
+func TestWebsocketSource_Disconnect(t *testing.T) {
 	//Arrange
-	mock_conn := &mockSocketConnection{
+	mock_conn := &MockWebsocketConnection{
 		NextError: errors.New("some error"),
 	}
-	sut := &websocketServerConn{
+	sut := &websocketSource{
 		conn:            mock_conn,
 		shouldReconnect: true,
 		readyState:      defs.ConnectionState.Open,
@@ -118,15 +118,15 @@ func TestWebsocketServerConn_Disconnect(t *testing.T) {
 	assert.Equal(t, websocket.CloseMessage, mock_conn.LastMessageType)
 }
 
-func TestWebsocketServerConn_Listen_don_t_reconnect(t *testing.T) {
+func TestWebsocketSource_Listen_don_t_reconnect(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
-	mock_conn := &mockSocketConnection{
+	mock_conn := &MockWebsocketConnection{
 		NextError: errors.New("some error"),
 		read:      make(chan bool, 1),
 	}
 
-	sut := &websocketServerConn{
+	sut := &websocketSource{
 		conn:            mock_conn,
 		shouldReconnect: false,
 		readyState:      defs.ConnectionState.Closed,
@@ -150,16 +150,16 @@ func TestWebsocketServerConn_Listen_don_t_reconnect(t *testing.T) {
 	assert.False(t, ok)
 }
 
-func TestWebsocketServerConn_Listen_sends_message(t *testing.T) {
+func TestWebsocketSource_Listen_sends_message(t *testing.T) {
 	//Arrange
 	defer goleak.VerifyNone(t)
-	mock_conn := &mockSocketConnection{
+	mock_conn := &MockWebsocketConnection{
 		NextMessageType: 1,
 		NextData:        []byte("some message"),
 		read:            make(chan bool, 1),
 	}
 
-	sut := &websocketServerConn{
+	sut := &websocketSource{
 		conn:       mock_conn,
 		rxMessages: make(chan []byte),
 	}
@@ -178,7 +178,7 @@ func TestWebsocketServerConn_Listen_sends_message(t *testing.T) {
 	wg_client.Add(1)
 
 	go func() {
-		msg, ok := <-sut.GetChannel()
+		msg, ok := <-sut.GetSendChannel()
 		message = msg
 		chanOk = ok
 		wg_client.Done()
