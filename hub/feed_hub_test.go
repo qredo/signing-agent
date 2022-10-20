@@ -161,3 +161,31 @@ func TestFeedHub_removes_unlistening_client(t *testing.T) {
 	assert.Equal(t, 0, len(feedHub.clients))
 	close(feedHub.broadcast)
 }
+
+func TestFeedHub_GetExternalFeedClients(t *testing.T) {
+	//Arrange
+	defer goleak.VerifyNone(t)
+
+	feedHub := &feedHubImpl{
+		log:       util.NewTestLogger(),
+		clients:   make(map[*FeedClient]bool),
+		broadcast: make(chan []byte),
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(4)
+
+	go func() {
+		for i := 0; i < 4; i++ {
+			client := NewFeedClient(false)
+			feedHub.RegisterClient(&client)
+			wg.Done()
+		}
+	}()
+
+	//Act//Assert
+	assert.Equal(t, 0, feedHub.GetExternalFeedClients())
+	wg.Wait()
+
+	assert.Equal(t, 4, feedHub.GetExternalFeedClients())
+}

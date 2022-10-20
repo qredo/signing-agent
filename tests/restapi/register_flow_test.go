@@ -219,14 +219,14 @@ func TestRestAPIs(t *testing.T) {
 	}
 
 	// API endpoint tests
+	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Closed, 0)
 	registrationTests(servAA, payload)
 	healthcheckVersionTests(servAA)
 	healthCheckConfigTests(servAA)
-	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Closed)
+	<-time.After(time.Second) //might take a second to open the websocket connection
+	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Open, 0)
 	clientActionTests(servAA)
-	//TODO - disabled for now, healthcheck end point will be updated
-	//	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Open)
-	websocketTests(servAA)
+	websocketTests(servAA, cfg.Base.QredoAPIDomain)
 }
 
 // registrationTests checks the register endpoint (/register). The payload includes the data to be registered.
@@ -328,7 +328,7 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 }
 
 // healthCheckStatusTests checks the healthcheck status endpoint (/healthcheck/status).
-func healthcheckStatusTests(e *httpexpect.Expect, host string, wsstatus string) {
+func healthcheckStatusTests(e *httpexpect.Expect, host string, wsstatus string, connectedClients int) {
 	hcStatus := e.GET(rest.WrapPathPrefix(rest.PathHealthCheckStatus)).
 		Expect().
 		Status(http.StatusOK).JSON()
@@ -338,6 +338,7 @@ func healthcheckStatusTests(e *httpexpect.Expect, host string, wsstatus string) 
 	webSocket.Value("ReadyState").String().Equal(wsstatus)
 	webSocket.Value("RemoteFeedUrl").String().Equal(fmt.Sprintf("ws://%s/api/v1/p/coreclient/feed", host))
 	webSocket.Value("LocalFeedUrl").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
+	webSocket.Value("ConnectedClients").Equal(connectedClients)
 }
 
 // clientActionTest tests the action endpoints (/client/action/{action_id}.
@@ -354,13 +355,16 @@ func clientActionTests(e *httpexpect.Expect) {
 }
 
 // websocketTest tests the signing agent websocket (/client/feed)
-func websocketTests(e *httpexpect.Expect) {
+func websocketTests(e *httpexpect.Expect, host string) {
 	ws := e.GET(rest.WrapPathPrefix(rest.PathClientFeed)).
 		WithWebsocketUpgrade().
 		Expect().
 		Status(http.StatusSwitchingProtocols).
 		Websocket()
 	defer ws.Disconnect()
+
+	//also check the number of connected clients is 1
+	healthcheckStatusTests(e, host, defs.ConnectionState.Open, 1)
 
 	ws.Subprotocol().Empty()
 	ws.CloseWithText("bye", websocket.CloseNormalClosure)

@@ -46,6 +46,7 @@ type Router struct {
 	middleware          *Middleware
 	version             *version.Version
 	signingAgentHandler *rest_handlers.SigningAgentHandler
+	healthCheckHandler  *rest_handlers.HealthCheckHandler
 }
 
 func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.Version) (*Router, error) {
@@ -75,13 +76,24 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	pool := goredis.NewPool(rds)
 	rs := redsync.New(pool)
 
+	serverConn := hub.NewWebsocketSource(hub.NewDefaultDialer(), genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme), log, core, &config.Websocket)
+	feedHub := hub.NewFeedHub(serverConn, log)
+
+	localFeed := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix)
+	autoApprover := autoapprover.NewAutoApprover(core, log, config, rds, rs)
+	upgrader := hub.NewDefaultUpgrader(config.Websocket.ReadBufferSize, config.Websocket.WriteBufferSize)
+	signingAgentHandler := rest_handlers.NewSigningAgentHandler(feedHub, core, log, config, autoApprover, upgrader, localFeed)
+
+	healthCheckHandler := rest_handlers.NewHealthCheckHandler(serverConn, version, config, feedHub, localFeed)
+
 	rt := &Router{
 		log:                 log,
 		config:              config,
 		handler:             NewHandler(core, config, log, version, rds, rs),
 		middleware:          NewMiddleware(log, config.HTTP.LogAllRequests),
 		version:             version,
-		signingAgentHandler: NewAgentHandler(core, log, config, autoapprover.NewAutoApprover(core, log, config, rds, rs)),
+		signingAgentHandler: signingAgentHandler,
+		healthCheckHandler:  healthCheckHandler,
 	}
 
 	rt.router = rt.SetHandlers()
@@ -89,23 +101,13 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	return rt, nil
 }
 
-func NewAgentHandler(core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApprover) *rest_handlers.SigningAgentHandler {
-	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme)
-	dialer := hub.NewDefaultDialer()
-	serverConn := hub.NewWebsocketSource(dialer, remoteFeedUrl, log, core, &config.Websocket)
-	feedHub := hub.NewFeedHub(serverConn, log)
-	upgrader := hub.NewDefaultUpgrader(config.Websocket.ReadBufferSize, config.Websocket.WriteBufferSize)
-
-	return rest_handlers.NewSigningAgentHandler(feedHub, core, log, config, autoApprover, upgrader)
-}
-
 // SetHandlers set all handlers
 func (r *Router) SetHandlers() http.Handler {
 
 	routes := []route{
-		{PathHealthcheckVersion, http.MethodGet, r.handler.HealthCheckVersion},
-		{PathHealthCheckConfig, http.MethodGet, r.handler.HealthCheckConfig},
-		{PathHealthCheckStatus, http.MethodGet, r.handler.HealthCheckStatus},
+		{PathHealthcheckVersion, http.MethodGet, r.healthCheckHandler.HealthCheckVersion},
+		{PathHealthCheckConfig, http.MethodGet, r.healthCheckHandler.HealthCheckConfig},
+		{PathHealthCheckStatus, http.MethodGet, r.healthCheckHandler.HealthCheckStatus},
 		{PathClientFullRegister, http.MethodPost, r.signingAgentHandler.RegisterAgent},
 		{PathClientsList, http.MethodGet, r.handler.ClientsList},
 		{PathAction, http.MethodPut, r.handler.ActionApprove},

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -33,13 +32,13 @@ type SigningAgentHandler struct {
 }
 
 // NewSigningAgentHandler instantiates and returns a new SigningAgentHandler object.
-func NewSigningAgentHandler(feedHub hub.FeedHub, core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApprover, upgrader hub.WebsocketUpgrader) *SigningAgentHandler {
+func NewSigningAgentHandler(feedHub hub.FeedHub, core lib.SigningAgentClient, log *zap.SugaredLogger, config *config.Config, autoApprover *autoapprover.AutoApprover, upgrader hub.WebsocketUpgrader, localFeed string) *SigningAgentHandler {
 	return &SigningAgentHandler{
 		feedHub:           feedHub,
 		log:               log,
 		core:              core,
 		config:            &config.AutoApprove,
-		localFeed:         fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix),
+		localFeed:         localFeed,
 		decode:            util.DecodeRequest,
 		autoApprover:      autoApprover,
 		upgrader:          upgrader,
