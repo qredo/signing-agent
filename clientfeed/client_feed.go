@@ -44,9 +44,9 @@ func NewClientFeed(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregis
 		conn:       conn,
 		log:        log,
 		closeConn:  make(chan bool),
-		writeWait:  time.Duration(config.WriteWait),
-		pongWait:   time.Duration(config.PongWait),
-		pingPeriod: time.Duration(config.PingPeriod),
+		writeWait:  time.Duration(config.WriteWait) * time.Second,
+		pongWait:   time.Duration(config.PongWait) * time.Second,
+		pingPeriod: time.Duration(config.PingPeriod) * time.Second,
 		readyState: defs.ConnectionState.Open,
 		unregister: unregister,
 	}

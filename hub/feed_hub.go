@@ -16,6 +16,12 @@ type FeedHub interface {
 	RegisterClient(client *FeedClient)
 	UnregisterClient(client *FeedClient)
 	IsRunning() bool
+	ConnectedClients
+}
+
+// ConnectedClients gives access to the number of connected external clients of the hub
+type ConnectedClients interface {
+	GetExternalFeedClients() int
 }
 
 type feedHubImpl struct {
@@ -94,20 +100,19 @@ func (w *feedHubImpl) UnregisterClient(client *FeedClient) {
 	}
 }
 
-// TODO - Will be used for the websocket status
-// func (w *websocketFeedHub) getExternalFeedClients() int {
-// 	w.lock.Lock()
-// 	defer w.lock.Unlock()
+func (w *feedHubImpl) GetExternalFeedClients() int {
+	w.lock.Lock()
+	defer w.lock.Unlock()
 
-// 	count := 0
-// 	for fc := range w.clients {
-// 		if !fc.IsInternal {
-// 			count++
-// 		}
-// 	}
+	count := 0
+	for fc := range w.clients {
+		if !fc.IsInternal {
+			count++
+		}
+	}
 
-// 	return count
-// }
+	return count
+}
 
 func (w *feedHubImpl) cleanUp() {
 	w.lock.Lock()

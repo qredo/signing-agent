@@ -57,6 +57,10 @@ func (m *mockFeedHub) UnregisterClient(client *hub.FeedClient) {
 	m.LastUnregisteredClient = client
 }
 
+func (m *mockFeedHub) GetExternalFeedClients() int {
+	return 0
+}
+
 type mockClientFeed struct {
 	StartCalled         bool
 	ListenCalled        bool
@@ -110,7 +114,7 @@ func TestSigningAgentHandler_RegisterAgent_already_registered(t *testing.T) {
 		NextAgentID: "some agent id",
 	}
 	handler := NewSigningAgentHandler(&mockFeedHub{}, mock_core, testLog, &config.Config{
-		HTTP: config.HttpSettings{}}, nil, nil)
+		HTTP: config.HttpSettings{}}, nil, nil, "")
 
 	rr := httptest.NewRecorder()
 
@@ -173,7 +177,7 @@ func TestSigningAgentHandler_RegisterAgent_doesnt_validate_request(t *testing.T)
 	mock_core := lib.NewMockSigningAgentClient("")
 
 	handler := NewSigningAgentHandler(&mockFeedHub{}, mock_core, testLog, &config.Config{
-		HTTP: config.HttpSettings{}}, nil, nil)
+		HTTP: config.HttpSettings{}}, nil, nil, "")
 
 	req, _ := http.NewRequest("POST", "/path", bytes.NewReader([]byte(`
 	{
@@ -200,7 +204,7 @@ func TestSigningAgentHandler_RegisterAgent_fails_to_register_client(t *testing.T
 	}
 
 	handler := NewSigningAgentHandler(&mockFeedHub{}, mock_core, testLog, &config.Config{
-		HTTP: config.HttpSettings{}}, nil, nil)
+		HTTP: config.HttpSettings{}}, nil, nil, "")
 
 	//Act
 	response, err := handler.RegisterAgent(nil, httptest.NewRecorder(), NewTestRequest())
@@ -222,7 +226,7 @@ func TestSigningAgentHandler_RegisterAgent_fails_to_init_registration(t *testing
 	}
 
 	handler := NewSigningAgentHandler(&mockFeedHub{}, mock_core, testLog, &config.Config{
-		HTTP: config.HttpSettings{}}, nil, nil)
+		HTTP: config.HttpSettings{}}, nil, nil, "")
 
 	//Act
 	response, err := handler.RegisterAgent(nil, httptest.NewRecorder(), NewTestRequest())
@@ -249,7 +253,7 @@ func TestSigningAgentHandler_RegisterAgent_fails_to_finish_registration(t *testi
 	}
 
 	handler := NewSigningAgentHandler(&mockFeedHub{}, mock_core, testLog, &config.Config{
-		HTTP: config.HttpSettings{}}, nil, nil)
+		HTTP: config.HttpSettings{}}, nil, nil, "")
 
 	//Act
 	response, err := handler.RegisterAgent(nil, httptest.NewRecorder(), NewTestRequest())
@@ -279,7 +283,7 @@ func TestSigningAgentHandler_RegisterAgent_returns_response(t *testing.T) {
 	handler := NewSigningAgentHandler(&mockFeedHub{}, mock_core, testLog, &config.Config{
 		HTTP: config.HttpSettings{
 			Addr: "some address",
-		}}, nil, nil)
+		}}, nil, nil, "ws://some address/api/v1/client/feed")
 
 	//Act
 	response, err := handler.RegisterAgent(nil, httptest.NewRecorder(), NewTestRequest())
@@ -303,7 +307,7 @@ func TestSigningAgentHandler_StartAgent_runs_feedHub(t *testing.T) {
 	mockCore := lib.NewMockSigningAgentClient("valid_agentID")
 	handler := NewSigningAgentHandler(mockFeedHub, mockCore, testLog,
 		&config.Config{
-			HTTP: config.HttpSettings{}}, nil, nil)
+			HTTP: config.HttpSettings{}}, nil, nil, "")
 
 	//Act
 	handler.StartAgent()
@@ -325,7 +329,7 @@ func TestSigningAgentHandler_StartAgent_doesnt_start_autoApproval(t *testing.T) 
 		HTTP:        config.HttpSettings{},
 		AutoApprove: config.AutoApprove{},
 	}
-	handler := NewSigningAgentHandler(mockFeedHub, mockCore, testLog, config, nil, nil)
+	handler := NewSigningAgentHandler(mockFeedHub, mockCore, testLog, config, nil, nil, "")
 
 	//Act
 	handler.StartAgent()
@@ -348,7 +352,7 @@ func TestSigningAgentHandler_StartAgent_registers_auto_approval(t *testing.T) {
 		AutoApprove: config.AutoApprove{
 			Enabled: true,
 		},
-	}, autoapprover.NewAutoApprover(mockCore, testLog, &config.Config{}, nil, nil), nil)
+	}, autoapprover.NewAutoApprover(mockCore, testLog, &config.Config{}, nil, nil), nil, "")
 
 	//Act
 	handler.StartAgent()
@@ -368,7 +372,7 @@ func TestSigningAgentHandler_StopAgent(t *testing.T) {
 	//Arrange
 	mockFeedHub := &mockFeedHub{}
 	handler := NewSigningAgentHandler(mockFeedHub, nil, util.NewTestLogger(), &config.Config{
-		HTTP: config.HttpSettings{}}, &autoapprover.AutoApprover{}, nil)
+		HTTP: config.HttpSettings{}}, &autoapprover.AutoApprover{}, nil, "")
 
 	//Act
 	handler.StopAgent()

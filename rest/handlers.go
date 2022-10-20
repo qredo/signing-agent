@@ -41,7 +41,7 @@ func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.Sug
 		cfg:       *config,
 		log:       log,
 		version:   version,
-		websocket: api.NewWebsocketStatus(defs.ConnectionState.Closed, remoteFeedUrl, localFeedUrl),
+		websocket: api.NewWebsocketStatus(defs.ConnectionState.Closed, remoteFeedUrl, localFeedUrl, 0),
 		redis:     redis,
 		rsync:     rsync,
 	}

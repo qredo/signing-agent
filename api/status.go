@@ -4,14 +4,15 @@ type WebsocketStatus struct {
 	ReadyState       string `json:"ReadyState"`
 	RemoteFeedUrl    string `json:"RemoteFeedUrl"`
 	LocalFeedUrl     string `json:"LocalFeedUrl"`
-	ConnectedClients uint32 `json:"ConnectedClients,omitempty"`
+	ConnectedClients uint32 `json:"ConnectedClients"`
 }
 
-func NewWebsocketStatus(readyState, remoteFeedUrl, localFeedUrl string) WebsocketStatus {
+func NewWebsocketStatus(readyState, remoteFeedUrl, localFeedUrl string, connectedClients int) WebsocketStatus {
 	w := WebsocketStatus{
-		ReadyState:    readyState,
-		RemoteFeedUrl: remoteFeedUrl,
-		LocalFeedUrl:  localFeedUrl,
+		ReadyState:       readyState,
+		RemoteFeedUrl:    remoteFeedUrl,
+		LocalFeedUrl:     localFeedUrl,
+		ConnectedClients: uint32(connectedClients),
 	}
 	return w
 }

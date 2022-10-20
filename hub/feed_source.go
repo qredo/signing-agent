@@ -18,9 +18,14 @@ type Source interface {
 	Connect() bool
 	Disconnect()
 	Listen(wg *sync.WaitGroup)
+	GetSendChannel() chan []byte
+	SourceStats
+}
+
+// SourceStats gives access to the feed url and the connection's ready state
+type SourceStats interface {
 	GetFeedUrl() string
 	GetReadyState() string
-	GetSendChannel() chan []byte
 }
 
 type websocketSource struct {
@@ -34,6 +39,7 @@ type websocketSource struct {
 	reconnectIntervalMax time.Duration
 	reconnectInterval    time.Duration
 	rxMessages           chan []byte
+	lock                 sync.RWMutex
 }
 
 // NewWebsocketSource returns a Source object that's an instance of websocketSource
@@ -48,13 +54,14 @@ func NewWebsocketSource(dialer WebsocketDialer, feedUrl string, log *zap.Sugared
 		reconnectIntervalMax: time.Duration(config.ReconnectTimeOut) * time.Second,
 		reconnectInterval:    time.Duration(config.ReconnectInterval) * time.Second,
 		rxMessages:           make(chan []byte),
+		lock:                 sync.RWMutex{},
 	}
 }
 
 // Connect is trying to establish a websocket connection which will be used as a source
 // It tries to reconnect at each interval defined in the configuration
 func (w *websocketSource) Connect() bool {
-	w.readyState = defs.ConnectionState.Connecting
+	w.setReadyState(defs.ConnectionState.Connecting)
 
 	startTime := time.Now()
 	for time.Since(startTime) < w.reconnectIntervalMax {
@@ -67,7 +74,7 @@ func (w *websocketSource) Connect() bool {
 		}
 	}
 
-	w.readyState = defs.ConnectionState.Closed
+	w.setReadyState(defs.ConnectionState.Closed)
 	return false
 }
 
@@ -107,7 +114,7 @@ func (w *websocketSource) Disconnect() {
 		w.log.Errorf("WebsocketSource: error on send CloseMessage, error: %v", err)
 	}
 	w.shouldReconnect = false
-	w.readyState = defs.ConnectionState.Closed
+	w.setReadyState(defs.ConnectionState.Closed)
 }
 
 // GetFeedUrl returns the websocket url
@@ -117,6 +124,9 @@ func (w *websocketSource) GetFeedUrl() string {
 
 // GetReadyState returns the status of the websocket connection
 func (w *websocketSource) GetReadyState() string {
+	w.lock.RLock()
+	defer w.lock.RUnlock()
+
 	return w.readyState
 }
 
@@ -135,7 +145,7 @@ func (w *websocketSource) dial() error {
 	conn, _, err := w.dialer.Dial(w.feedUrl, headers)
 	if err == nil {
 		w.conn = conn
-		w.readyState = defs.ConnectionState.Open
+		w.setReadyState(defs.ConnectionState.Open)
 		return nil
 	}
 
@@ -151,4 +161,11 @@ func (w *websocketSource) genConnectHeaders() (http.Header, error) {
 	headers := http.Header{}
 	headers.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 	return headers, nil
+}
+
+func (w *websocketSource) setReadyState(state string) {
+	w.lock.Lock()
+	defer w.lock.Unlock()
+
+	w.readyState = state
 }
