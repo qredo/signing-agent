@@ -45,7 +45,7 @@ func TestAutoApprover_handleMessage_action_expired(t *testing.T) {
 	sut := &AutoApprover{
 		log: util.NewTestLogger(),
 	}
-	bytes, _ := json.Marshal(ActionInfo{
+	bytes, _ := json.Marshal(actionInfo{
 		ExpireTime: 12360,
 	})
 
@@ -62,7 +62,7 @@ func TestAutoApprover_shouldHandleAction_cached(t *testing.T) {
 		NextStringCmd: redis.NewStringCmd(context.Background()),
 	}
 	sut := NewAutoApprover(nil, util.NewTestLogger(), &config.Config{LoadBalancing: config.LoadBalancing{Enable: true}}, cacheMock, nil)
-	bytes, _ := json.Marshal(ActionInfo{
+	bytes, _ := json.Marshal(actionInfo{
 		ID:         "actionid",
 		ExpireTime: time.Now().Add(time.Minute).Unix(),
 	})
@@ -152,7 +152,7 @@ func TestAutoApprover_handleAction_unlock_error(t *testing.T) {
 	}
 
 	//Act
-	err := sut.handleAction(&ActionInfo{
+	err := sut.handleAction(&actionInfo{
 		ID:         "some action id",
 		ExpireTime: time.Now().Add(time.Minute).Unix(),
 	})

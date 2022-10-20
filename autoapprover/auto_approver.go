@@ -61,7 +61,7 @@ func (a *AutoApprover) Listen() {
 }
 
 func (a *AutoApprover) handleMessage(message []byte) {
-	var action ActionInfo
+	var action actionInfo
 	if err := json.Unmarshal(message, &action); err == nil {
 		if action.IsNotExpired() {
 			if a.shouldHandleAction(action.ID) {
@@ -88,7 +88,7 @@ func (a *AutoApprover) shouldHandleAction(actionId string) bool {
 	return true
 }
 
-func (a *AutoApprover) handleAction(action *ActionInfo) error {
+func (a *AutoApprover) handleAction(action *actionInfo) error {
 	if a.cfgLoadBalancing.Enable {
 		if err := a.mutex.Lock(); err != nil {
 			time.Sleep(time.Duration(a.cfgLoadBalancing.OnLockErrorTimeOutMs) * time.Millisecond)
