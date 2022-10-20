@@ -1,107 +1,42 @@
 package rest
 
 import (
-	"fmt"
+	"context"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
 	"gitlab.qredo.com/custody-engine/automated-approver/config"
 	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
 )
 
+var rMutex *redsync.Mutex
+var rCtx = context.Background()
+
 type handler struct {
-	core      lib.SigningAgentClient
-	cfg       config.Config
-	log       *zap.SugaredLogger
-	version   *version.Version
-	websocket api.WebsocketStatus
-	redis     *redis.Client
-	rsync     *redsync.Redsync
+	core  lib.SigningAgentClient
+	cfg   config.Config
+	log   *zap.SugaredLogger
+	redis *redis.Client
+	rsync *redsync.Redsync
 }
 
-func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.SugaredLogger,
-	version *version.Version, redis *redis.Client, rsync *redsync.Redsync) *handler {
-
-	localFeedUrl := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix)
-	remoteFeedUrl := genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme)
+func NewHandler(core lib.SigningAgentClient, config *config.Config, log *zap.SugaredLogger, redis *redis.Client, rsync *redsync.Redsync) *handler {
 
 	h := &handler{
-		core:      core,
-		cfg:       *config,
-		log:       log,
-		version:   version,
-		websocket: api.NewWebsocketStatus(defs.ConnectionState.Closed, remoteFeedUrl, localFeedUrl, 0),
-		redis:     redis,
-		rsync:     rsync,
+		core:  core,
+		cfg:   *config,
+		log:   log,
+		redis: redis,
+		rsync: rsync,
 	}
 
 	return h
-}
-
-// genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
-func genWSQredoCoreClientFeedURL(config_base *config.Base, ws_scheme string) string {
-	builder := strings.Builder{}
-	builder.WriteString(ws_scheme)
-	builder.WriteString("://")
-	builder.WriteString(config_base.QredoAPIDomain)
-	builder.WriteString(config_base.QredoAPIBasePath)
-	builder.WriteString("/coreclient/feed")
-	return builder.String()
-}
-
-func (h *handler) UpdateWebsocketStatus(status string) {
-	h.websocket.ReadyState = status
-}
-
-func (h *handler) GetWSQredoCoreClientFeedURL() string {
-	return h.websocket.RemoteFeedUrl
-}
-
-// HealthCheckVersion
-//
-// swagger:route GET /healthcheck/version
-//
-// Check application version.
-func (h *handler) HealthCheckVersion(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
-	response := h.version
-	return response, nil
-}
-
-// HealthCheckConfig
-//
-// swagger:route GET /healthcheck/config
-//
-// Check application version.
-func (h *handler) HealthCheckConfig(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
-	response := h.cfg
-	return response, nil
-}
-
-// HealthCheckStatus
-//
-// swagger:route GET /healthcheck/status
-//
-// Check application status.
-func (h *handler) HealthCheckStatus(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
-
-	response := api.HealthCheckStatusResponse{
-		WebsocketStatus: h.websocket,
-	}
-	return response, nil
 }
 
 // ClientsList
@@ -161,93 +96,4 @@ func (h *handler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r 
 		return nil, defs.ErrBadRequest().WithDetail("actionID")
 	}
 	return nil, h.core.ActionReject(actionID)
-}
-
-// AutoApprovalFunction
-func (h *handler) AutoApproval() error {
-	// enable auto-approval only if configured
-	if !h.cfg.AutoApprove.Enabled {
-		h.log.Debug("Auto-approval feature not enabled in config")
-		return nil
-	}
-
-	h.log.Debug("Handler for Auto-approval background job")
-	go AutoApproveHandler(h)
-
-	return nil
-}
-
-// ClientFeed
-//
-// swagger:route POST /client/feed  ClientFeed
-//
-// Get approval requests Feed (via websocket) from Qredo Backend
-func (h *handler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	h.log.Debug("Handler for ClientFeed endpoint")
-	WebSocketFeedHandler(h, w, r)
-	return nil, nil
-}
-
-// ClientFullRegister
-//
-// swagger:route POST /client/register ClientFullRegister
-//
-// Client registration process (3 steps in one)
-//
-// Responses:
-//
-//	200: ClientRegisterFinishResponse
-func (h *handler) ClientFullRegister(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	h.log.Debug("Handler for ClientFullRegister endpoint")
-
-	w.Header().Set("Content-Type", "application/json")
-
-	if h.core.GetSystemAgentID() != "" {
-		return nil, defs.ErrBadRequest().WithDetail("AgentID already exist. You can not set new one.")
-	}
-	response := api.ClientFullRegisterResponse{}
-	cRegReq := &api.ClientRegisterRequest{}
-	err := util.DecodeRequest(cRegReq, r)
-	if err != nil {
-		return nil, err
-	}
-	if err := cRegReq.Validate(); err != nil {
-		return nil, defs.ErrBadRequest().WithDetail(err.Error())
-	}
-	registerResults, err := h.core.ClientRegister(cRegReq.Name) // we get bls, ec publicks keys
-	if err != nil {
-		return nil, err
-	}
-
-	reqDataInit := &api.QredoRegisterInitRequest{
-		Name:         cRegReq.Name,
-		BLSPublicKey: registerResults.BLSPublicKey,
-		ECPublicKey:  registerResults.ECPublicKey,
-	}
-
-	initResults, err := h.core.ClientInit(reqDataInit, registerResults.RefID, cRegReq.APIKey, cRegReq.Base64PrivateKey)
-	if err != nil {
-		return response, err
-	}
-
-	response.AgentID = initResults.AccountCode
-	reqDataFinish := &api.ClientRegisterFinishRequest{}
-	copier.Copy(&reqDataFinish, &initResults) // initResults contain only one field more - timestamp
-	_, err = h.core.ClientRegisterFinish(reqDataFinish, registerResults.RefID)
-	if err != nil {
-		return response, err
-	}
-
-	err = h.core.SetSystemAgentID(initResults.AccountCode)
-	if err != nil {
-		h.log.Errorf("Could not set AgentID to Storage: %s", err)
-	}
-
-	// return local feedUrl for request approvals
-	response.FeedURL = h.websocket.LocalFeedUrl
-
-	// also enable auto-approval of requests
-	h.AutoApproval()
-
-	return response, nil
 }

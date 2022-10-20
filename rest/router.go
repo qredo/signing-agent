@@ -89,7 +89,7 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	rt := &Router{
 		log:                 log,
 		config:              config,
-		handler:             NewHandler(core, config, log, version, rds, rs),
+		handler:             NewHandler(core, config, log, rds, rs),
 		middleware:          NewMiddleware(log, config.HTTP.LogAllRequests),
 		version:             version,
 		signingAgentHandler: signingAgentHandler,
@@ -99,6 +99,17 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 	rt.router = rt.SetHandlers()
 
 	return rt, nil
+}
+
+// genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
+func genWSQredoCoreClientFeedURL(config_base *config.Base, ws_scheme string) string {
+	builder := strings.Builder{}
+	builder.WriteString(ws_scheme)
+	builder.WriteString("://")
+	builder.WriteString(config_base.QredoAPIDomain)
+	builder.WriteString(config_base.QredoAPIBasePath)
+	builder.WriteString("/coreclient/feed")
+	return builder.String()
 }
 
 // SetHandlers set all handlers
