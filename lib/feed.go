@@ -4,11 +4,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/websocket"
-	"github.com/pkg/errors"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
 )
 
 const WsTimeout = time.Second * 60

@@ -7,11 +7,12 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
 	"go.uber.org/goleak"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 func TestWebsocketSource_Connect_retries_on_fail_to_get__ZKPOnePass(t *testing.T) {

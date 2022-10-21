@@ -3,8 +3,9 @@ package hub
 import (
 	"sync"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
 	"go.uber.org/zap"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
 )
 
 // FeedHub maintains the set of active clients

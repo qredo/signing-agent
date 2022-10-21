@@ -46,7 +46,7 @@ RUN echo Building Milagro Crypt C library && \
 ARG BUILD_TYPE
 ARG BUILD_DATE
 
-ENV PROJECT_PATH=/src/gitlab.qredo.com/custody-engine/automated-approver
+ENV PROJECT_PATH=/src/gitlab.qredo.com/computational-custodian/signing-agent
 
 COPY . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
@@ -57,6 +57,6 @@ RUN CGO_ENABLED=1 \
     GO111MODULES=on \
     go build \
       -o sa-cli \
-      gitlab.qredo.com/custody-engine/automated-approver/cmd/sa-cli
+      gitlab.qredo.com/computational-custodian/signing-agent/cmd/sa-cli
 
 CMD ["./sa-cli", "help"]

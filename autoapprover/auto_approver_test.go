@@ -10,10 +10,10 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/test-go/testify/assert"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/hub"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
+	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 	"go.uber.org/goleak"
 )
 

@@ -6,13 +6,13 @@ import (
 	"os/signal"
 	"time"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/rest"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"github.com/jessevdk/go-flags"
 	"go.uber.org/zap"
 
-	"github.com/jessevdk/go-flags"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 var (

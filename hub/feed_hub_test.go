@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
 	"go.uber.org/goleak"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 type mockSourceConnection struct {

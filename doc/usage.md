@@ -27,7 +27,7 @@ store:
     vault: ocid1.vault....
     secret_encryption_key: ocid1.key....
     compartment: ocid1.tenancy....
-    config_secret: automated_approver_config
+    config_secret: signing_agent_config
   ...
 ```
 
@@ -88,7 +88,7 @@ autonumber
 
 All the data above is currently stored on premises in a file by the signing-agent-service, and since some of it (ClientSecret, EC & BLS private keys) is quite sensitive it needs to be running in a secure environment.
 
-**Note:** an always up to date API documentation can be accessed within the (private) [Gitlab repo](https://gitlab.qredo.com/custody-engine/signing-agent/-/blob/master/doc/swagger/swagger.yaml).
+**Note:** an always up to date API documentation can be accessed within the (private) [Gitlab repo](https://gitlab.qredo.com/computational-custodian/signing-agent/-/blob/master/doc/swagger/swagger.yaml).
 
 ## API
 

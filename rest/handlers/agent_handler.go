@@ -5,15 +5,16 @@ import (
 	"sync"
 
 	"github.com/jinzhu/copier"
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-	"gitlab.qredo.com/custody-engine/automated-approver/autoapprover"
-	"gitlab.qredo.com/custody-engine/automated-approver/clientfeed"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	"gitlab.qredo.com/custody-engine/automated-approver/hub"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
 	"go.uber.org/zap"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/api"
+	"gitlab.qredo.com/computational-custodian/signing-agent/autoapprover"
+	"gitlab.qredo.com/computational-custodian/signing-agent/clientfeed"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
+	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 type newClientFeedFunc func(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister clientfeed.UnregisterFunc, config *config.WebSocketConf) clientfeed.ClientFeed

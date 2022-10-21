@@ -1,6 +1,6 @@
 package lib
 
-import "gitlab.qredo.com/custody-engine/automated-approver/api"
+import "gitlab.qredo.com/computational-custodian/signing-agent/api"
 
 type MockSigningAgentClient struct {
 	GetSystemAgentIDCalled     bool

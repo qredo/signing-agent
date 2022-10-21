@@ -8,17 +8,13 @@ import (
 	"strings"
 
 	"github.com/btcsuite/btcd/btcec"
-
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/google/uuid"
-
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
-
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-
-	"gitlab.qredo.com/custody-engine/automated-approver/crypto"
-	defs "gitlab.qredo.com/custody-engine/automated-approver/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/api"
+	"gitlab.qredo.com/computational-custodian/signing-agent/crypto"
+	defs "gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 func (h *signingAgent) ClientRegister(name string) (*api.ClientRegisterResponse, error) {

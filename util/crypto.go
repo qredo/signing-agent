@@ -6,7 +6,8 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/custody-engine/automated-approver/crypto"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/crypto"
 )
 
 const (

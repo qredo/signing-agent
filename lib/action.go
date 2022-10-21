@@ -4,13 +4,11 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-
 	"github.com/pkg/errors"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
-
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/api"
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 func (h *signingAgent) ActionApprove(actionID string) error {

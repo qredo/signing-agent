@@ -9,23 +9,20 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
-
-	"github.com/pkg/errors"
-	"gitlab.qredo.com/custody-engine/automated-approver/autoapprover"
-	"gitlab.qredo.com/custody-engine/automated-approver/hub"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
-
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-
 	"github.com/gorilla/context"
 	"github.com/gorilla/handlers"
-
 	"github.com/gorilla/mux"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	rest_handlers "gitlab.qredo.com/custody-engine/automated-approver/rest/handlers"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/autoapprover"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
+	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	rest_handlers "gitlab.qredo.com/computational-custodian/signing-agent/rest/handlers"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 const (

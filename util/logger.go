@@ -1,8 +1,9 @@
 package util
 
 import (
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
 	"go.uber.org/zap"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
 )
 
 func NewLogger(cfg *config.Logging) *zap.SugaredLogger {

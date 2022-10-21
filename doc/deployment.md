@@ -65,8 +65,8 @@ Start the service using the command:
 
 ```docker-compose -f {project_dir}/dockerfiles/load-balancing/docker-compose.yml up aa nginx```
 
-This prepares NGINX and automated-approver images.
-NGINX uses the **nginx.conf** file to specify and rotate the requests between automated-approver running instances, where **worker_connections** represents the max concurrent connections the load balancer can handle.
+This prepares NGINX and signing-agent images.
+NGINX uses the **nginx.conf** file to specify and rotate the requests between signing-agent running instances, where **worker_connections** represents the max concurrent connections the load balancer can handle.
 
 ### Stop the load balancer
 

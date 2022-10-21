@@ -2,19 +2,20 @@ package e2e_test
 
 import (
 	"fmt"
-	"github.com/gavv/httpexpect"
-	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
+	"github.com/gavv/httpexpect"
+	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/api"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
 )
 
 const (

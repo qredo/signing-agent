@@ -12,8 +12,8 @@ websocket:
   reconnect_timeout_sec: 300
   reconnect_interval_sec: 5
   ping_period_sec: 5
-	pong_wait_sec: 10
-	write_wait_sec: 10
+  pong_wait_sec: 10
+  write_wait_sec: 10
   read_buffer_size: 512
   write_buffer_size: 1024
 http:
@@ -40,7 +40,7 @@ store:
     compartment: ocid1.tenancy.oc1...
     vault: ocid1.vault.oc1...
     secret_encryption_key: ocid1.key.oc1...
-    config_secret: automated_approver_config
+    config_secret: signing_agent_config
   aws:
     region: aws-region-...
     config_secret: secrets_manager_secret...

@@ -16,10 +16,11 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/api"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 type SaCli struct {
