@@ -15,14 +15,14 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/custody-engine/signing-agent/autoapprover"
-	"gitlab.qredo.com/custody-engine/signing-agent/config"
-	"gitlab.qredo.com/custody-engine/signing-agent/defs"
-	"gitlab.qredo.com/custody-engine/signing-agent/hub"
-	"gitlab.qredo.com/custody-engine/signing-agent/lib"
-	rest_handlers "gitlab.qredo.com/custody-engine/signing-agent/rest/handlers"
-	"gitlab.qredo.com/custody-engine/signing-agent/rest/version"
-	"gitlab.qredo.com/custody-engine/signing-agent/util"
+	"gitlab.qredo.com/computational-custodian/signing-agent/autoapprover"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
+	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	rest_handlers "gitlab.qredo.com/computational-custodian/signing-agent/rest/handlers"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 const (

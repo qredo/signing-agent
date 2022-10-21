@@ -52,7 +52,7 @@ ARG BUILD_VERSION
 ARG BUILD_COMMIT
 ARG GIT_TOKEN
 
-ENV PROJECT_PATH=/src/gitlab.qredo.com/custody-engine/signing-agent
+ENV PROJECT_PATH=/src/gitlab.qredo.com/computational-custodian/signing-agent
 
 ADD . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
@@ -61,11 +61,11 @@ RUN CGO_ENABLED=1 \
     GO111MODULES=on \
     go build \
       -tags debug \
-      -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/custody-engine/signing-agent/service.buildDate=$BUILD_DATE' \
-                                                            -X 'gitlab.qredo.com/custody-engine/signing-agent/service.commit=$BUILD_COMMIT' \
-                                                            -X 'gitlab.qredo.com/custody-engine/signing-agent/service.version=$BUILD_VERSION'" \
+      -ldflags "-w -linkmode external -extldflags '-static' -X 'gitlab.qredo.com/computational-custodian/signing-agent/service.buildDate=$BUILD_DATE' \
+                                                            -X 'gitlab.qredo.com/computational-custodian/signing-agent/service.commit=$BUILD_COMMIT' \
+                                                            -X 'gitlab.qredo.com/computational-custodian/signing-agent/service.version=$BUILD_VERSION'" \
       -o signing-agent \
-      gitlab.qredo.com/custody-engine/signing-agent/cmd/service
+      gitlab.qredo.com/computational-custodian/signing-agent/cmd/service
 
 RUN useradd appuser
 USER appuser

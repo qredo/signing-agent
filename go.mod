@@ -1,4 +1,4 @@
-module gitlab.qredo.com/custody-engine/signing-agent
+module gitlab.qredo.com/computational-custodian/signing-agent
 
 go 1.19
 

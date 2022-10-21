@@ -12,8 +12,8 @@ import (
 	"github.com/test-go/testify/assert"
 	"github.com/test-go/testify/require"
 
-	"gitlab.qredo.com/custody-engine/signing-agent/config"
-	"gitlab.qredo.com/custody-engine/signing-agent/util"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 func createOciConfig() *config.Config {

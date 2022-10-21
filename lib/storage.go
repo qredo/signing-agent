@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"gitlab.qredo.com/custody-engine/signing-agent/defs"
-	"gitlab.qredo.com/custody-engine/signing-agent/util"
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 var agentIDString = "AgentID"

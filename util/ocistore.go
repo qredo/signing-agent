@@ -13,8 +13,8 @@ import (
 	"github.com/oracle/oci-go-sdk/v65/vault"
 	"github.com/pkg/errors"
 
-	"gitlab.qredo.com/custody-engine/signing-agent/config"
-	"gitlab.qredo.com/custody-engine/signing-agent/defs"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
 )
 
 /*

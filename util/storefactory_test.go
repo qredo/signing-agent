@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/require"
 
-	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
 )
 
 func Test_StoreFactory_CreateStore_Creates_file_store(t *testing.T) {

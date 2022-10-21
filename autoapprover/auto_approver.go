@@ -10,11 +10,11 @@ import (
 	"errors"
 	"time"
 
-	"gitlab.qredo.com/custody-engine/signing-agent/config"
-	"gitlab.qredo.com/custody-engine/signing-agent/hub"
-	"gitlab.qredo.com/custody-engine/signing-agent/lib"
-
 	"go.uber.org/zap"
+
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
+	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
 )
 
 var defaultCtx = context.Background()

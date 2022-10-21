@@ -12,10 +12,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/custody-engine/signing-agent/api"
-	"gitlab.qredo.com/custody-engine/signing-agent/config"
-	"gitlab.qredo.com/custody-engine/signing-agent/rest"
-	"gitlab.qredo.com/custody-engine/signing-agent/rest/version"
+	"gitlab.qredo.com/computational-custodian/signing-agent/api"
+	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest"
+	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
 )
 
 const (

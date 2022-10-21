@@ -79,7 +79,7 @@ local_cli_build() {
   go mod tidy
   go build \
       -o sa-cli \
-      gitlab.qredo.com/custody-engine/signing-agent/cmd/sa-cli
+      gitlab.qredo.com/computational-custodian/signing-agent/cmd/sa-cli
 }
 
 # Build a the Go binary to run in the local environment
@@ -91,7 +91,7 @@ local_build() {
                 -X 'main.buildVersion=$BUILD_VERSION' \
                 -X 'main.buildType=$BUILD_TYPE'" \
       -o out/signing-agent \
-      gitlab.qredo.com/custody-engine/signing-agent/cmd/service
+      gitlab.qredo.com/computational-custodian/signing-agent/cmd/service
 }
 
 if [ -n "$1" ]; then

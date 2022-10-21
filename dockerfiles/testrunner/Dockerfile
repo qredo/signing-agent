@@ -46,6 +46,6 @@ RUN echo Building Milagro Crypt C library && \
 ARG BUILD_TYPE
 ARG BUILD_DATE
 
-ENV PROJECT_PATH=/src/gitlab.qredo.com/custody-engine/signing-agent
+ENV PROJECT_PATH=/src/gitlab.qredo.com/computational-custodian/signing-agent
 
 WORKDIR $PROJECT_PATH
