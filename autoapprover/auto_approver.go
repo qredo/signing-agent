@@ -10,9 +10,9 @@ import (
 	"errors"
 	"time"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/hub"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/hub"
+	"gitlab.qredo.com/custody-engine/signing-agent/lib"
 
 	"go.uber.org/zap"
 )

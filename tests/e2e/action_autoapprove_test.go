@@ -22,8 +22,8 @@ import (
 	"github.com/gavv/httpexpect"
 	"github.com/stretchr/testify/assert"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest"
+	"gitlab.qredo.com/custody-engine/signing-agent/api"
+	"gitlab.qredo.com/custody-engine/signing-agent/rest"
 )
 
 const (

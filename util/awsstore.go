@@ -3,16 +3,16 @@ package util
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"sync"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"github.com/pkg/errors"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
 )
 
 // SecretNotInitialised is used to identify an uninitialised AWS secret.

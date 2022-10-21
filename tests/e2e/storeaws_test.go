@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/util"
 )
 
 func createAWSConfig() *config.Config {

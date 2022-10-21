@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
 )
 
 func NewFileStore(fileName string) KVStore {

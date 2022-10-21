@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"gitlab.qredo.com/custody-engine/signing-agent/api"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/util"
 )
 
 type SigningAgentClient interface {

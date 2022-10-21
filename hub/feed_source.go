@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
 	"go.uber.org/zap"
+
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
+	"gitlab.qredo.com/custody-engine/signing-agent/lib"
 )
 
 // Source has an underlying websocket connection used to receive messages. It will send these messages to an outbound channel

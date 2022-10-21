@@ -2,10 +2,12 @@ package lib
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/util"
 )
 
 // mock the serve function

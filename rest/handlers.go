@@ -10,9 +10,9 @@ import (
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
+	"gitlab.qredo.com/custody-engine/signing-agent/lib"
 )
 
 var rMutex *redsync.Mutex

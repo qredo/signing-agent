@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/rest/version"
+
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/rest/version"
 )
 
 type mockSourceStats struct {

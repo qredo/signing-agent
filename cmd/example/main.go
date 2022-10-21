@@ -12,12 +12,12 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/api"
+	"gitlab.qredo.com/custody-engine/signing-agent/api"
 
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/lib"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/lib"
+	"gitlab.qredo.com/custody-engine/signing-agent/util"
 )
 
 // Fill in you partner api key and public key pem here

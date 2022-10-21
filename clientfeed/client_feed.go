@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	"gitlab.qredo.com/custody-engine/automated-approver/hub"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
+	"gitlab.qredo.com/custody-engine/signing-agent/hub"
 	"go.uber.org/zap"
 )
 

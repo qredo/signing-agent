@@ -8,10 +8,10 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-	"gitlab.qredo.com/custody-engine/automated-approver/hub"
-	"gitlab.qredo.com/custody-engine/automated-approver/util"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
+	"gitlab.qredo.com/custody-engine/signing-agent/hub"
+	"gitlab.qredo.com/custody-engine/signing-agent/util"
 	"go.uber.org/goleak"
 )
 

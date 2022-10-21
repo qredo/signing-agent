@@ -5,9 +5,9 @@ import (
 	"io"
 	"net/http"
 
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
-
 	"github.com/go-playground/validator/v10"
+
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
 )
 
 func DecodeRequest(req interface{}, hr *http.Request) error {

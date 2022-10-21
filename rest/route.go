@@ -6,7 +6,8 @@ import (
 
 	"github.com/gorilla/context"
 	"github.com/pkg/errors"
-	"gitlab.qredo.com/custody-engine/automated-approver/defs"
+
+	"gitlab.qredo.com/custody-engine/signing-agent/defs"
 )
 
 func WrapPathPrefix(uri string) string {

@@ -1,7 +1,7 @@
 package util
 
 import (
-	"gitlab.qredo.com/custody-engine/automated-approver/config"
+	"gitlab.qredo.com/custody-engine/signing-agent/config"
 )
 
 func CreateStore(cfg *config.Config) KVStore {
