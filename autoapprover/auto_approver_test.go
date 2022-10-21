@@ -106,65 +106,6 @@ func TestAutoApprover_shouldHandleAction_gets_mutex(t *testing.T) {
 	assert.NotNil(t, sut.mutex)
 }
 
-func TestAutoApprover_handleAction_lock_error(t *testing.T) {
-	//Arrange
-	mutexMock := &mockMutex{
-		NextLockError: errors.New("some lock error"),
-	}
-
-	sut := &AutoApprover{
-		cfgLoadBalancing: &config.LoadBalancing{
-			Enable: true,
-		},
-		mutex: mutexMock,
-	}
-
-	//Act
-	err := sut.handleAction(nil)
-
-	//Assert
-	assert.NotNil(t, err)
-	assert.Contains(t, "some lock error", err.Error())
-	assert.True(t, mutexMock.LockCalled)
-}
-
-func TestAutoApprover_handleAction_unlock_error(t *testing.T) {
-	//Arrange
-	stringCmd := redis.NewStringCmd(context.Background())
-	stringCmd.SetErr(errors.New("some error"))
-	cacheMock := &mockCache{
-		NextStringCmd: stringCmd,
-	}
-	mutexMock := &mockMutex{
-		NextLock:        true,
-		NextUnlockError: errors.New("some unlock error"),
-	}
-
-	sut := &AutoApprover{
-		log: util.NewTestLogger(),
-		cfgLoadBalancing: &config.LoadBalancing{
-			Enable: true,
-		},
-		cfgAutoApproval: &config.AutoApprove{},
-		cache:           cacheMock,
-		mutex:           mutexMock,
-		core:            &lib.MockSigningAgentClient{},
-	}
-
-	//Act
-	err := sut.handleAction(&actionInfo{
-		ID:         "some action id",
-		ExpireTime: time.Now().Add(time.Minute).Unix(),
-	})
-
-	//Assert
-	assert.Nil(t, err)
-	assert.True(t, cacheMock.SetCalled)
-	assert.Equal(t, "some action id", cacheMock.LastKey)
-	assert.Equal(t, 1, cacheMock.LastValue)
-	assert.True(t, mutexMock.UnlockCalled)
-}
-
 func TestAutoApprover_approveAction_times_out(t *testing.T) {
 	//Arrange
 	coreMock := &lib.MockSigningAgentClient{

@@ -2,7 +2,6 @@ package util
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"sync"
 
@@ -28,7 +27,7 @@ func (s *FileStore) Init() error {
 	s.Lock()
 	defer s.Unlock()
 
-	b, err := ioutil.ReadFile(s.fileName)
+	b, err := os.ReadFile(s.fileName)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return s.save()
@@ -51,7 +50,7 @@ func (s *FileStore) save() error {
 		return err
 	}
 
-	return ioutil.WriteFile(s.fileName, b, 0600)
+	return os.WriteFile(s.fileName, b, 0600)
 }
 
 func (s *FileStore) Get(key string) ([]byte, error) {

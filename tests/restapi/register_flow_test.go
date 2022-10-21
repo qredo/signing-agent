@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -90,8 +89,7 @@ func serverMockQB(QredoAPIBasePath string) *httptest.Server {
 }
 
 func mockQBClientInit(w http.ResponseWriter, r *http.Request) {
-	var statusCode int
-	statusCode = http.StatusOK
+	statusCode := http.StatusOK
 
 	fixtureFile, err := os.Open(FixturePathRegisterClientInitResponse)
 	if err != nil {
@@ -105,26 +103,7 @@ func mockQBClientInit(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(statusCode)
-	w.Write(dataFromFixture)
-}
-
-func mockQBClientRegisterConfirmation(w http.ResponseWriter, r *http.Request) {
-	var statusCode int
-	statusCode = http.StatusOK
-
-	fixtureFile, err := os.Open(FixturePathRegisterClientInitResponse)
-	if err != nil {
-		panic("Can't get fixtured ClientInit response file.")
-	}
-
-	dataFromFixture, err := io.ReadAll(fixtureFile)
-	if err != nil {
-		panic("Can't get fixtured ClientInit response content.")
-	}
-
-	w.Header().Add("content-type", "application/json")
-	w.WriteHeader(statusCode)
-	w.Write(dataFromFixture)
+	_, _ = w.Write(dataFromFixture)
 }
 
 func mockQBClientInitFinish(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +115,7 @@ func mockQBClientInitFinish(w http.ResponseWriter, r *http.Request) {
 	dataJSON, _ := json.Marshal(response)
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(statusCode)
-	w.Write(dataJSON)
+	_, _ = w.Write(dataJSON)
 }
 
 func mockQBClientFeed(w http.ResponseWriter, r *http.Request) {
@@ -147,7 +126,7 @@ func mockQBClientFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ws, _ := upgrader.Upgrade(w, r, nil)
-	ws.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
+	_ = ws.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
 	_ = ws.WriteMessage(websocket.TextMessage, []byte(`{"id": "Action if needed"}`))
 	w.WriteHeader(http.StatusSwitchingProtocols)
 }
@@ -177,7 +156,7 @@ func mockQBActionFeed(w http.ResponseWriter, r *http.Request) {
 
 	dataJSON, _ := json.Marshal(response)
 	w.Header().Add("content-type", "test/plain")
-	w.Write(dataJSON)
+	_, _ = w.Write(dataJSON)
 }
 
 // TestRestAPIs  mocks the http server and tests each of the endpoints.
@@ -186,7 +165,7 @@ func TestRestAPIs(t *testing.T) {
 	// key is compared with data in FixturePathRegisterClientInitResponse.
 	// defaults if not on the command line.
 	APIKey := "not a real key"
-	Base64PrivateKey, err := ioutil.ReadFile(TestBase64PrivateKeyFilePath)
+	Base64PrivateKey, err := os.ReadFile(TestBase64PrivateKeyFilePath)
 	assert.NoError(t, err)
 
 	cfg := testDefaultConf()

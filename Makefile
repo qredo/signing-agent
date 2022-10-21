@@ -35,3 +35,7 @@ update-packages:
 test-all:
 	@echo "running all tests"
 	go test ./... -v -count=1
+
+lint:
+	@echo "running lint"
+	golangci-lint run 

@@ -197,7 +197,7 @@ func WriteHTTPError(w http.ResponseWriter, r *http.Request, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(apiErr.Code())
-	w.Write(apiErr.JSON())
+	_, _ = w.Write(apiErr.JSON())
 }
 
 // FormatJSONResp encodes response as JSON and handle errors

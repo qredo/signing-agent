@@ -54,22 +54,3 @@ type mutex interface {
 	Lock() error
 	Unlock() (bool, error)
 }
-
-type mockMutex struct {
-	NextLockError   error
-	NextUnlockError error
-	NextLock        bool
-	LockCalled      bool
-	UnlockCalled    bool
-}
-
-func (m *mockMutex) Lock() error {
-	m.LockCalled = true
-	return m.NextLockError
-}
-
-func (m *mockMutex) Unlock() (bool, error) {
-	m.UnlockCalled = true
-
-	return m.NextLock, m.NextUnlockError
-}

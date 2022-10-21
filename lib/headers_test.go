@@ -41,7 +41,7 @@ func TestHeaders(t *testing.T) {
 				Body: []byte(`{"name": "Test Data"}`),
 			}
 			GenTimestamp(req)
-			DecodeBase64RSAKey(req, base64PrivateKey)
+			_ = DecodeBase64RSAKey(req, base64PrivateKey)
 			assert.NotEmpty(t, req.RsaKey)
 			// make the signature
 			assert.Empty(t, req.Signature)

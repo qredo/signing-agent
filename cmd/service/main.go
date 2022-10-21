@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/jessevdk/go-flags"
-	"go.uber.org/zap"
 
 	"gitlab.qredo.com/computational-custodian/signing-agent/config"
 	"gitlab.qredo.com/computational-custodian/signing-agent/rest"
@@ -107,35 +106,6 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-func logger(cfg *config.Logging) *zap.SugaredLogger {
-	var logConfig zap.Config
-
-	switch cfg.Format {
-	case "text":
-		logConfig = zap.NewDevelopmentConfig()
-	case "json":
-		fallthrough
-	default:
-		logConfig = zap.NewProductionConfig()
-	}
-
-	switch cfg.Level {
-	case "info":
-		logConfig.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
-	case "warn":
-		logConfig.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
-	case "error":
-		logConfig.Level = zap.NewAtomicLevelAt(zap.ErrorLevel)
-	default:
-		logConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-	}
-
-	logConfig.DisableStacktrace = true
-	l, _ := logConfig.Build()
-
-	return l.Sugar()
 }
 
 func setCtrlC(router *rest.Router) {

@@ -135,13 +135,13 @@ func TestRegisterExistingAgentDeny(t *testing.T) {
 	}
 
 	// a new client
-	registrationResponse := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
+	e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
 		WithJSON(payload).
 		Expect().
 		Status(http.StatusOK).JSON()
 
 	// registering again should result in an error
-	registrationResponse = e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
+	registrationResponse := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
 		WithJSON(payload).
 		Expect().
 		Status(http.StatusBadRequest).JSON()

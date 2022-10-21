@@ -23,7 +23,6 @@ import (
 // Fill in you partner api key and public key pem here
 const partnerAPIKey = ""
 const rsaPrivateKey = ``
-const qredoURL = "https://qa-api.qredo.net"
 
 type qredoRegisterInitRequest struct {
 	Name         string `json:"name"`

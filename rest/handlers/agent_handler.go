@@ -179,7 +179,11 @@ func (h *SigningAgentHandler) initRegistration(register *api.ClientRegisterRespo
 
 func (h *SigningAgentHandler) finishRegistration(initResults *api.QredoRegisterInitResponse, refId string) error {
 	reqDataFinish := &api.ClientRegisterFinishRequest{}
-	copier.Copy(&reqDataFinish, &initResults) // initResults contains only one extra field, timestamp
+
+	// initResults contains only one extra field, timestamp
+	if err := copier.Copy(&reqDataFinish, &initResults); err != nil {
+		return err
+	}
 
 	if _, err := h.core.ClientRegisterFinish(reqDataFinish, refId); err != nil {
 		h.log.Debugf("error while finishing client registration, %v", err)

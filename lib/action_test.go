@@ -3,7 +3,7 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -22,7 +22,6 @@ const (
 func popMockHttpResponse(alist []*http.Response) *http.Response {
 	f := len(alist)
 	rv := (alist)[f-1]
-	alist = (alist)[:f-1]
 	return rv
 }
 
@@ -62,8 +61,8 @@ func TestAction(t *testing.T) {
 	assert.NoError(t, err)
 	err = json.Unmarshal(data, agent)
 	assert.NoError(t, err)
-	core.store.AddAgent(accountCode, agent)
-	core.store.SetSystemAgentID(accountCode)
+	_ = core.store.AddAgent(accountCode, agent)
+	_ = core.store.SetSystemAgentID(accountCode)
 
 	t.Run(
 		"ActionApprove",
@@ -72,7 +71,7 @@ func TestAction(t *testing.T) {
 
 			dataFromFixture, err := os.Open(fixturePathActionApproveGetMessage)
 			assert.NoError(t, err)
-			body := ioutil.NopCloser(dataFromFixture)
+			body := io.NopCloser(dataFromFixture)
 
 			httpResponseMockGetActionMessages := &http.Response{
 				Status:     "200 OK",
@@ -82,7 +81,7 @@ func TestAction(t *testing.T) {
 			httpResponseMockPutActionApprove := &http.Response{
 				Status:     "200 OK",
 				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
+				Body:       io.NopCloser(bytes.NewReader([]byte(""))),
 			}
 			httpResponseList = append(httpResponseList, httpResponseMockPutActionApprove)
 			httpResponseList = append(httpResponseList, httpResponseMockGetActionMessages)
@@ -103,7 +102,7 @@ func TestAction(t *testing.T) {
 			var httpResponseList = []*http.Response{}
 
 			msg := []byte(`{"messages":[]}`)
-			body := ioutil.NopCloser(bytes.NewReader(msg))
+			body := io.NopCloser(bytes.NewReader(msg))
 			httpResponseMockGetActionMessages := &http.Response{
 				Status:     "200 OK",
 				StatusCode: 200,
@@ -111,7 +110,7 @@ func TestAction(t *testing.T) {
 			}
 			httpResponseMockPutActionApprove := &http.Response{
 				StatusCode: 400,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
+				Body:       io.NopCloser(bytes.NewReader([]byte(""))),
 			}
 			httpResponseList = append(httpResponseList, httpResponseMockPutActionApprove)
 			httpResponseList = append(httpResponseList, httpResponseMockGetActionMessages)
@@ -129,7 +128,7 @@ func TestAction(t *testing.T) {
 			var httpResponseList = []*http.Response{}
 
 			msg := []byte(`{"messages":["wrong message that is not a hex"]}`)
-			body := ioutil.NopCloser(bytes.NewReader(msg))
+			body := io.NopCloser(bytes.NewReader(msg))
 			httpResponseMockGetActionMessages := &http.Response{
 				Status:     "200 OK",
 				StatusCode: 200,
@@ -137,7 +136,7 @@ func TestAction(t *testing.T) {
 			}
 			httpResponseMockPutActionApprove := &http.Response{
 				StatusCode: 400,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
+				Body:       io.NopCloser(bytes.NewReader([]byte(""))),
 			}
 			httpResponseList = append(httpResponseList, httpResponseMockPutActionApprove)
 			httpResponseList = append(httpResponseList, httpResponseMockGetActionMessages)
@@ -156,7 +155,7 @@ func TestAction(t *testing.T) {
 				return &http.Response{
 					Status:     "200 OK",
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
 				}, nil
 			}
 			err = core.ActionReject(actionID)
