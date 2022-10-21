@@ -28,7 +28,7 @@ func TestStorage(t *testing.T) {
 			val := store.GetSystemAgentID()
 			assert.Equal(t, val, "")
 			agentID := "5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn"
-			store.SetSystemAgentID(agentID)
+			_ = store.SetSystemAgentID(agentID)
 
 			val = store.GetSystemAgentID()
 			assert.Equal(t, val, agentID)

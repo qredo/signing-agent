@@ -88,21 +88,24 @@ func (a *AutoApprover) shouldHandleAction(actionId string) bool {
 	return true
 }
 
-func (a *AutoApprover) handleAction(action *actionInfo) error {
+func (a *AutoApprover) handleAction(action *actionInfo) {
 	if a.cfgLoadBalancing.Enable {
 		if err := a.mutex.Lock(); err != nil {
 			time.Sleep(time.Duration(a.cfgLoadBalancing.OnLockErrorTimeOutMs) * time.Millisecond)
-			return err
+			a.log.Warnf("AutoApproval, mutex lock: %v action [%v]", err, action.ID)
+			return
 		}
 		defer func() {
 			if ok, err := a.mutex.Unlock(); !ok || err != nil {
-				a.log.Errorf("AutoApproval: %v action [%v]", err, action.ID)
+				a.log.Warnf("AutoApproval, mutex unlock: %v action [%v]", err, action.ID)
 			}
 			a.cache.Set(defaultCtx, action.ID, 1, time.Duration(a.cfgLoadBalancing.ActionIDExpirationSec)*time.Second)
 		}()
 	}
 
-	return a.approveAction(action.ID, action.AgentID)
+	if err := a.approveAction(action.ID, action.AgentID); err != nil {
+		a.log.Warnf("AutoApproval, approveAction: %v action [%v]", err, action.ID)
+	}
 }
 
 func (a *AutoApprover) approveAction(actionId, agentId string) error {

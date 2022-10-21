@@ -1,7 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -130,7 +130,7 @@ func (c *Config) Default() {
 
 // Load reads and parses yaml config.
 func (c *Config) Load(fileName string) error {
-	f, err := ioutil.ReadFile(fileName)
+	f, err := os.ReadFile(fileName)
 	if err != nil {
 		return errors.Wrap(err, "read config file")
 	}
@@ -149,5 +149,5 @@ func (c *Config) Save(fileName string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(fileName, b, 0600)
+	return os.WriteFile(fileName, b, 0600)
 }

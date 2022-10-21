@@ -107,7 +107,9 @@ func (s *OciStore) Set(key string, data []byte) error {
 		return err
 	}
 
-	s.setSecret(s.config_secret, secret_data)
+	if err := s.setSecret(s.config_secret, secret_data); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -141,7 +143,9 @@ func (s *OciStore) Del(key string) error {
 		return err
 	}
 
-	s.setSecret(s.config_secret, secret_data)
+	if err := s.setSecret(s.config_secret, secret_data); err != nil {
+		return err
+	}
 
 	return nil
 }

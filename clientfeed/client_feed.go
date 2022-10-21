@@ -77,7 +77,7 @@ func (c *clientFeedImpl) Start(wg *sync.WaitGroup) {
 	for {
 		select {
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(c.writeWait))
+			_ = c.conn.SetWriteDeadline(time.Now().Add(c.writeWait)) // result is always nil
 			if err := c.conn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(c.pingPeriod)); err != nil {
 				c.log.Errorf("ClientFeed - websocket PingMessage found broken pipe, terminating, err: %v", err)
 				c.readyState = defs.ConnectionState.Closed
@@ -117,12 +117,18 @@ func (c *clientFeedImpl) Listen() {
 
 func (c *clientFeedImpl) setHandlers() {
 	c.conn.SetPongHandler(func(message string) error {
-		c.conn.SetReadDeadline(time.Now().Add(c.pongWait))
+		if err := c.conn.SetReadDeadline(time.Now().Add(c.pongWait)); err != nil {
+			return err
+		}
+
 		return c.conn.WriteControl(websocket.PingMessage, []byte(message), time.Now().Add(c.writeWait))
 	})
 
 	c.conn.SetPingHandler(func(message string) error {
-		c.conn.SetWriteDeadline(time.Now().Add(c.pingPeriod))
+		if err := c.conn.SetWriteDeadline(time.Now().Add(c.pingPeriod)); err != nil {
+			return err
+		}
+
 		return c.conn.WriteControl(websocket.PongMessage, []byte(message), time.Now().Add(c.writeWait))
 	})
 }

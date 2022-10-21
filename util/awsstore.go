@@ -93,7 +93,9 @@ func (s *AWSStore) Set(key string, data []byte) error {
 		return err
 	}
 
-	s.setSecret(s.secretName, secretData)
+	if err := s.setSecret(s.secretName, secretData); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -128,7 +130,9 @@ func (s *AWSStore) Del(key string) error {
 		return err
 	}
 
-	s.setSecret(s.secretName, secretData)
+	if err := s.setSecret(s.secretName, secretData); err != nil {
+		return err
+	}
 
 	return nil
 }

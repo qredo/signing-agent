@@ -11,7 +11,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -304,7 +304,7 @@ func doBackEndCall(method string, path string, data *bytes.Buffer, respData inte
 	case nil:
 		return nil
 	default:
-		b, err := ioutil.ReadAll(resp.Body)
+		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("read response body: %v", err)
 		}

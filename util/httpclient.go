@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -71,7 +70,7 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 
 	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOK {
-		if b, err := ioutil.ReadAll(resp.Body); err == nil && len(b) > 0 {
+		if b, err := io.ReadAll(resp.Body); err == nil && len(b) > 0 {
 			return errors.Errorf("%v %v Status %v (%v) with body: %s", method, url, resp.StatusCode, resp.Status, b)
 		}
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
@@ -81,12 +80,12 @@ func (c *Client) Request(method string, url string, reqData interface{}, respDat
 	case nil:
 		return nil
 	case *[]byte:
-		_, err = ioutil.ReadAll(resp.Body)
+		_, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Wrap(err, "read response body")
 		}
 	default:
-		b, err := ioutil.ReadAll(resp.Body)
+		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Wrap(err, "read response body")
 		}
@@ -125,7 +124,7 @@ func (c *Client) RequestNoLog(method string, url string, reqData interface{}, re
 
 	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !statusOK {
-		if b, err := ioutil.ReadAll(resp.Body); err == nil && len(b) > 0 {
+		if b, err := io.ReadAll(resp.Body); err == nil && len(b) > 0 {
 			return errors.Errorf("%v %v Status %v (%v) with body: %s", method, url, resp.StatusCode, resp.Status, b)
 		}
 		return errors.Errorf("%v %v Status %v (%v)", method, url, resp.StatusCode, resp.Status)
@@ -135,12 +134,12 @@ func (c *Client) RequestNoLog(method string, url string, reqData interface{}, re
 	case nil:
 		return nil
 	case *[]byte:
-		_, err = ioutil.ReadAll(resp.Body)
+		_, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Wrap(err, "read response body")
 		}
 	default:
-		b, err := ioutil.ReadAll(resp.Body)
+		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Wrap(err, "read response body")
 		}

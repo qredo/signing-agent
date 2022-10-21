@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -34,7 +34,7 @@ type testCase struct {
 type testCases []testCase
 
 func setupTestCases(t *testing.T) testCases {
-	tcData, err := ioutil.ReadFile("testVectors/mpin_bls381.json")
+	tcData, err := os.ReadFile("testVectors/mpin_bls381.json")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -86,7 +86,7 @@ func TestClient(t *testing.T) {
 			util.GetDoMockHTTPClientFunc = func(*http.Request) (*http.Response, error) {
 				dataFromFixture, err := os.Open(FixturePathRegisterClientInitResponse)
 				assert.NoError(t, err)
-				body := ioutil.NopCloser(dataFromFixture)
+				body := io.NopCloser(dataFromFixture)
 
 				return &http.Response{
 					Status:     "200 OK",
@@ -118,7 +118,7 @@ func TestClient(t *testing.T) {
 				}
 
 				dataJSON, _ := json.Marshal(response)
-				body := ioutil.NopCloser(bytes.NewReader(dataJSON))
+				body := io.NopCloser(bytes.NewReader(dataJSON))
 
 				return &http.Response{
 					Status:     "200 OK",
@@ -128,7 +128,7 @@ func TestClient(t *testing.T) {
 
 			}
 			registerFinishRequest = &api.ClientRegisterFinishRequest{}
-			copier.Copy(&registerFinishRequest, &initResponse)
+			_ = copier.Copy(&registerFinishRequest, &initResponse)
 			registerFinishResponse, err = core.ClientRegisterFinish(registerFinishRequest, registerResponse.RefID)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, registerFinishResponse.FeedURL)
@@ -176,7 +176,7 @@ func TestClient(t *testing.T) {
 		"Agent - setting and getting",
 		func(t *testing.T) {
 			agentID := "BbCoiGKwPfc4DYWE6mE2zAEeuEowXLE8sk1Tc9TN8tos"
-			core.SetSystemAgentID(agentID)
+			_ = core.SetSystemAgentID(agentID)
 			assert.Equal(t, core.GetSystemAgentID(), agentID)
 
 			var agentsIDList []string
