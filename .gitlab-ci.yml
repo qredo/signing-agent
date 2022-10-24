@@ -31,7 +31,7 @@ lint:
     - amd64-eks
     - dev
   before_script:
-    - apk add jq
+    - . ./dockerfiles/testrunner/configure.sh
   script:
     - PROJECT_GO_VERSION=$(grep -m 1 "^go" go.mod | awk '{print $2}')
     - echo $PROJECT_GO_VERSION
