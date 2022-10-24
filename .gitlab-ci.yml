@@ -1,7 +1,7 @@
 stages:
   - internal_secret_detection
-  - unit-test
-  - e2e-test
+  - unit-e2e-test
+  - lint
   - docker
 
 include:
@@ -9,25 +9,39 @@ include:
     ref: master
     file: .gitlab-ci.yml
 
-Unit test:
-  stage: unit-test
-  image: golang:1.18.1
-  tags:
-    - amd64-eks
-    - dev
-  script:
-    - echo "Running Unit tests from /scripts/test_coverage.sh"
-    - sh scripts/test_coverage
-
 
 E2E test:
-  stage: e2e-test
+  stage: unit-e2e-test
   image: golang:1.18.1
   tags:
     - custody
   script:
     - echo "Running Unit tests from /scripts/e2e_test"
     - sh scripts/e2e_test
+    - echo "Running Unit tests from /scripts/test_coverage.sh"
+    - sh scripts/test_coverage
+
+lint:
+  stage: lint
+  allow_failure: true
+  image:
+    name: golangci/golangci-lint:v1.49.0-alpine
+    pull_policy: if-not-present
+  tags:
+    - amd64-eks
+    - dev
+  before_script:
+    - apk add jq
+  script:
+    - PROJECT_GO_VERSION=$(grep -m 1 "^go" go.mod | awk '{print $2}')
+    - echo $PROJECT_GO_VERSION
+    - go mod tidy -compat=$PROJECT_GO_VERSION
+    - golangci-lint run --out-format code-climate --timeout 1000s | tee gl-code-quality-aa-report.json | jq -r '.[] | "\(.location.path):\(.location.lines.begin) \(.description)"'
+  artifacts:
+    reports:
+      codequality: gl-code-quality-aa-report.json
+    paths:
+      - gl-code-quality-aa-report.json
 
 variables:
   KANIKO_VERSION: "debug"
@@ -47,10 +61,4 @@ Build docker images:
       --build-arg BUILD_TYPE="dev"
       --build-arg BUILD_DATE="$(date -u)"
       --dockerfile=dockerfiles/Dockerfile
-      --no-push
-      --destination=signing-agent
-      --tarPath=signing-agent-$(date +%F).tar
-  artifacts:
-    expire_in: 1 hour
-    paths:
-      - signing-agent-*.tar
+      --destination=$CI_REGISTRY/$CI_PROJECT_NAME:latest
