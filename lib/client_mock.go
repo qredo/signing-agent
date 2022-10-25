@@ -9,6 +9,8 @@ type MockSigningAgentClient struct {
 	ClientInitCalled           bool
 	ClientRegisterFinishCalled bool
 	ActionApproveCalled        bool
+	ClientsListCalled          bool
+	ActionRejectCalled         bool
 	Counter                    int
 	NextError                  error
 	NextClientInitError        error
@@ -26,6 +28,8 @@ type MockSigningAgentClient struct {
 	LastApiKey                 string
 	Last64PrivateKey           string
 	LastActionId               string
+	LastRejectActionId         string
+	NextClientsList            []string
 }
 
 func NewMockSigningAgentClient(agentId string) *MockSigningAgentClient {
@@ -56,17 +60,22 @@ func (m *MockSigningAgentClient) ClientRegisterFinish(req *api.ClientRegisterFin
 }
 
 func (m *MockSigningAgentClient) ClientsList() ([]string, error) {
-	return nil, nil
+	m.ClientsListCalled = true
+
+	return m.NextClientsList, nil
 }
 
 func (m *MockSigningAgentClient) ActionApprove(actionID string) error {
 	m.ActionApproveCalled = true
 	m.LastActionId = actionID
+	m.Counter++
 	return m.NextError
 }
 
 func (m *MockSigningAgentClient) ActionReject(actionID string) error {
-	return nil
+	m.ActionRejectCalled = true
+	m.LastRejectActionId = actionID
+	return m.NextError
 }
 
 func (m *MockSigningAgentClient) SetSystemAgentID(agetID string) error {

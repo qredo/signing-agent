@@ -5,7 +5,7 @@ go 1.19
 replace github.com/btcsuite/btcd => github.com/qredo/btcd v0.21.2
 
 require (
-	github.com/aws/aws-sdk-go v1.44.120
+	github.com/aws/aws-sdk-go v1.44.122
 	github.com/btcsuite/btcd v0.23.2
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/go-playground/validator/v10 v10.11.1

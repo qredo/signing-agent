@@ -14,12 +14,13 @@ type cache interface {
 }
 
 type mockCache struct {
-	GetCalled     bool
-	SetCalled     bool
-	LastKey       string
-	NextStringCmd *redis.StringCmd
-	NextStatusCmd *redis.StatusCmd
-	LastValue     interface{}
+	GetCalled      bool
+	SetCalled      bool
+	LastKey        string
+	NextStringCmd  *redis.StringCmd
+	NextStatusCmd  *redis.StatusCmd
+	LastValue      interface{}
+	LastExpiration time.Duration
 }
 
 func (m *mockCache) Get(ctx context.Context, key string) *redis.StringCmd {
@@ -31,6 +32,7 @@ func (m *mockCache) Set(ctx context.Context, key string, value interface{}, expi
 	m.SetCalled = true
 	m.LastKey = key
 	m.LastValue = value
+	m.LastExpiration = expiration
 	return m.NextStatusCmd
 }
 

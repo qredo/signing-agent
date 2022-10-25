@@ -39,7 +39,7 @@ type Router struct {
 	log                 *zap.SugaredLogger
 	config              *config.Config
 	router              http.Handler
-	handler             *handler
+	actionHandler       *rest_handlers.ActionHandler
 	middleware          *Middleware
 	version             *version.Version
 	signingAgentHandler *rest_handlers.SigningAgentHandler
@@ -65,48 +65,32 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 		return nil, errors.Wrap(err, "failed to initialise core")
 	}
 
-	rds := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", config.LoadBalancing.RedisConfig.Host, config.LoadBalancing.RedisConfig.Port),
-		Password: config.LoadBalancing.RedisConfig.Password,
-		DB:       config.LoadBalancing.RedisConfig.DB,
-	})
-	pool := goredis.NewPool(rds)
-	rs := redsync.New(pool)
-
 	serverConn := hub.NewWebsocketSource(hub.NewDefaultDialer(), genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme), log, core, &config.Websocket)
 	feedHub := hub.NewFeedHub(serverConn, log)
 
 	localFeed := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix)
-	autoApprover := autoapprover.NewAutoApprover(core, log, config, rds, rs)
-	upgrader := hub.NewDefaultUpgrader(config.Websocket.ReadBufferSize, config.Websocket.WriteBufferSize)
-	signingAgentHandler := rest_handlers.NewSigningAgentHandler(feedHub, core, log, config, autoApprover, upgrader, localFeed)
 
+	syncronizer := newActionSyncronizer(&config.LoadBalancing)
+	autoApprover := autoapprover.NewAutoApprover(core, log, config, syncronizer)
+	upgrader := hub.NewDefaultUpgrader(config.Websocket.ReadBufferSize, config.Websocket.WriteBufferSize)
+
+	signingAgentHandler := rest_handlers.NewSigningAgentHandler(feedHub, core, log, config, autoApprover, upgrader, localFeed)
 	healthCheckHandler := rest_handlers.NewHealthCheckHandler(serverConn, version, config, feedHub, localFeed)
+	actionHandler := rest_handlers.NewActionHandler(autoapprover.NewActionManager(core, syncronizer, log, config.LoadBalancing.Enable))
 
 	rt := &Router{
 		log:                 log,
 		config:              config,
-		handler:             NewHandler(core, config, log, rds, rs),
 		middleware:          NewMiddleware(log, config.HTTP.LogAllRequests),
 		version:             version,
 		signingAgentHandler: signingAgentHandler,
 		healthCheckHandler:  healthCheckHandler,
+		actionHandler:       actionHandler,
 	}
 
 	rt.router = rt.SetHandlers()
 
 	return rt, nil
-}
-
-// genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
-func genWSQredoCoreClientFeedURL(config_base *config.Base, ws_scheme string) string {
-	builder := strings.Builder{}
-	builder.WriteString(ws_scheme)
-	builder.WriteString("://")
-	builder.WriteString(config_base.QredoAPIDomain)
-	builder.WriteString(config_base.QredoAPIBasePath)
-	builder.WriteString("/coreclient/feed")
-	return builder.String()
 }
 
 // SetHandlers set all handlers
@@ -117,9 +101,9 @@ func (r *Router) SetHandlers() http.Handler {
 		{PathHealthCheckConfig, http.MethodGet, r.healthCheckHandler.HealthCheckConfig},
 		{PathHealthCheckStatus, http.MethodGet, r.healthCheckHandler.HealthCheckStatus},
 		{PathClientFullRegister, http.MethodPost, r.signingAgentHandler.RegisterAgent},
-		{PathClientsList, http.MethodGet, r.handler.ClientsList},
-		{PathAction, http.MethodPut, r.handler.ActionApprove},
-		{PathAction, http.MethodDelete, r.handler.ActionReject},
+		{PathClientsList, http.MethodGet, r.signingAgentHandler.ClientsList},
+		{PathAction, http.MethodPut, r.actionHandler.ActionApprove},
+		{PathAction, http.MethodDelete, r.actionHandler.ActionReject},
 		{PathClientFeed, defs.MethodWebsocket, r.signingAgentHandler.ClientFeed},
 	}
 
@@ -158,31 +142,6 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 	r.signingAgentHandler.StartAgent()
 
 	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
-}
-
-func (r *Router) setupCORS(h http.Handler) http.Handler {
-	cors := handlers.CORS(
-		handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
-		handlers.AllowedOrigins(r.config.HTTP.CORSAllowOrigins),
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD"}),
-		handlers.AllowCredentials(),
-	)
-	return cors(h)
-}
-
-func (r *Router) printRoutes(router *mux.Router) {
-	if err := router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-		if tpl, err := route.GetPathTemplate(); err == nil {
-			if met, err := route.GetMethods(); err == nil {
-				for _, m := range met {
-					r.log.Debugf("Registered handler %v %v", m, tpl)
-				}
-			}
-		}
-		return nil
-	}); err != nil {
-		panic(err)
-	}
 }
 
 // WriteHTTPError writes the error response as JSON
@@ -224,6 +183,55 @@ func FormatJSONResp(w http.ResponseWriter, r *http.Request, v interface{}, err e
 	w.Header().Set("Content-Type", "application/json")
 }
 
+// Stop closes the signing agent
 func (r *Router) Stop() {
 	r.signingAgentHandler.StopAgent()
+}
+
+func (r *Router) setupCORS(h http.Handler) http.Handler {
+	cors := handlers.CORS(
+		handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
+		handlers.AllowedOrigins(r.config.HTTP.CORSAllowOrigins),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD"}),
+		handlers.AllowCredentials(),
+	)
+	return cors(h)
+}
+
+func (r *Router) printRoutes(router *mux.Router) {
+	if err := router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		if tpl, err := route.GetPathTemplate(); err == nil {
+			if met, err := route.GetMethods(); err == nil {
+				for _, m := range met {
+					r.log.Debugf("Registered handler %v %v", m, tpl)
+				}
+			}
+		}
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+}
+
+// genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
+func genWSQredoCoreClientFeedURL(config_base *config.Base, ws_scheme string) string {
+	builder := strings.Builder{}
+	builder.WriteString(ws_scheme)
+	builder.WriteString("://")
+	builder.WriteString(config_base.QredoAPIDomain)
+	builder.WriteString(config_base.QredoAPIBasePath)
+	builder.WriteString("/coreclient/feed")
+	return builder.String()
+}
+
+func newActionSyncronizer(config *config.LoadBalancing) autoapprover.ActionSyncronizer {
+	rds := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", config.RedisConfig.Host, config.RedisConfig.Port),
+		Password: config.RedisConfig.Password,
+		DB:       config.RedisConfig.DB,
+	})
+	pool := goredis.NewPool(rds)
+	rs := redsync.New(pool)
+
+	return autoapprover.NewSyncronizer(config, rds, rs)
 }

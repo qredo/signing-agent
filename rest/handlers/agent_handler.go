@@ -77,7 +77,15 @@ func (h *SigningAgentHandler) StopAgent() {
 	h.log.Info("feed hub stopped")
 }
 
-// RegisterAgent handles the registration and starting of a new agent
+// RegisterAgent
+//
+// swagger:route POST /client/register RegisterAgent
+//
+// Client registration process (3 steps in one)
+//
+// Responses:
+//
+// 200: ClientFullRegisterResponse
 func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -93,7 +101,11 @@ func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.Respo
 	}
 }
 
-// ClientFeed provides a way to open a websocket connection to receive data send through the websocket connection with the Qredo back end
+// ClientFeed
+//
+// swagger:route POST /client/feed  ClientFeed
+//
+// Get approval requests Feed (via websocket) from Qredo Backend
 func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	hubRunning := h.feedHub.IsRunning()
 
@@ -115,6 +127,20 @@ func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.Response
 	}
 
 	return nil, nil
+}
+
+// ClientsList
+//
+// swagger:route GET /client ClientsList
+//
+// # Return AgentID if it's configured
+//
+// Responses:
+//
+//	200: []string
+func (h *SigningAgentHandler) ClientsList(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
+	w.Header().Set("Content-Type", "application/json")
+	return h.core.ClientsList()
 }
 
 func (h *SigningAgentHandler) newClientFeed(w http.ResponseWriter, r *http.Request) clientfeed.ClientFeed {

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -353,7 +354,7 @@ func TestSigningAgentHandler_StartAgent_registers_auto_approval(t *testing.T) {
 		AutoApprove: config.AutoApprove{
 			Enabled: true,
 		},
-	}, autoapprover.NewAutoApprover(mockCore, testLog, &config.Config{}, nil, nil), nil, "")
+	}, autoapprover.NewAutoApprover(mockCore, testLog, &config.Config{}, nil), nil, "")
 
 	//Act
 	handler.StartAgent()
@@ -470,4 +471,30 @@ func TestSigningAgentHandler_ClientFeed_registers_client(t *testing.T) {
 	assert.True(t, mockFeedClient.StartCalled)
 	assert.True(t, mockFeedClient.GetFeedClientCalled)
 	assert.True(t, mockFeedClient.ListenCalled)
+}
+
+func TestSigningAgentHandler_ClientsList(t *testing.T) {
+	//Arrange
+	mockCore := &lib.MockSigningAgentClient{
+		NextClientsList: []string{"client 1", "client2"},
+	}
+	handler := &SigningAgentHandler{
+		core: mockCore,
+	}
+	req, _ := http.NewRequest("GET", "/path", nil)
+	rr := httptest.NewRecorder()
+
+	//Act
+	response, err := handler.ClientsList(nil, rr, req)
+
+	//Assert
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
+
+	assert.True(t, mockCore.ClientsListCalled)
+	data, _ := json.Marshal(response)
+
+	assert.Equal(t, "[\"client 1\",\"client2\"]", string(data))
 }
