@@ -1,14 +1,11 @@
 package autoapprover
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"testing"
 	"time"
 
-	"github.com/go-redis/redis/v8"
-	"github.com/go-redsync/redsync/v4"
 	"github.com/test-go/testify/assert"
 	"gitlab.qredo.com/computational-custodian/signing-agent/config"
 	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
@@ -16,6 +13,31 @@ import (
 	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 	"go.uber.org/goleak"
 )
+
+type mockActionSyncronizer struct {
+	ShouldHandleActionCalled bool
+	AcquireLockCalled        bool
+	ReleaseCalled            bool
+	LastActionId             string
+	NextShouldHandle         bool
+	NextLockError            error
+	NextReleaseError         error
+}
+
+func (m *mockActionSyncronizer) ShouldHandleAction(actionID string) bool {
+	m.ShouldHandleActionCalled = true
+	m.LastActionId = actionID
+	return m.NextShouldHandle
+}
+func (m *mockActionSyncronizer) AcquireLock() error {
+	m.AcquireLockCalled = true
+	return m.NextLockError
+}
+func (m *mockActionSyncronizer) Release(actionID string) error {
+	m.ReleaseCalled = true
+	m.LastActionId = actionID
+	return m.NextReleaseError
+}
 
 func TestAutoApprover_Listen_fails_to_unmarshal(t *testing.T) {
 	//Arrange
@@ -56,12 +78,11 @@ func TestAutoApprover_handleMessage_action_expired(t *testing.T) {
 	assert.Nil(t, sut.lastError)
 }
 
-func TestAutoApprover_shouldHandleAction_cached(t *testing.T) {
+func TestAutoApprover_handleMessage_shouldnt_handle_action(t *testing.T) {
 	//Arrange
-	cacheMock := &mockCache{
-		NextStringCmd: redis.NewStringCmd(context.Background()),
-	}
-	sut := NewAutoApprover(nil, util.NewTestLogger(), &config.Config{LoadBalancing: config.LoadBalancing{Enable: true}}, cacheMock, nil)
+	syncronizerMock := &mockActionSyncronizer{}
+
+	sut := NewAutoApprover(nil, util.NewTestLogger(), &config.Config{LoadBalancing: config.LoadBalancing{Enable: true}}, syncronizerMock)
 	bytes, _ := json.Marshal(actionInfo{
 		ID:         "actionid",
 		ExpireTime: time.Now().Add(time.Minute).Unix(),
@@ -71,42 +92,57 @@ func TestAutoApprover_shouldHandleAction_cached(t *testing.T) {
 	sut.handleMessage(bytes)
 
 	//Assert
-	assert.True(t, cacheMock.GetCalled)
-	assert.Equal(t, "actionid", cacheMock.LastKey)
+	assert.True(t, syncronizerMock.ShouldHandleActionCalled)
+	assert.Equal(t, "actionid", syncronizerMock.LastActionId)
 }
 
-func TestAutoApprover_shouldHandleAction_gets_mutex(t *testing.T) {
+func TestAutoApprover_handleMessage_fails_to_lock(t *testing.T) {
 	//Arrange
-	syncMock := &mockSync{
-		NextMutex: &redsync.Mutex{},
-	}
-	stringCmd := redis.NewStringCmd(context.Background())
-	stringCmd.SetErr(errors.New("some error"))
-	cacheMock := &mockCache{
-		NextStringCmd: stringCmd,
+	defer goleak.VerifyNone(t)
+	syncronizerMock := &mockActionSyncronizer{
+		NextLockError:    errors.New("some lock error"),
+		NextShouldHandle: true,
 	}
 
-	sut := &AutoApprover{
-		cfgLoadBalancing: &config.LoadBalancing{
-			Enable: true,
-		},
-		sync:  syncMock,
-		cache: cacheMock,
+	sut := NewAutoApprover(nil, util.NewTestLogger(), &config.Config{LoadBalancing: config.LoadBalancing{Enable: true}}, syncronizerMock)
+	bytes, _ := json.Marshal(actionInfo{
+		ID:         "actionid",
+		ExpireTime: time.Now().Add(time.Minute).Unix(),
+	})
+
+	//Act
+	sut.handleMessage(bytes)
+	<-time.After(time.Second) //give it a second to process
+
+	//Assert
+	assert.True(t, syncronizerMock.AcquireLockCalled)
+	assert.False(t, syncronizerMock.ReleaseCalled)
+}
+
+func TestAutoApprover_handleAction_acquires_lock_and_approves(t *testing.T) {
+	//Arrange
+	defer goleak.VerifyNone(t)
+	syncronizerMock := &mockActionSyncronizer{
+		NextReleaseError: errors.New("some release error"),
+	}
+	coreMock := &lib.MockSigningAgentClient{}
+	sut := NewAutoApprover(coreMock, util.NewTestLogger(), &config.Config{LoadBalancing: config.LoadBalancing{Enable: true}}, syncronizerMock)
+	action := actionInfo{
+		ID:         "actionid",
+		ExpireTime: time.Now().Add(time.Minute).Unix(),
 	}
 
 	//Act
-	res := sut.shouldHandleAction("actionid")
+	sut.handleAction(&action)
 
 	//Assert
-	assert.True(t, res)
-	assert.True(t, cacheMock.GetCalled)
-	assert.Equal(t, "actionid", cacheMock.LastKey)
-	assert.True(t, syncMock.NewMutexCalled)
-	assert.Equal(t, "actionid", syncMock.LastName)
-	assert.NotNil(t, sut.mutex)
+	assert.True(t, syncronizerMock.AcquireLockCalled)
+	assert.True(t, syncronizerMock.ReleaseCalled)
+	assert.True(t, coreMock.ActionApproveCalled)
+	assert.Equal(t, "actionid", coreMock.LastActionId)
 }
 
-func TestAutoApprover_approveAction_times_out(t *testing.T) {
+func TestAutoApprover_approveAction_retries_to_approve(t *testing.T) {
 	//Arrange
 	coreMock := &lib.MockSigningAgentClient{
 		NextError: errors.New("some error"),
@@ -114,18 +150,17 @@ func TestAutoApprover_approveAction_times_out(t *testing.T) {
 	sut := &AutoApprover{
 		core: coreMock,
 		cfgAutoApproval: &config.AutoApprove{
-			RetryIntervalMax: 2,
+			RetryIntervalMax: 3,
 			RetryInterval:    1,
 		},
 		log: util.NewTestLogger(),
 	}
 
 	//Act
-	err := sut.approveAction("some action id", "some agent id")
+	sut.approveAction("some action id", "some agent id")
 
 	//Assert
-	assert.NotNil(t, err)
-	assert.Equal(t, "timeout", err.Error())
 	assert.True(t, coreMock.ActionApproveCalled)
 	assert.Equal(t, "some action id", coreMock.LastActionId)
+	assert.True(t, coreMock.Counter > 1)
 }
