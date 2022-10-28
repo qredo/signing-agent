@@ -16,3 +16,4 @@ volume/
 incubator-milagro-crypto-c
 config.yaml
 .env
+node_modules
