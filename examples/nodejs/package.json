@@ -1,0 +1,15 @@
+{
+  "name": "signingagentclient",
+  "version": "1.0.0",
+  "description": "",
+  "main": "signingagent-client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-rsa": "^1.1.1",
+    "ws": "^8.10.0"
+  }
+}
