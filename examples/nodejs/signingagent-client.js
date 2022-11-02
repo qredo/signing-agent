@@ -91,7 +91,7 @@
                     let msg = JSON.parse(event.data)
 
                     // get transaction details
-                    this.#getTransactionDetails(msg.id).then((details) => {
+                    this.#getTransactionDetails(msg).then((details) => {
                         msg.details = details
 
                         // call callback
@@ -115,19 +115,19 @@
             this.#executeAgentApiCall("DELETE", `http://${this.#host}:${this.#port}/api/v1/client/action/${transaction_id}`, null)
         }
 
-        #getTransactionDetails(msg) {
+        async #getTransactionDetails(msg) {
             if (!this.#company_id) {
                 return null
             }
 
             let type_url = ""
             if (msg.type == "ApproveWithdraw") {
-                type_url = "/withdraw"
+                type_url = "withdraw"
             } else {
-                type_url = "/transfer"
+                type_url = "transfer"
             }
 
-            return this.#executePartnerApiCall("GET", `https://play-api.qredo.network/api/v1/p/company/${this.#company_id}/${type_url}/${msg.id}`, null)
+            return await this.#executePartnerApiCall("GET", `https://play-api.qredo.network/api/v1/p/company/${this.#company_id}/${type_url}/${msg.id}`, null)
         }
 
         async #executeAgentApiCall(method, url, body) {
@@ -188,10 +188,10 @@
                 to_sign += json_body
             }
             const rsa_sig = this.#rsa_key.sign(to_sign, 'buffer')
-            const signature = this.#base64UrlEncode(signature)
+            const signature = this.#base64UrlEncode(rsa_sig)
             req.headers["x-sign"] = signature
 
-            let response = fetch(url, req)
+            let response = await fetch(url, req)
             if (response.status != 200) {
                 return null
             }
@@ -208,7 +208,7 @@
         }
 
         #base64UrlEncode(buffer){
-            this.#base64Encode(buffer)
+            return this.#base64Encode(buffer)
                 .replace(/\+/g, '-')
                 .replace(/\//g, '_')
                 .replace(/=+$/, '')
@@ -218,7 +218,7 @@
     const client = new SigningAgentClient(agent_name, rsa_key, api_key, company_id, host, port, async (trx) => {
         console.log(trx)
 
-        console.log(details.statusDetails.netAmount)
+        console.log(trx.details.statusDetails.netAmount)
         if (trx.details.statusDetails.netAmount < 100000) {
             // approve
             console.log("Approving transaction")
