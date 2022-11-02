@@ -92,27 +92,8 @@ In the steps that follow, you will create the `private.pem` files and store it i
 
 ## Config data
 
-Please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to the `volume` directory.
-Here you will find explanation of each line:
+Please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to the `volume` directory. Please see the [YAML configuration template](configuration.md) documentation for a description of each configuration option available.
 
-```yaml
-
-base:  # base config set 
-  qredo_api_domain: play-api.qredo.network  # qredo environment domain like: (play-api.qredo.network, dev.qredo.net, qa-api.qredo.net).
-  qredo_api_base_path: /api/v1/p  # The base path that contain verion info of the REST interface.
-  store_file: /volume/ccstore.db  # This is a store file path inside docker image.
-  auto_approve: false  # Set to true if You would like to turn on background job that will automaticly approve incoming actions (transactions).
-  pin: 0  # set your pin
-http:  # host http config set
-  addr: 0.0.0.0:8007  # host server name e.g. agent.example.org
-  cors_allow_origins:  # specify resource sharing list:
-  - '*'
-  proxy_forwarded_header: ""  # specify Proxy forwarded-for header
-  log_all_requests: true  # log all REST request, not only those with errors
-logging:  # logging config set
-  format: text  # choose format of logging (text or json), currently we support only text
-  level: debug  # choose level of logs that should be noticed (e.g. error, warn, info, debug)
-```
 
 ## Generate RSA keys for signing request on register step (Partner API)
 

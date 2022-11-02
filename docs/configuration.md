@@ -15,8 +15,8 @@ websocket:
   reconnect_timeout_sec: 300
   reconnect_interval_sec: 5
   ping_period_sec: 5
-	pong_wait_sec: 10
-	write_wait_sec: 10
+  pong_wait_sec: 10
+  write_wait_sec: 10
   read_buffer_size: 512
   write_buffer_size: 1024
 http:
