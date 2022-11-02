@@ -129,7 +129,8 @@ The status healthcheck endpoint accepts a `GET` request, and it responds with an
     "WebSocket": {
         "ReadyState":"CLOSED",
         "RemoteFeedUrl": "wss://play-api.qredo.network/api/v1/p/coreclient/feed",
-        "LocalFeedUrl":"ws://0.0.0.0:8007/api/v1/client/feed"
+        "LocalFeedUrl":"ws://0.0.0.0:8007/api/v1/client/feed",
+        "ConnectedClients": 2
     }
 }
 ```
