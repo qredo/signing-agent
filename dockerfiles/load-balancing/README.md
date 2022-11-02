@@ -1,3 +1,3 @@
 # Load balancing
 
-Please see `/doc/deplayment.md` for how to set up the load balancing.
+Please see `/docs/deployment.md` for how to set up the load balancing.

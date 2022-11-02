@@ -17,3 +17,6 @@ incubator-milagro-crypto-c
 config.yaml
 .env
 node_modules
+.vscode/launch.json
+.gitignore
+cmd/service/cc.yaml

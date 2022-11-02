@@ -1,5 +1,5 @@
 ## Purpose
-The purpose of the doc is to demonstrate how to use signing agent cli (sa-cli) which uses the signing agent as a library.
+The purpose of the document is to demonstrate how to use signing agent cli (sa-cli) which uses the signing agent as a library.
 
 ## Prerequisites
 Installed Golang toolchain and OpenSSL environments
