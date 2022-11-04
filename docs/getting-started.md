@@ -64,7 +64,7 @@ Before continuing with the guide, it is recommended you enable Testnet Assets. T
   
 ![Screenshot 2022-06-09 at 14.18.36.png](img/Screenshot_2022-06-09_at_14.18.36.png)
     
-Next, select **Personal Account** and then the **Preferences** tab and enable **Testnet Assets** to use ETH-TESTNET and BTC-TESTNET.
+Next, select **Personal Account** and then the **Preferences** tab and enable **Testnet Assets** to use ETH-GOERLI and BTC-TESTNET.
 
 ![Screenshot 2022-06-09 at 14.24.23.png](img/Screenshot_2022-06-09_at_14.24.23.png)
 
@@ -219,7 +219,7 @@ curl -X 'POST' \
 
 # Create a fund with a wallet and corresponding policies
 
-Here we are explicitly creating a new fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-TESTNET* wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentId` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#funds).
+Here we are explicitly creating a new fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-GOERLI* wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentId` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#funds).
 
 ```bash
 **Request:**
@@ -247,7 +247,7 @@ curl -X 'POST' \
   "wallets": [
     {
       "name": "New wallet with custom custody group",
-      "asset": "ETH-TESTNET",
+      "asset": "ETH-GOERLI",
       "custodygroup_withdraw": {
         "threshold": 1,
         "members": [
@@ -275,7 +275,7 @@ curl -X 'POST' \
 
 # Discover wallet address and deposit testnet assets to the wallet
 
-Since we have created a fund with an ETH-TESTNET asset type (Ropsten testnet), we can now try to deposit some test ETH. To do that, first we need to find out the ETH address to which we need to send the assets. We’ll ask for the list of fund assets with their deposit addresses and current balances. Each fund contains one or more deposit addresses for the different types of assets. As you can see below, for this request we have supplied the `company_id` and `fund_id` we previously obtained in the API URL.
+Since we have created a fund with an ETH-GOERLI asset type (Ropsten testnet), we can now try to deposit some test ETH. To do that, first we need to find out the ETH address to which we need to send the assets. We’ll ask for the list of fund assets with their deposit addresses and current balances. Each fund contains one or more deposit addresses for the different types of assets. As you can see below, for this request we have supplied the `company_id` and `fund_id` we previously obtained in the API URL.
 
 ```bash
 **Request**:
@@ -291,7 +291,7 @@ curl -X 'GET' \
   "total_count": 1,
   "list": [
     {
-      "asset": "ETH-TESTNET",
+      "asset": "ETH-GOERLI",
       "address": "0x9B2154307C4987B9e67389cea8795E921b71e117",
       "balance": 0
     }
@@ -314,7 +314,7 @@ curl -X 'POST' \
   -H 'Content-Type: application/json' \
   -d '{
   "name": "Metamask",
-  "asset": "ETH-TESTNET",
+  "asset": "ETH-GOERLI",
   "address": "0x5F1F7bD49690c...9Be67ED6A2b6F76c86127"
 }'
 
@@ -344,7 +344,7 @@ curl -X 'POST' \
   "reference": "CX15R99XX",
   "partner_txID": "",
   "send": {
-    "symbol": "ETH-TESTNET",
+    "symbol": "ETH-GOERLI",
     "amount": 1000
   }
 }'
@@ -378,7 +378,7 @@ curl -X 'POST' \
   "reference": "ABC123",
   "partner_txID": "some-partner-txxID",
   "send": {
-    "symbol": "ETH-TESTNET",
+    "symbol": "ETH-GOERLI",
     "amount": 50000
   }
 }'
