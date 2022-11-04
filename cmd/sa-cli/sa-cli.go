@@ -172,7 +172,7 @@ func (d *SaCli) CreateFund(companyID, fundName, fundDesc, memberID string) (*Add
 		Wallets: []FundWallet{
 			{
 				Name:  "New wallet with custom custody group",
-				Asset: "ETH-TESTNET",
+				Asset: "ETH-GOERLI",
 				CustodygroupWithdraw: &CustodyGroup{
 					Threshold: 1,
 					Members:   []string{memberID},
@@ -200,7 +200,7 @@ func (d *SaCli) CreateFund(companyID, fundName, fundDesc, memberID string) (*Add
 func (d *SaCli) AddWhitelist(companyID, fundID, address string) error {
 	reqAWL := &AddWhitelistRequest{
 		Address: address,
-		Asset:   "ETH-TESTNET",
+		Asset:   "ETH-GOERLI",
 		Name:    "Metamask",
 	}
 
@@ -233,7 +233,7 @@ func (d *SaCli) Withdraw(companyID, walletID, address string, amount int64) (*Ne
 		WalletID: walletID,
 		Address:  address,
 		Send: AssetAmount{
-			Asset:  "ETH-TESTNET",
+			Asset:  "ETH-GOERLI",
 			Amount: amount,
 		},
 		Reference: "CX23453XX",
