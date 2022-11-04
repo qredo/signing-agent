@@ -14,14 +14,14 @@ import (
 	"go.uber.org/goleak"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/api"
-	"gitlab.qredo.com/computational-custodian/signing-agent/autoapprover"
-	"gitlab.qredo.com/computational-custodian/signing-agent/clientfeed"
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
-	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
-	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
-	"gitlab.qredo.com/computational-custodian/signing-agent/util"
+	"signing-agent/api"
+	"signing-agent/autoapprover"
+	"signing-agent/clientfeed"
+	"signing-agent/config"
+	"signing-agent/defs"
+	"signing-agent/hub"
+	"signing-agent/lib"
+	"signing-agent/util"
 )
 
 type mockFeedHub struct {

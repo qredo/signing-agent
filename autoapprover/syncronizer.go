@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
+	"signing-agent/config"
 )
 
 var rCtx = context.Background()

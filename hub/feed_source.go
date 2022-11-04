@@ -9,9 +9,9 @@ import (
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
-	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	"signing-agent/config"
+	"signing-agent/defs"
+	"signing-agent/lib"
 )
 
 // Source has an underlying websocket connection used to receive messages. It will send these messages to an outbound channel

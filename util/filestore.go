@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"signing-agent/defs"
 )
 
 func NewFileStore(fileName string) KVStore {

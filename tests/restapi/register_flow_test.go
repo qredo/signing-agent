@@ -16,11 +16,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/api"
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
-	"gitlab.qredo.com/computational-custodian/signing-agent/rest"
-	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
+	"signing-agent/api"
+	"signing-agent/config"
+	"signing-agent/defs"
+	"signing-agent/rest"
+	"signing-agent/rest/version"
 )
 
 const (
@@ -185,8 +185,10 @@ func TestRestAPIs(t *testing.T) {
 	handlers := getTestHandlers(cfg)
 	server := httptest.NewServer(handlers)
 	defer func() {
-		err := os.Remove(TestDataDBStoreFilePath)
-		assert.NoError(t, err)
+		if _, err := os.Stat(TestDataDBStoreFilePath); err == nil {
+			err := os.Remove(TestDataDBStoreFilePath)
+			assert.NoError(t, err)
+		}
 		server.Close()
 	}()
 	servAA := httpexpect.New(t, server.URL)

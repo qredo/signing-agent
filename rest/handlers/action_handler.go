@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strings"
 
+	"signing-agent/autoapprover"
+	"signing-agent/defs"
+
 	"github.com/gorilla/mux"
-	"gitlab.qredo.com/computational-custodian/signing-agent/autoapprover"
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
 )
 
 type ActionHandler struct {

@@ -3,11 +3,11 @@ package handlers
 import (
 	"net/http"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/api"
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
-	"gitlab.qredo.com/computational-custodian/signing-agent/hub"
-	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
+	"signing-agent/api"
+	"signing-agent/config"
+	"signing-agent/defs"
+	"signing-agent/hub"
+	"signing-agent/rest/version"
 )
 
 type HealthCheckHandler struct {

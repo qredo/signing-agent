@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/goleak"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
-	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
-	"gitlab.qredo.com/computational-custodian/signing-agent/util"
+	"signing-agent/config"
+	"signing-agent/defs"
+	"signing-agent/lib"
+	"signing-agent/util"
 )
 
 func TestWebsocketSource_Connect_retries_on_fail_to_get__ZKPOnePass(t *testing.T) {

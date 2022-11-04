@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"signing-agent/config"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/stretchr/testify/assert"
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
 )
 
 type mutexMock struct {

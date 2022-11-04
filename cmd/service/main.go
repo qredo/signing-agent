@@ -8,10 +8,10 @@ import (
 
 	"github.com/jessevdk/go-flags"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/rest"
-	"gitlab.qredo.com/computational-custodian/signing-agent/rest/version"
-	"gitlab.qredo.com/computational-custodian/signing-agent/util"
+	"signing-agent/config"
+	"signing-agent/rest"
+	"signing-agent/rest/version"
+	"signing-agent/util"
 )
 
 var (
