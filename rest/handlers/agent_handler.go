@@ -7,14 +7,14 @@ import (
 	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
 
-	"signing-agent/api"
-	"signing-agent/autoapprover"
-	"signing-agent/clientfeed"
-	"signing-agent/config"
-	"signing-agent/defs"
-	"signing-agent/hub"
-	"signing-agent/lib"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/api"
+	"github.com/qredo/signing-agent/autoapprover"
+	"github.com/qredo/signing-agent/clientfeed"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/hub"
+	"github.com/qredo/signing-agent/lib"
+	"github.com/qredo/signing-agent/util"
 )
 
 type newClientFeedFunc func(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister clientfeed.UnregisterFunc, config *config.WebSocketConf) clientfeed.ClientFeed

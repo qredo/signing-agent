@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"signing-agent/config"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/util"
 )
 
 // mock the serve function

@@ -57,6 +57,6 @@ RUN CGO_ENABLED=1 \
     GO111MODULES=on \
     go build \
       -o sa-cli \
-      signing-agent/cmd/sa-cli
+      github.com/qredo/signing-agent/cmd/sa-cli
 
 CMD ["./sa-cli", "help"]

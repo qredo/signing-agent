@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"signing-agent/api"
-	"signing-agent/config"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/api"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/util"
 )
 
 type SigningAgentClient interface {

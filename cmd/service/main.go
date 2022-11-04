@@ -8,10 +8,10 @@ import (
 
 	"github.com/jessevdk/go-flags"
 
-	"signing-agent/config"
-	"signing-agent/rest"
-	"signing-agent/rest/version"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/rest"
+	"github.com/qredo/signing-agent/rest/version"
+	"github.com/qredo/signing-agent/util"
 )
 
 var (

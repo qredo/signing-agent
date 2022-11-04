@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/defs"
 )
 
 // FeedHub maintains the set of active clients

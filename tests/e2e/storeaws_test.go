@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 
-	"signing-agent/config"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/util"
 )
 
 func createAWSConfig() *config.Config {

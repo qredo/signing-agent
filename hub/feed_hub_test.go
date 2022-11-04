@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/goleak"
 
-	"signing-agent/defs"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/util"
 )
 
 type mockSourceConnection struct {

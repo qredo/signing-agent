@@ -12,8 +12,8 @@ import (
 	"github.com/test-go/testify/assert"
 	"github.com/test-go/testify/require"
 
-	"signing-agent/config"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/util"
 )
 
 func createOciConfig() *config.Config {

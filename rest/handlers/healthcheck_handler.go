@@ -3,11 +3,11 @@ package handlers
 import (
 	"net/http"
 
-	"signing-agent/api"
-	"signing-agent/config"
-	"signing-agent/defs"
-	"signing-agent/hub"
-	"signing-agent/rest/version"
+	"github.com/qredo/signing-agent/api"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/hub"
+	"github.com/qredo/signing-agent/rest/version"
 )
 
 type HealthCheckHandler struct {

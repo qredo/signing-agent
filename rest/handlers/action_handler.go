@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"signing-agent/autoapprover"
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/autoapprover"
+	"github.com/qredo/signing-agent/defs"
 
 	"github.com/gorilla/mux"
 )

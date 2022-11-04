@@ -13,8 +13,8 @@ import (
 	"github.com/oracle/oci-go-sdk/v65/vault"
 	"github.com/pkg/errors"
 
-	"signing-agent/config"
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
 )
 
 /*

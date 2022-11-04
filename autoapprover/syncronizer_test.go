@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"signing-agent/config"
+	"github.com/qredo/signing-agent/config"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redsync/redsync/v4"

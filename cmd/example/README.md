@@ -8,4 +8,4 @@ openssl rsa -in private.pem -outform PEM -pubout -out public.pem
 ```
 * Upload public.pem in the partner API screen of the qredo webapp
 * Set the correct values for the consts on top of main.go (`partnerAPIKey`,`rsaPrivateKey`, `qredoURL`)
-* `go run signing-agent/cmd/example`
+* `go run github.com/qredo/signing-agent/cmd/example`

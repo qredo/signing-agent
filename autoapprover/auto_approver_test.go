@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"signing-agent/config"
-	"signing-agent/hub"
-	"signing-agent/lib"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/hub"
+	"github.com/qredo/signing-agent/lib"
+	"github.com/qredo/signing-agent/util"
 
 	"github.com/test-go/testify/assert"
 	"go.uber.org/goleak"

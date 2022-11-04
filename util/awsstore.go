@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/pkg/errors"
 
-	"signing-agent/config"
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
 )
 
 // SecretNotInitialised is used to identify an uninitialised AWS secret.

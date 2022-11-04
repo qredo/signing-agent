@@ -1,7 +1,7 @@
 package autoapprover
 
 import (
-	"signing-agent/lib"
+	"github.com/qredo/signing-agent/lib"
 
 	"go.uber.org/zap"
 )
