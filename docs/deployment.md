@@ -13,17 +13,17 @@ Should work on UNIX systems. Windows is untested as a deployment environment, bu
 The Signing Agent service is written in Go, using version go1.18+. It is a single executable. That executable binary can be built by running:
 
 ```bash
-    go build
+    make build
 ```
 
 in the project root folder. This should be done on the same platform as the deployment platform, so that it uses the same CPU architecture.
 
-This will create an executable called `taint` in the top level of the project.
+This will create an executable called `out/signing-agent` in the top level of the project.
 
-For testing, just run the default Go testing suite:
+For testing, the following will run the default Go testing suite:
 
 ```bash
-    go test ./...
+    make test
 ```
 
 ## Installation
