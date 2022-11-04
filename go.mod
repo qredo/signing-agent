@@ -1,4 +1,4 @@
-module signing-agent
+module github.com/qredo/signing-agent
 
 go 1.19
 

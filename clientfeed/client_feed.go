@@ -10,9 +10,9 @@ import (
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 
-	"signing-agent/config"
-	"signing-agent/defs"
-	"signing-agent/hub"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/hub"
 )
 
 // UnregisterFunc is used by the ClientFeed to unregister itself from the feed hub. Upon its request, the Feed channel will be closed and no data will be received

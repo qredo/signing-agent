@@ -11,7 +11,7 @@ build:
 	    -tags debug \
 	    -ldflags ${LDFLAGS} \
         -o out/signing-agent \
-        signing-agent/cmd/service
+        github.com/qredo/signing-agent/cmd/service
 
 test: unittest apitest
 

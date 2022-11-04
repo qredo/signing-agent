@@ -22,8 +22,8 @@ import (
 	"github.com/gavv/httpexpect"
 	"github.com/stretchr/testify/assert"
 
-	"signing-agent/api"
-	"signing-agent/rest"
+	"github.com/qredo/signing-agent/api"
+	"github.com/qredo/signing-agent/rest"
 )
 
 const (

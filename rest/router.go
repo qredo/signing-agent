@@ -15,14 +15,14 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"signing-agent/autoapprover"
-	"signing-agent/config"
-	"signing-agent/defs"
-	"signing-agent/hub"
-	"signing-agent/lib"
-	rest_handlers "signing-agent/rest/handlers"
-	"signing-agent/rest/version"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/autoapprover"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/hub"
+	"github.com/qredo/signing-agent/lib"
+	rest_handlers "github.com/qredo/signing-agent/rest/handlers"
+	"github.com/qredo/signing-agent/rest/version"
+	"github.com/qredo/signing-agent/util"
 )
 
 const (

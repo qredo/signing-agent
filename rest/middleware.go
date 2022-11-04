@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/defs"
 )
 
 func NewMiddleware(log *zap.SugaredLogger, logAllRequests bool) *Middleware {

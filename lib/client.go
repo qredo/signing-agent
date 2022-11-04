@@ -11,10 +11,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"signing-agent/api"
-	"signing-agent/crypto"
-	defs "signing-agent/defs"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/api"
+	"github.com/qredo/signing-agent/crypto"
+	defs "github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/util"
 )
 
 func (h *signingAgent) ClientRegister(name string) (*api.ClientRegisterResponse, error) {

@@ -16,11 +16,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
-	"signing-agent/api"
-	"signing-agent/config"
-	"signing-agent/defs"
-	"signing-agent/rest"
-	"signing-agent/rest/version"
+	"github.com/qredo/signing-agent/api"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/rest"
+	"github.com/qredo/signing-agent/rest/version"
 )
 
 const (

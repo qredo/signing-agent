@@ -3,7 +3,7 @@ package util
 import (
 	"go.uber.org/zap"
 
-	"signing-agent/config"
+	"github.com/qredo/signing-agent/config"
 )
 
 func NewLogger(cfg *config.Logging) *zap.SugaredLogger {

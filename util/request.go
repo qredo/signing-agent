@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/defs"
 )
 
 func DecodeRequest(req interface{}, hr *http.Request) error {

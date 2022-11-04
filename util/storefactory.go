@@ -1,7 +1,7 @@
 package util
 
 import (
-	"signing-agent/config"
+	"github.com/qredo/signing-agent/config"
 )
 
 func CreateStore(cfg *config.Config) KVStore {

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"signing-agent/lib"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/lib"
+	"github.com/qredo/signing-agent/util"
 
 	"github.com/stretchr/testify/assert"
 )

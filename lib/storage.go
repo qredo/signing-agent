@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"signing-agent/defs"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/util"
 )
 
 var agentIDString = "AgentID"

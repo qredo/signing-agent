@@ -1,6 +1,6 @@
 package lib
 
-import "signing-agent/api"
+import "github.com/qredo/signing-agent/api"
 
 type MockSigningAgentClient struct {
 	GetSystemAgentIDCalled     bool

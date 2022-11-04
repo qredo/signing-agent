@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/defs"
 
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"

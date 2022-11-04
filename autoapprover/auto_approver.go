@@ -9,9 +9,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"signing-agent/config"
-	"signing-agent/hub"
-	"signing-agent/lib"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/hub"
+	"github.com/qredo/signing-agent/lib"
 )
 
 type AutoApprover struct {

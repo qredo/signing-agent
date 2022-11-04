@@ -6,9 +6,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"signing-agent/api"
-	"signing-agent/defs"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/api"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/util"
 )
 
 func (h *signingAgent) ActionApprove(actionID string) error {

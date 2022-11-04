@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"signing-agent/config"
-	"signing-agent/rest/version"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/rest/version"
 )
 
 type mockSourceStats struct {

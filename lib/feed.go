@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 
-	"signing-agent/defs"
+	"github.com/qredo/signing-agent/defs"
 )
 
 const WsTimeout = time.Second * 60

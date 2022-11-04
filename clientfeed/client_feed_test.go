@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/goleak"
 
-	"signing-agent/config"
-	"signing-agent/defs"
-	"signing-agent/hub"
-	"signing-agent/util"
+	"github.com/qredo/signing-agent/config"
+	"github.com/qredo/signing-agent/defs"
+	"github.com/qredo/signing-agent/hub"
+	"github.com/qredo/signing-agent/util"
 )
 
 func TestClientFeedImpl_GetFeedClient(t *testing.T) {
