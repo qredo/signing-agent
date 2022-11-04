@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"gitlab.qredo.com/computational-custodian/signing-agent/api"
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/util"
+	"signing-agent/api"
+	"signing-agent/config"
+	"signing-agent/util"
 )
 
 type SigningAgentClient interface {

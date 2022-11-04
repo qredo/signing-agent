@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/util"
+	"signing-agent/util"
 )
 
 func TestStorage(t *testing.T) {

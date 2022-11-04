@@ -1,7 +1,8 @@
 package autoapprover
 
 import (
-	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
+	"signing-agent/lib"
+
 	"go.uber.org/zap"
 )
 

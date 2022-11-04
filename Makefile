@@ -11,7 +11,7 @@ build:
 	    -tags debug \
 	    -ldflags ${LDFLAGS} \
         -o out/signing-agent \
-        gitlab.qredo.com/computational-custodian/signing-agent/cmd/service
+        signing-agent/cmd/service
 
 test: unittest apitest
 

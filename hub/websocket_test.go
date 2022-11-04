@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"signing-agent/defs"
 )
 
 func TestDefaultDialer(t *testing.T) {

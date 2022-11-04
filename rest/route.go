@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/context"
 	"github.com/pkg/errors"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/defs"
+	"signing-agent/defs"
 )
 
 func WrapPathPrefix(uri string) string {

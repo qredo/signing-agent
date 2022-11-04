@@ -46,7 +46,7 @@ RUN echo Building Milagro Crypt C library && \
 ARG BUILD_TYPE
 ARG BUILD_DATE
 
-ENV PROJECT_PATH=/src/gitlab.qredo.com/computational-custodian/signing-agent
+ENV PROJECT_PATH=/src/signing-agent
 
 COPY . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
@@ -61,15 +61,15 @@ RUN CGO_ENABLED=1 \
                                                             -X 'main.buildVersion="$(git rev-list -1 --abbrev-commit HEAD)"' \
                                                             -X 'main.buildType=$BUILD_TYPE'" \
       -o signing-agent \
-      gitlab.qredo.com/computational-custodian/signing-agent/cmd/service
+      signing-agent/cmd/service
 
 FROM alpine as certs
 RUN apk add -U --no-cache ca-certificates
 
 FROM scratch
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=go_builder /src/gitlab.qredo.com/computational-custodian/signing-agent/signing-agent /signing-agent/signing-agent
-COPY --from=go_builder /src/gitlab.qredo.com/computational-custodian/signing-agent/config-template.yaml /signing-agent/config-template.yaml
+COPY --from=go_builder /src/signing-agent/signing-agent /signing-agent/signing-agent
+COPY --from=go_builder /src/signing-agent/config-template.yaml /signing-agent/config-template.yaml
 
 VOLUME /volume
 WORKDIR /signing-agent

@@ -4,9 +4,10 @@ import (
 	"errors"
 	"testing"
 
+	"signing-agent/lib"
+	"signing-agent/util"
+
 	"github.com/stretchr/testify/assert"
-	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
-	"gitlab.qredo.com/computational-custodian/signing-agent/util"
 )
 
 func TestActionManage_Approve_shouldnt_handle_action(t *testing.T) {

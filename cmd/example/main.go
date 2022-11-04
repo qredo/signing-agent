@@ -14,10 +14,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"gitlab.qredo.com/computational-custodian/signing-agent/api"
-	"gitlab.qredo.com/computational-custodian/signing-agent/config"
-	"gitlab.qredo.com/computational-custodian/signing-agent/lib"
-	"gitlab.qredo.com/computational-custodian/signing-agent/util"
+	"signing-agent/api"
+	"signing-agent/config"
+	"signing-agent/lib"
+	"signing-agent/util"
 )
 
 // Fill in you partner api key and public key pem here

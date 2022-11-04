@@ -1,11 +1,11 @@
-module gitlab.qredo.com/computational-custodian/signing-agent
+module signing-agent
 
 go 1.19
 
 replace github.com/btcsuite/btcd => github.com/qredo/btcd v0.21.2
 
 require (
-	github.com/aws/aws-sdk-go v1.44.122
+	github.com/aws/aws-sdk-go v1.44.130
 	github.com/btcsuite/btcd v0.23.2
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/go-playground/validator/v10 v10.11.1
@@ -52,7 +52,7 @@ require (
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mkideal/expr v0.1.0 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
-	github.com/oracle/oci-go-sdk/v65 v65.23.0
+	github.com/oracle/oci-go-sdk/v65 v65.25.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
