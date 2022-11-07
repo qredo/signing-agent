@@ -7,6 +7,8 @@
     const rsa_key = "private.pem"
     const api_key = process.env.APIKEY
     const company_id = process.env.CUSTOMERID
+    const coinbase_api_key = process.env.COINBASE_APIKEY
+    const coinbase_api_secret = process.env.COINBASE_APISECRET
 
     class SigningAgentClient {
 
@@ -18,10 +20,12 @@
         #port = 8007
         #transaction_callback = async ()=>{}
         #company_id = null
+        #coinbase_client = null
 
         constructor(agent_name, rsa_key_file, api_key, company_id, host, port, transaction_callback) {
             const NodeRSA = require("node-rsa")
             const fs = require('fs')
+            const CoinbaseClient = require('coinbase').Client;
 
             this.#agent_name = agent_name || this.#agent_name
             this.#api_key = api_key
@@ -31,6 +35,10 @@
             this.#transaction_callback = transaction_callback || this.#transaction_callback
             this.#rsa_key_pem = fs.readFileSync(rsa_key_file, "utf8")
             this.#rsa_key = NodeRSA(this.#rsa_key_pem, "pkcs1", { signingScheme: "pkcs1-sha256" })
+
+            this.#coinbase_client = new CoinbaseClient({'apiKey': coinbase_api_key,
+                                                        'apiSecret': coinbase_api_secret,
+                                                        'strictSSL': false});
         }
 
         async init() {
@@ -70,7 +78,7 @@
             const socket = new WebSocket(`ws://${this.#host}:${this.#port}/api/v1/client/feed`)
 
             let reconnect = (async function(){
-                this.connectFeed()
+                this.#connectFeed()
                 reconnect_timeout = null
             }).bind(this)
     
@@ -213,13 +221,41 @@
                 .replace(/\//g, '_')
                 .replace(/=+$/, '')
         }
+
+        async getUsdPrice(asset, amount) {
+            const currency = 'USD'
+
+            return new Promise((resolve, reject) => {
+                this.#coinbase_client.getSpotPrice({'currencyPair': `${asset.toUpperCase()}-${currency}`}, function(err, price) {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(price.data.amount * amount * 1e-9)
+                    }
+                })
+            })
+        }
     }
 
     const client = new SigningAgentClient(agent_name, rsa_key, api_key, company_id, host, port, async (trx) => {
         console.log(trx)
 
-        console.log(trx.details.statusDetails.netAmount)
-        if (trx.details.statusDetails.netAmount < 100000) {
+        let asset = trx.details.statusDetails.asset;
+        if (asset == "ETH-GOERLI") {
+            asset = "ETH"
+        }
+        
+        const usd_with_fees = await client.getUsdPrice(asset, trx.details.statusDetails.amount)
+
+        console.log(usd_with_fees)
+        if (usd_with_fees < 1000) {
+            // approve
+            console.log("Approving transaction")
+            return true
+        }
+
+        console.log(trx.details.statusDetails.amount)
+        if (trx.details.statusDetails.amount < 10000000) {
             // approve
             console.log("Approving transaction")
             return true
