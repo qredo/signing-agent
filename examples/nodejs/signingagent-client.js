@@ -1,12 +1,12 @@
 (async () => {
 
-    const host = "127.0.0.1"
-    const port = 8007
+    const host = process.env.SIGNING_AGENT_HOST
+    const port = process.env.SIGNING_AGENT_PORT
 
-    const agent_name = "test-agent"
-    const rsa_key = "private.pem"
+    const agent_name = process.env.SIGNING_AGENT_NAME
+    const rsa_key = process.env.SIGNING_AGENT_PRIVATE_KEY
     const api_key = process.env.APIKEY
-    const company_id = process.env.CUSTOMERID
+    const company_id = process.env.COMPANYID
     const coinbase_api_key = process.env.COINBASE_APIKEY
     const coinbase_api_secret = process.env.COINBASE_APISECRET
 
@@ -244,7 +244,7 @@
         if (asset == "ETH-GOERLI") {
             asset = "ETH"
         }
-        
+
         const usd_with_fees = await client.getUsdPrice(asset, trx.details.statusDetails.amount)
 
         console.log(usd_with_fees)
