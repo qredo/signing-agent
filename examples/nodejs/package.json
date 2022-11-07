@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "coinbase": "^2.0.8",
     "node-rsa": "^1.1.1",
     "ws": "^8.10.0"
   }
