@@ -28,11 +28,11 @@ For testing, the following will run the default Go testing suite:
 
 ## Installation
 
+**Note:** You should never run the service directly connected to the internet. All external requests to the API endpoints exposed by the Signing Agent should be done through a reverse proxy service (e.g., Nginx or HAProxy) and over TLS.
+
 If running as a Docker container, a host directory must be mounted as a virtual volume, in order to ensure data persistency between different container versions.
 
 ## Load balancing
-
-**Note:** You should never run the service directly connected to the internet. All external requests to the API endpoints exposed by the Signing Agent should be done through a reverse proxy service (e.g., Nginx or HAProxy) and over TLS.
 
 You should be able to run more than one container instance of the Signing Agent, and establish NGINX load balancer between available instances. A distributed mutex mechanism (based on Redis) is used to ensure synchronization between individual instances.
 
