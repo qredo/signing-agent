@@ -9,6 +9,17 @@ IMAGE_DATE="$(date +%F)"
 
 rm -rf vendor
 
+docker_latest() {
+  BUILD_TYPE="latest"
+  docker build --build-arg BUILD_DATE="$BUILD_DATE" \
+                --build-arg BUILD_TYPE="$BUILD_TYPE" \
+                --build-arg BUILD_VERSION="$BUILD_VERSION" \
+                -t signing-agent:latest \
+                -f dockerfiles/Dockerfile .
+
+  rm -rf vendor
+}
+
 # Build (and import) a docker image for the local architecture
 docker_local() {
   docker build --build-arg BUILD_DATE="$BUILD_DATE" \
@@ -98,6 +109,9 @@ if [ -n "$1" ]; then
   case $1 in
     docker)
       docker_local
+      ;;
+    docker_latest)
+      docker_latest
       ;;
     docker_amd64)
       docker_export amd64
