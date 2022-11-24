@@ -106,8 +106,7 @@ The config healthcheck endpoint accepts a `GET` request, and it responds with an
 ```json
 {
     "Base": {
-        "QredoAPIDomain":"play-api.qredo.network",
-        "QredoAPIBasePath":"/api/v1/p",
+        "QredoAPI":"https://play-api.qredo.network/api/v1/p",
         "AutoApprove":false
         ...
     },

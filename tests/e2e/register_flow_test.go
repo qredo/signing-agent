@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	TestQredoAPIDomain      = "play-api.qredo.network"
+	TestQredoAPI            = "https://play-api.qredo.network/api/v1/p"
 	TestDataDBStoreFilePath = "../../testdata/test-store.db"
 	TestBuildVersion        = "(test-cb12berf)"
 	TestBuildType           = "test-dev"
@@ -47,9 +47,9 @@ func createTestConfig() config.Config {
 	cfg.Default()
 	cfg.Logging.Level = "debug"
 	cfg.Store.FileConfig = TestDataDBStoreFilePath
-	cfg.Websocket.WsScheme = "wss"
+	cfg.Websocket.QredoWebsocket = "wss://play-api.qredo.network/api/v1/p/coreclient/feed"
 	cfg.AutoApprove.Enabled = true
-	cfg.Base.QredoAPIDomain = TestQredoAPIDomain
+	cfg.Base.QredoAPI = TestQredoAPI
 	return cfg
 }
 

@@ -36,7 +36,7 @@ func mocServe(fakeError error) ServeCB {
 }
 
 func TestFeedRead(t *testing.T) {
-	cfg := config.Base{QredoAPIDomain: "mock_domain", QredoAPIBasePath: "mock_path"}
+	cfg := config.Config{Base: config.Base{QredoAPI: "mock_url"}}
 	agent, err := New(&cfg, util.NewFileStore("mock.db"))
 	assert.NoError(t, err)
 	fakeError := errors.New("fake error")

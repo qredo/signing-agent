@@ -102,8 +102,8 @@ func TestHealthCheckHandler_HealthCheckConfig(t *testing.T) {
 	//Arrange
 	config := &config.Config{
 		Base: config.Base{
-			PIN:            25,
-			QredoAPIDomain: "some domain",
+			PIN:      25,
+			QredoAPI: "some url",
 		},
 		HTTP: config.HttpSettings{
 			Addr: "some address",
@@ -124,6 +124,6 @@ func TestHealthCheckHandler_HealthCheckConfig(t *testing.T) {
 	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
 
 	data, _ := json.Marshal(response)
-	expected := "{\"Base\":{\"PIN\":25,\"QredoAPIDomain\":\"some domain\",\"QredoAPIBasePath\":\"\",\"HttpScheme\":\"\"},\"HTTP\":{\"Addr\":\"some address\",\"CORSAllowOrigins\":null,\"LogAllRequests\":false},\"Logging\":{\"Format\":\"\",\"Level\":\"\"},\"LoadBalancing\":{\"Enable\":false,\"OnLockErrorTimeOutMs\":0,\"ActionIDExpirationSec\":0,\"RedisConfig\":{\"Host\":\"\",\"Port\":0,\"Password\":\"\",\"DB\":0}},\"Store\":{\"Type\":\"\",\"FileConfig\":\"\",\"OciConfig\":{\"Compartment\":\"\",\"Vault\":\"\",\"SecretEncryptionKey\":\"\",\"ConfigSecret\":\"\"},\"AwsConfig\":{\"Region\":\"\",\"SecretName\":\"\"}},\"AutoApprove\":{\"Enabled\":false,\"RetryIntervalMax\":0,\"RetryInterval\":0},\"Websocket\":{\"WsScheme\":\"\",\"ReconnectTimeOut\":0,\"ReconnectInterval\":0,\"PingPeriod\":0,\"PongWait\":0,\"WriteWait\":0,\"ReadBufferSize\":0,\"WriteBufferSize\":0}}"
+	expected := "{\"Base\":{\"PIN\":25,\"QredoAPI\":\"some url\"},\"HTTP\":{\"Addr\":\"some address\",\"CORSAllowOrigins\":null,\"LogAllRequests\":false},\"Logging\":{\"Format\":\"\",\"Level\":\"\"},\"LoadBalancing\":{\"Enable\":false,\"OnLockErrorTimeOutMs\":0,\"ActionIDExpirationSec\":0,\"RedisConfig\":{\"Host\":\"\",\"Port\":0,\"Password\":\"\",\"DB\":0}},\"Store\":{\"Type\":\"\",\"FileConfig\":\"\",\"OciConfig\":{\"Compartment\":\"\",\"Vault\":\"\",\"SecretEncryptionKey\":\"\",\"ConfigSecret\":\"\"},\"AwsConfig\":{\"Region\":\"\",\"SecretName\":\"\"}},\"AutoApprove\":{\"Enabled\":false,\"RetryIntervalMax\":0,\"RetryInterval\":0},\"Websocket\":{\"QredoWebsocket\":\"\",\"ReconnectTimeOut\":0,\"ReconnectInterval\":0,\"PingPeriod\":0,\"PongWait\":0,\"WriteWait\":0,\"ReadBufferSize\":0,\"WriteBufferSize\":0}}"
 	assert.Equal(t, expected, string(data))
 }

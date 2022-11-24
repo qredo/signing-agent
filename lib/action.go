@@ -21,7 +21,7 @@ func (h *signingAgent) ActionApprove(actionID string) error {
 		return defs.ErrNotFound().WithDetail("agent")
 	}
 
-	zkpOnePass, err := util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
+	zkpOnePass, err := util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.Base.PIN)
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}
@@ -29,7 +29,7 @@ func (h *signingAgent) ActionApprove(actionID string) error {
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 	messagesResp := &api.CoreClientServiceActionMessagesResponse{}
-	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.HttpScheme, h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath, actionID), nil, messagesResp, header); err != nil {
+	if err = h.htc.Request(http.MethodGet, util.URLActionMessages(h.cfg.Base.QredoAPI, actionID), nil, messagesResp, header); err != nil {
 		return err
 	}
 
@@ -52,7 +52,7 @@ func (h *signingAgent) ActionApprove(actionID string) error {
 		signatures[i] = hex.EncodeToString(signature)
 	}
 
-	zkpOnePass, err = util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
+	zkpOnePass, err = util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.Base.PIN)
 	if err != nil {
 		return errors.Wrap(err, "get zkp token")
 	}
@@ -62,7 +62,7 @@ func (h *signingAgent) ActionApprove(actionID string) error {
 	}
 	header = http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
-	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.HttpScheme, h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath, actionID), req, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodPut, util.URLActionApprove(h.cfg.Base.QredoAPI, actionID), req, nil, header); err != nil {
 		return err
 	}
 
@@ -78,7 +78,7 @@ func (h *signingAgent) ActionReject(actionID string) error {
 	header := http.Header{}
 	header.Set(defs.AuthHeader, hex.EncodeToString(zkpOnePass))
 
-	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.HttpScheme, h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath, actionID), nil, nil, header); err != nil {
+	if err = h.htc.Request(http.MethodDelete, util.URLActionReject(h.cfg.Base.QredoAPI, actionID), nil, nil, header); err != nil {
 		return err
 	}
 

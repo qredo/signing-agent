@@ -60,12 +60,12 @@ func NewQRouter(log *zap.SugaredLogger, config *config.Config, version *version.
 		return nil, errors.Wrap(err, "failed to initialise store")
 	}
 
-	core, err := lib.New(&config.Base, store)
+	core, err := lib.New(config, store)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialise core")
 	}
 
-	serverConn := hub.NewWebsocketSource(hub.NewDefaultDialer(), genWSQredoCoreClientFeedURL(&config.Base, config.Websocket.WsScheme), log, core, &config.Websocket)
+	serverConn := hub.NewWebsocketSource(hub.NewDefaultDialer(), genWSQredoCoreClientFeedURL(&config.Websocket), log, core, &config.Websocket)
 	feedHub := hub.NewFeedHub(serverConn, log)
 
 	localFeed := fmt.Sprintf("ws://%s%s/client/feed", config.HTTP.Addr, defs.PathPrefix)
@@ -214,14 +214,8 @@ func (r *Router) printRoutes(router *mux.Router) {
 }
 
 // genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
-func genWSQredoCoreClientFeedURL(config_base *config.Base, ws_scheme string) string {
-	builder := strings.Builder{}
-	builder.WriteString(ws_scheme)
-	builder.WriteString("://")
-	builder.WriteString(config_base.QredoAPIDomain)
-	builder.WriteString(config_base.QredoAPIBasePath)
-	builder.WriteString("/coreclient/feed")
-	return builder.String()
+func genWSQredoCoreClientFeedURL(config *config.WebSocketConf) string {
+	return config.QredoWebsocket
 }
 
 func newActionSyncronizer(config *config.LoadBalancing) autoapprover.ActionSyncronizer {

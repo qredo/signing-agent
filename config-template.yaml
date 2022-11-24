@@ -1,14 +1,12 @@
 base:
-  qredo_api_domain: play-api.qredo.network
-  qredo_api_base_path: /api/v1/p
-  http_scheme: https
+  qredo_api: https://play-api.qredo.network/api/v1/p
   pin: 0
 auto_approval:
   enabled: false
   retry_interval_max_sec: 300
   retry_interval_sec: 5
 websocket:
-  ws_scheme: wss
+  qredo_websocket: wss://play-api.qredo.network/api/v1/p/coreclient/feed
   reconnect_timeout_sec: 300
   reconnect_interval_sec: 5
   ping_period_sec: 5

@@ -19,10 +19,8 @@ type Config struct {
 }
 
 type Base struct {
-	PIN              int    `yaml:"pin"`
-	QredoAPIDomain   string `yaml:"qredo_api_domain"`
-	QredoAPIBasePath string `yaml:"qredo_api_base_path"`
-	HttpScheme       string `yaml:"http_scheme"`
+	PIN      int    `yaml:"pin"`
+	QredoAPI string `yaml:"qredo_api"`
 }
 
 type AutoApprove struct {
@@ -31,7 +29,7 @@ type AutoApprove struct {
 	RetryInterval    int  `yaml:"retry_interval_sec"`
 }
 type WebSocketConf struct {
-	WsScheme          string `yaml:"ws_scheme"`
+	QredoWebsocket    string `yaml:"qredo_websocket"`
 	ReconnectTimeOut  int    `yaml:"reconnect_timeout_sec"`
 	ReconnectInterval int    `yaml:"reconnect_interval_sec"`
 	PingPeriod        int    `yaml:"ping_period_sec"`
@@ -93,8 +91,7 @@ func (c *Config) Default() {
 	}
 
 	c.Base.PIN = 0
-	c.Base.QredoAPIDomain = "play-api.qredo.network"
-	c.Base.QredoAPIBasePath = "/api/v1/p"
+	c.Base.QredoAPI = "https://play-api.qredo.network/api/v1/p"
 	c.AutoApprove = AutoApprove{
 		Enabled:          false,
 		RetryIntervalMax: 300,
@@ -103,14 +100,13 @@ func (c *Config) Default() {
 	c.Websocket = WebSocketConf{
 		ReconnectTimeOut:  300,
 		ReconnectInterval: 5,
-		WsScheme:          "wss",
+		QredoWebsocket:    "wss://play-api.qredo.network/api/v1/p/coreclient/feed",
 		PingPeriod:        5,
 		PongWait:          10,
 		WriteWait:         10,
 		ReadBufferSize:    512,
 		WriteBufferSize:   1024,
 	}
-	c.Base.HttpScheme = "https"
 	c.Logging.Level = "info"
 	c.Logging.Format = "json"
 	c.Store.Type = "file"
