@@ -24,23 +24,22 @@ import (
 )
 
 type SaCli struct {
-	Agent            lib.SigningAgentClient
-	QredoAPIDomain   string
-	QredoAPIBasePath string
-	PartnerAPIKey    string
-	PrivateKey       string
+	Agent         lib.SigningAgentClient
+	QredoAPI      string
+	PartnerAPIKey string
+	PrivateKey    string
 }
 
-func NewDemo(domain, basePath, apiKey, privateKey string) (*SaCli, error) {
+func NewDemo(url, apiKey, privateKey string) (*SaCli, error) {
 	store := util.NewFileStore("demo.db")
 	if err := store.Init(); err != nil {
 		return nil, errors.Wrap(err, "file store init")
 	}
-	cfg := config.Base{
-		PIN:              123,
-		QredoAPIDomain:   domain,
-		QredoAPIBasePath: basePath,
-		HttpScheme:       "https",
+	cfg := config.Config{
+		Base: config.Base{
+			PIN:      123,
+			QredoAPI: url,
+		},
 	}
 
 	agent, err := lib.New(&cfg, store)
@@ -49,11 +48,10 @@ func NewDemo(domain, basePath, apiKey, privateKey string) (*SaCli, error) {
 	}
 
 	demo := &SaCli{
-		Agent:            agent,
-		QredoAPIDomain:   cfg.QredoAPIDomain,
-		QredoAPIBasePath: cfg.QredoAPIBasePath,
-		PartnerAPIKey:    apiKey,
-		PrivateKey:       privateKey,
+		Agent:         agent,
+		QredoAPI:      cfg.Base.QredoAPI,
+		PartnerAPIKey: apiKey,
+		PrivateKey:    privateKey,
 	}
 	return demo, nil
 }
@@ -74,7 +72,7 @@ func (d *SaCli) Register(name string) (*ClientRegisterResponse, error) {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("https://%s%s/coreclient/init", d.QredoAPIDomain, d.QredoAPIBasePath)
+	url := fmt.Sprintf("%s/coreclient/init", d.QredoAPI)
 	req := &httpRequest{timestamp: fmt.Sprintf("%v", time.Now().Unix()), method: "POST", url: url, body: body}
 
 	signature, err := d.sign(req.body, req.timestamp, req.url)
@@ -135,7 +133,7 @@ func (d *SaCli) CreateCompany(name, city, country, domain, ref string) (*CreateC
 	header.Add("x-api-key", d.PartnerAPIKey)
 
 	ResCC := &CreateCompanyResponse{}
-	url := fmt.Sprintf("https://%s%s/company", d.QredoAPIDomain, d.QredoAPIBasePath)
+	url := fmt.Sprintf("%s/company", d.QredoAPI)
 	httpClient := util.NewHTTPClient()
 	if err := httpClient.Request("POST", url, reqCC, ResCC, header); err != nil {
 		return nil, errors.Wrap(err, "request to partner api")
@@ -149,7 +147,7 @@ func (d *SaCli) AddTrustedparty(companyID, agentId string) error {
 	header := http.Header{}
 	header.Add("x-api-key", d.PartnerAPIKey)
 
-	url := fmt.Sprintf("https://%s%s/company/%s/trustedparty", d.QredoAPIDomain, d.QredoAPIBasePath, companyID)
+	url := fmt.Sprintf("%s/company/%s/trustedparty", d.QredoAPI, companyID)
 	httpClient := util.NewHTTPClient()
 	if err := httpClient.Request("POST", url, reqAtp, nil, header); err != nil {
 		return errors.Wrap(err, "request to partner api")
@@ -189,7 +187,7 @@ func (d *SaCli) CreateFund(companyID, fundName, fundDesc, memberID string) (*Add
 	header.Add("x-api-key", d.PartnerAPIKey)
 
 	fRes := &AddFundResponse{}
-	url := fmt.Sprintf("https://%s%s/company/%s/fund", d.QredoAPIDomain, d.QredoAPIBasePath, companyID)
+	url := fmt.Sprintf("%s/company/%s/fund", d.QredoAPI, companyID)
 	httpClient := util.NewHTTPClient()
 	if err := httpClient.Request("POST", url, reqAF, fRes, header); err != nil {
 		return nil, errors.Wrap(err, "request to partner api")
@@ -207,7 +205,7 @@ func (d *SaCli) AddWhitelist(companyID, fundID, address string) error {
 	header := http.Header{}
 	header.Add("x-api-key", d.PartnerAPIKey)
 
-	url := fmt.Sprintf("https://%s%s/company/%s/fund/%s/whitelist", d.QredoAPIDomain, d.QredoAPIBasePath, companyID, fundID)
+	url := fmt.Sprintf("%s/company/%s/fund/%s/whitelist", d.QredoAPI, companyID, fundID)
 	httpClient := util.NewHTTPClient()
 	if err := httpClient.Request("POST", url, reqAWL, nil, header); err != nil {
 		return errors.Wrap(err, "request to partner api")
@@ -220,7 +218,7 @@ func (d *SaCli) GetDepositList(companyID, fundID string) (*DepositAddressListRes
 	header.Add("x-api-key", d.PartnerAPIKey)
 
 	respDa := &DepositAddressListResponse{}
-	url := fmt.Sprintf("https://%s%s/company/%s/fund/%s/deposit", d.QredoAPIDomain, d.QredoAPIBasePath, companyID, fundID)
+	url := fmt.Sprintf("%s/company/%s/fund/%s/deposit", d.QredoAPI, companyID, fundID)
 	httpClient := util.NewHTTPClient()
 	if err := httpClient.Request("GET", url, nil, respDa, header); err != nil {
 		return nil, errors.Wrap(err, "request to partner api")
@@ -246,7 +244,7 @@ func (d *SaCli) Withdraw(companyID, walletID, address string, amount int64) (*Ne
 	header.Add("x-api-key", d.PartnerAPIKey)
 
 	resTx := &NewTransactionResponse{}
-	url := fmt.Sprintf("https://%s%s/company/%s/withdraw", d.QredoAPIDomain, d.QredoAPIBasePath, companyID)
+	url := fmt.Sprintf("%s/company/%s/withdraw", d.QredoAPI, companyID)
 	httpClient := util.NewHTTPClient()
 	if err := httpClient.Request("POST", url, reqWD, resTx, header); err != nil {
 		return nil, errors.Wrap(err, "request to partner api")

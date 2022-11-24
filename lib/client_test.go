@@ -28,10 +28,8 @@ func TestClient(t *testing.T) {
 	)
 	cfg = &config.Config{
 		Base: config.Base{
-			PIN:              1234,
-			QredoAPIDomain:   "play-api.qredo.network",
-			QredoAPIBasePath: "/api/v1/p",
-			HttpScheme:       "http",
+			PIN:      1234,
+			QredoAPI: "https://play-api.qredo.network/api/v1/p",
 		},
 		AutoApprove: config.AutoApprove{
 			Enabled: true,
@@ -110,9 +108,8 @@ func TestClient(t *testing.T) {
 
 				response := &api.CoreClientServiceRegisterFinishResponse{
 					Feed: fmt.Sprintf(
-						"ws://%s%s/coreclient/%s/feed",
-						core.cfg.QredoAPIDomain,
-						core.cfg.QredoAPIBasePath,
+						"%s/coreclient/%s/feed",
+						core.cfg.Websocket.QredoWebsocket,
 						initResponse.AccountCode,
 					),
 				}

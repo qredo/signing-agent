@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/mkideal/cli"
 	"github.com/pkg/errors"
 )
@@ -61,7 +62,7 @@ type CreateFundT struct {
 
 func NewDCli() *dCli {
 
-	demo, _ := NewDemo("play-api.qredo.network", "/api/v1/p", APIKey, PrivateKey)
+	demo, _ := NewDemo("https://play-api.qredo.network/api/v1/p", APIKey, PrivateKey)
 
 	dCli := &dCli{demo: demo}
 

@@ -35,11 +35,11 @@ type SigningAgentClient interface {
 
 type signingAgent struct {
 	store *Storage
-	cfg   *config.Base
+	cfg   *config.Config
 	htc   *util.Client
 }
 
-func New(cfg *config.Base, kv util.KVStore) (*signingAgent, error) {
+func New(cfg *config.Config, kv util.KVStore) (*signingAgent, error) {
 	return &signingAgent{
 		cfg:   cfg,
 		store: NewStore(kv),

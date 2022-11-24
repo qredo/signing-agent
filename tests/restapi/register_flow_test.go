@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -43,7 +42,6 @@ func testDefaultConf() config.Config {
 	cfg.Default()
 	cfg.Logging.Level = "debug"
 	cfg.Store.FileConfig = TestDataDBStoreFilePath
-	cfg.Base.HttpScheme = "http"
 	return cfg
 }
 
@@ -169,8 +167,8 @@ func TestRestAPIs(t *testing.T) {
 	assert.NoError(t, err)
 
 	cfg := testDefaultConf()
-	srvQB := serverMockQB(cfg.Base.QredoAPIBasePath)
-	cfg.Base.QredoAPIDomain = strings.ReplaceAll(srvQB.URL, "http://", "")
+	srvQB := serverMockQB("/api/v1/p")
+	cfg.Base.QredoAPI = srvQB.URL + "/api/v1/p"
 	cfg.AutoApprove = config.AutoApprove{
 		Enabled:          true,
 		RetryIntervalMax: 300,
@@ -179,7 +177,7 @@ func TestRestAPIs(t *testing.T) {
 	cfg.Websocket = config.WebSocketConf{
 		ReconnectTimeOut:  200,
 		ReconnectInterval: 15,
-		WsScheme:          "ws",
+		QredoWebsocket:    "wss://play-api.qredo.network/api/v1/p/coreclient/feed",
 		PingPeriod:        10,
 	}
 	handlers := getTestHandlers(cfg)
@@ -201,14 +199,14 @@ func TestRestAPIs(t *testing.T) {
 	}
 
 	// API endpoint tests
-	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Closed, 0)
+	healthcheckStatusTests(servAA, cfg.Websocket.QredoWebsocket, defs.ConnectionState.Closed, 0)
 	registrationTests(servAA, payload)
 	healthcheckVersionTests(servAA)
 	healthCheckConfigTests(servAA)
 	<-time.After(time.Second) //might take a second to open the websocket connection
-	healthcheckStatusTests(servAA, cfg.Base.QredoAPIDomain, defs.ConnectionState.Open, 0)
+	healthcheckStatusTests(servAA, cfg.Websocket.QredoWebsocket, defs.ConnectionState.Open, 0)
 	clientActionTests(servAA)
-	websocketTests(servAA, cfg.Base.QredoAPIDomain)
+	websocketTests(servAA, cfg.Websocket.QredoWebsocket)
 }
 
 // registrationTests checks the register endpoint (/register). The payload includes the data to be registered.
@@ -270,8 +268,7 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 	hcConfig.Object().Keys().Contains("Base")
 	baseCfg := hcConfig.Object().Value("Base").Object()
 	baseCfg.Value("PIN").Equal(0)
-	baseCfg.Value("QredoAPIBasePath").String().Equal("/api/v1/p")
-	baseCfg.Value("QredoAPIDomain").NotNull()
+	baseCfg.Value("QredoAPI").NotNull()
 
 	hcConfig.Object().Keys().Contains("AutoApprove")
 	autoApprove := hcConfig.Object().Value("AutoApprove").Object()
@@ -310,7 +307,7 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 }
 
 // healthCheckStatusTests checks the healthcheck status endpoint (/healthcheck/status).
-func healthcheckStatusTests(e *httpexpect.Expect, host string, wsstatus string, connectedClients int) {
+func healthcheckStatusTests(e *httpexpect.Expect, websocketUrl string, wsstatus string, connectedClients int) {
 	hcStatus := e.GET(rest.WrapPathPrefix(rest.PathHealthCheckStatus)).
 		Expect().
 		Status(http.StatusOK).JSON()
@@ -318,7 +315,7 @@ func healthcheckStatusTests(e *httpexpect.Expect, host string, wsstatus string, 
 	hcStatus.Object().Keys().ContainsOnly("WebSocket")
 	webSocket := hcStatus.Object().Value("WebSocket").Object()
 	webSocket.Value("ReadyState").String().Equal(wsstatus)
-	webSocket.Value("RemoteFeedUrl").String().Equal(fmt.Sprintf("ws://%s/api/v1/p/coreclient/feed", host))
+	webSocket.Value("RemoteFeedUrl").String().Equal(websocketUrl)
 	webSocket.Value("LocalFeedUrl").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
 	webSocket.Value("ConnectedClients").Equal(connectedClients)
 }

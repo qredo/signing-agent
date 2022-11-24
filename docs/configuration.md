@@ -2,8 +2,7 @@
 
 ```yaml
 base:
-  qredo_api_domain: play-api.qredo.network
-  qredo_api_base_path: /api/v1/p
+  qredo_api: https://play-api.qredo.network/api/v1/p
   http_scheme: https
   pin: 0
 auto_approval:
@@ -11,7 +10,7 @@ auto_approval:
   retry_interval_max_sec: 300
   retry_interval_sec: 5
 websocket:
-  ws_scheme: wss
+  qredo_websocket: wss://play-api.qredo.network/api/v1/p/coreclient/feed
   reconnect_timeout_sec: 300
   reconnect_interval_sec: 5
   ping_period_sec: 5
@@ -51,8 +50,7 @@ store:
 
 ## Base
 
-- **qredo_api_domain:** the domain of the api you want to use
-- **qredo_api_base_path:** base path for the api urls, ex. scheme://domain/base_path
+- **qredo_api:** the url of the api you want to use
 - **http_scheme:** the scheme to use for the api connection, ex. http or https
 - **pin:** the pin number to use to provide a zero knowledge proof token for communication with the partner api
 
@@ -62,7 +60,7 @@ store:
 - **retry_interval_sec:** the approve action retry interval in seconds
 
 ## Websocket
-- **ws_scheme:** the scheme to use for the web socket feed connection, ex. ws or wss
+- **qredo_websocket:** the url of the websocket feed you want to use
 - **reconnect_timeout_sec:** the reconnect timeout in seconds
 - **reconnect_interval_sec:** the reconnect interval in seconds
 - **ping_period_sec:** the ping period for the ping handler in seconds

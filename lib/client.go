@@ -72,7 +72,7 @@ func (h *signingAgent) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 	}
 
 	// ZKP Token
-	pending.ZKPToken, err = crypto.ExtractPIN(pending.ZKPID, h.cfg.PIN, cs)
+	pending.ZKPToken, err = crypto.ExtractPIN(pending.ZKPID, h.cfg.Base.PIN, cs)
 	if err != nil {
 		return nil, errors.Wrap(err, "extract pin")
 	}
@@ -87,7 +87,7 @@ func (h *signingAgent) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 		return nil, errors.Wrap(err, "idDoc sign")
 	}
 
-	zkpOnePass, err := util.ZKPOnePass(pending.ZKPID, pending.ZKPToken, h.cfg.PIN)
+	zkpOnePass, err := util.ZKPOnePass(pending.ZKPID, pending.ZKPToken, h.cfg.Base.PIN)
 	if err != nil {
 		return nil, errors.Wrap(err, "get zkp token")
 	}
@@ -101,7 +101,7 @@ func (h *signingAgent) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 
 	finishResp := &api.CoreClientServiceRegisterFinishResponse{}
 
-	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.HttpScheme, h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath), confirmRequest, finishResp, header); err != nil {
+	if err = h.htc.Request(http.MethodPost, util.URLRegisterConfirm(h.cfg.Base.QredoAPI), confirmRequest, finishResp, header); err != nil {
 		return nil, err
 	}
 
@@ -147,7 +147,7 @@ func (h *signingAgent) ClientInit(reqData *api.QredoRegisterInitRequest, ref, ap
 		return nil, err
 	}
 	req.ApiKey = strings.TrimSpace(apikey)
-	req.Uri = util.URLClientInit(h.cfg.HttpScheme, h.cfg.QredoAPIDomain, h.cfg.QredoAPIBasePath)
+	req.Uri = util.URLClientInit(h.cfg.Base.QredoAPI)
 	err = SignRequest(req)
 	if err != nil {
 		return nil, err
@@ -178,7 +178,7 @@ func (h *signingAgent) GetAgentZKPOnePass() ([]byte, error) {
 	if agent == nil {
 		return nil, errors.Errorf("can not get agent from the store.")
 	}
-	zkpOnePass, err := util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.PIN)
+	zkpOnePass, err := util.ZKPOnePass(agent.ZKPID, agent.ZKPToken, h.cfg.Base.PIN)
 	if err != nil {
 		return nil, err
 	}
