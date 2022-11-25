@@ -141,7 +141,13 @@ func (r *Router) StartHTTPListener(errChan chan error) {
 
 	r.signingAgentHandler.StartAgent()
 
-	errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
+	if r.config.HTTP.TLS.Enabled {
+		r.log.Info("Start listening on HTTPS")
+		errChan <- http.ListenAndServeTLS(r.config.HTTP.Addr, r.config.HTTP.TLS.CertFile, r.config.HTTP.TLS.KeyFile, context.ClearHandler(r.router))
+	} else {
+		r.log.Info("Start listening on HTTP")
+		errChan <- http.ListenAndServe(r.config.HTTP.Addr, context.ClearHandler(r.router))
+	}
 }
 
 // WriteHTTPError writes the error response as JSON
