@@ -19,6 +19,10 @@ http:
   cors_allow_origins:
     - '*'
   log_all_requests: false
+  tls:
+    enabled: true
+    cert_file: tls/domain.crt
+    key_file: tls/domain.key
 logging:
   format: text
   level: debug

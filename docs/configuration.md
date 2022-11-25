@@ -23,6 +23,10 @@ http:
   cors_allow_origins:
     - '*'
   log_all_requests: false
+  tls:
+    enabled: true
+    cert_file: tls/domain.crt
+    key_file: tls/domain.key  
 logging:
   format: text
   level: debug
@@ -74,6 +78,11 @@ store:
 - **addr:** the bind address and port the build in api endpoints
 - **cors_allow_origins:** the value the the Access-Control-Allow-Origin of the responses of the build in api
 - **log_all_requests:** log all incoming requests to the build in api
+- **tls:**
+  - **enabled:** wether or not you want to enable tls on the server side
+  - **cert_file:** path to the cert file you want to use
+  - **key_file:** path to the key file you want to use
+
 
 ## Logging
 

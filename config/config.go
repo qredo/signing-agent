@@ -23,6 +23,12 @@ type Base struct {
 	QredoAPI string `yaml:"qredo_api"`
 }
 
+type TLSConfig struct {
+	Enabled  bool   `yaml:"enabled"`
+	CertFile string `yaml:"cert_file"`
+	KeyFile  string `yaml:"key_file"`
+}
+
 type AutoApprove struct {
 	Enabled          bool `yaml:"enabled"`
 	RetryIntervalMax int  `yaml:"retry_interval_max_sec"`
@@ -59,9 +65,10 @@ type AWSConfig struct {
 }
 
 type HttpSettings struct {
-	Addr             string   `yaml:"addr"`
-	CORSAllowOrigins []string `yaml:"cors_allow_origins"`
-	LogAllRequests   bool     `yaml:"log_all_requests"`
+	Addr             string    `yaml:"addr"`
+	CORSAllowOrigins []string  `yaml:"cors_allow_origins"`
+	LogAllRequests   bool      `yaml:"log_all_requests"`
+	TLS              TLSConfig `yaml:"tls"`
 }
 
 type Logging struct {
@@ -88,6 +95,9 @@ func (c *Config) Default() {
 	c.HTTP = HttpSettings{
 		Addr:             "127.0.0.1:8007",
 		CORSAllowOrigins: []string{"*"},
+		TLS: TLSConfig{
+			Enabled: false,
+		},
 	}
 
 	c.Base.PIN = 0
