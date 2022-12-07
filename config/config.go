@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Config is the service configuration
+// swagger:model ConfigResponse
 type Config struct {
 	Base          Base          `yaml:"base"`
 	HTTP          HttpSettings  `yaml:"http"`

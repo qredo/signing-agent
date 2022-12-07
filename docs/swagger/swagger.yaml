@@ -1,122 +1,370 @@
+basePath: /api/v1
 definitions:
-  ClientRegisterFinishRequest:
-    properties:
-      accountCode:
-        type: string
-      clientID:
-        type: string
-      clientSecret:
-        type: string
-      id:
-        type: string
-      idDoc:
-        type: string
-    type: object
-  ClientRegisterRequest:
-    properties:
-      apikey:
-        type: string
-      base64privatekey:
-        type: string
-      name:
-        type: string
-    type: object
-  SignRequest:
-    properties:
-      message_hash_hex:
-        type: string
-    type: object
-  VerifyRequest:
-    properties:
-      message_hash_hex:
-        type: string
-      signature_hex:
-        type: string
-      signer_id:
-        type: string
-    type: object
-  clientRegisterFinishResponse:
-    properties:
-      feed_url:
-        type: string
-    type: object
-  clientRegisterResponse:
-    properties:
-      bls_public_key:
-        type: string
-      ec_public_key:
-        type: string
-      ref_id:
-        type: string
-    type: object
-  signResponse:
-    properties:
-      signature_hex:
-        type: string
-      signer_id:
-        type: string
-    type: object
+    AWSConfig:
+        properties:
+            Region:
+                type: string
+            SecretName:
+                type: string
+        title: AWSConfig based signing-agent config. Used when Base StoreType is aws.
+        type: object
+    AutoApprove:
+        properties:
+            Enabled:
+                type: boolean
+            RetryInterval:
+                format: int64
+                type: integer
+            RetryIntervalMax:
+                format: int64
+                type: integer
+        type: object
+    Base:
+        properties:
+            PIN:
+                format: int64
+                type: integer
+            QredoAPI:
+                type: string
+        type: object
+    ClientFeedResponse:
+        properties:
+            coreClientID:
+                description: The ID of the agent
+                example: 98cTMMSPrDdcDDVU8idhuJGK2U1P4vmQcsp8wnED8pPR
+                type: string
+            expireTime:
+                description: The time that the transaction will expire, utc unix time
+                example: 1676184187
+                format: int64
+                type: integer
+            id:
+                description: The ID of the transaction
+                example: 2IXwq4klvWbnPf1YaAc1XD85jJX
+                type: string
+            status:
+                description: The status of the transaction
+                example: pending
+                type: string
+            timestamp:
+                description: The time that the transaction was started, utc unix time
+                example: 1670341423
+                format: int64
+                type: integer
+            type:
+                description: The type of the transaction
+                example: ApproveWithdraw
+                type: string
+        type: object
+    ClientFullRegisterResponse:
+        properties:
+            agentId:
+                type: string
+            feedUrl:
+                type: string
+        type: object
+    ClientListResponse:
+        items:
+            type: string
+        type: array
+    ClientRegisterRequest:
+        properties:
+            apikey:
+                description: The api key for the partner api
+                example: eyJrZXkiOiJHM0Fo... (truncated)
+                type: string
+            base64privatekey:
+                description: The base64 encoded private key pem of which the public key has been registered in the partner api
+                example: LS0tLS1CRUdJTiBS... (truncated)
+                type: string
+            name:
+                description: The name of the agent
+                example: test-agent
+                type: string
+        type: object
+    ConfigResponse:
+        properties:
+            AutoApprove:
+                $ref: '#/definitions/AutoApprove'
+            Base:
+                $ref: '#/definitions/Base'
+            HTTP:
+                $ref: '#/definitions/HttpSettings'
+            LoadBalancing:
+                $ref: '#/definitions/LoadBalancing'
+            Logging:
+                $ref: '#/definitions/Logging'
+            Store:
+                $ref: '#/definitions/Store'
+            Websocket:
+                $ref: '#/definitions/WebSocketConf'
+        type: object
+    GenericResponse:
+        properties:
+            Code:
+                description: The result code of the request
+                example: 200
+                format: int64
+                type: integer
+            Msg:
+                description: The result message of the request
+                example: OK
+                type: string
+        type: object
+    HealthCheckStatusResponse:
+        properties:
+            WebSocket:
+                $ref: '#/definitions/WebsocketStatus'
+        type: object
+    HttpSettings:
+        properties:
+            Addr:
+                type: string
+            CORSAllowOrigins:
+                items:
+                    type: string
+                type: array
+            LogAllRequests:
+                type: boolean
+            TLS:
+                $ref: '#/definitions/TLSConfig'
+        type: object
+    LoadBalancing:
+        properties:
+            ActionIDExpirationSec:
+                format: int64
+                type: integer
+            Enable:
+                type: boolean
+            OnLockErrorTimeOutMs:
+                format: int64
+                type: integer
+            RedisConfig:
+                $ref: '#/definitions/RedisConfig'
+        type: object
+    Logging:
+        properties:
+            Format:
+                type: string
+            Level:
+                type: string
+        type: object
+    OciConfig:
+        properties:
+            Compartment:
+                type: string
+            ConfigSecret:
+                type: string
+            SecretEncryptionKey:
+                type: string
+            Vault:
+                type: string
+        type: object
+    RedisConfig:
+        properties:
+            DB:
+                format: int64
+                type: integer
+            Host:
+                type: string
+            Password:
+                type: string
+            Port:
+                format: int64
+                type: integer
+        type: object
+    Store:
+        properties:
+            AwsConfig:
+                $ref: '#/definitions/AWSConfig'
+            FileConfig:
+                type: string
+            OciConfig:
+                $ref: '#/definitions/OciConfig'
+            Type:
+                type: string
+        type: object
+    TLSConfig:
+        properties:
+            CertFile:
+                type: string
+            Enabled:
+                type: boolean
+            KeyFile:
+                type: string
+        type: object
+    VersionResponse:
+        properties:
+            BuildDate:
+                type: string
+            BuildType:
+                type: string
+            BuildVersion:
+                type: string
+        type: object
+    WebSocketConf:
+        properties:
+            PingPeriod:
+                format: int64
+                type: integer
+            PongWait:
+                format: int64
+                type: integer
+            QredoWebsocket:
+                type: string
+            ReadBufferSize:
+                format: int64
+                type: integer
+            ReconnectInterval:
+                format: int64
+                type: integer
+            ReconnectTimeOut:
+                format: int64
+                type: integer
+            WriteBufferSize:
+                format: int64
+                type: integer
+            WriteWait:
+                format: int64
+                type: integer
+        type: object
+    WebsocketStatus:
+        properties:
+            ConnectedClients:
+                format: uint32
+                type: integer
+            LocalFeedUrl:
+                type: string
+            ReadyState:
+                type: string
+            RemoteFeedUrl:
+                type: string
+        type: object
+host: localhost:8007
+info:
+    contact:
+        email: support@qredo.com
+        name: Qredo API Services
+        url: https://www.qredo.com
+    description: |-
+        Qredo Signing Agent service interacts with [Partner API](https://developers.qredo.com/partner-api/api/swagger/) to register a Signing Agent to automate approvals according to your custody policy. <br/>
+        Authentication and encryption are required; set up your [API key and secret in the Qredo Web App](https://developers.qredo.com/signing-agent/v2-signing-agent/get-started/). <br/>
+    license:
+        name: APACHE 2.0
+        url: https://www.apache.org/licenses/LICENSE-2.0
+    title: Qredo Signing Agent V2
+    version: 0.1.0
 paths:
-  /client:
-    get:
-      description: Return AgentID if it's configured
-      operationId: ClientsList
-      responses:
-        "200":
-          $ref: '#/responses/string'
-      tags:
-      - clientsList
-  /client/{client_id}/sign:
-    post:
-      description: Sign a payload
-      operationId: payloadSign
-      parameters:
-      - in: body
-        name: Body
-        schema:
-          $ref: '#/definitions/SignRequest'
-      responses:
-        "200":
-          description: signResponse
-          schema:
-            $ref: '#/definitions/signResponse'
-      tags:
-      - payloads
-  /client/action/{action_id}:
-    delete:
-      description: Reject action
-      operationId: actionReject
-      tags:
-      - actions
-    put:
-      description: Approve action
-      operationId: actionApprove
-      tags:
-      - actions
-  /client/feed:
-    post:
-      description: Get approval requests Feed (via websocket) from Qredo Backend
-      operationId: ClientFeed
-      tags:
-      - clientFeed
-  /client/register:
-    post:
-      description: Client registration process (3 steps in one)
-      operationId: ClientFullRegister
-      responses:
-        "200":
-          $ref: '#/responses/ClientRegisterFinishResponse'
-      tags:
-      - clientFullRegister
-  /verify:
-    post:
-      description: Verify a signature
-      operationId: signatureVerify
-      parameters:
-      - in: body
-        name: Body
-        schema:
-          $ref: '#/definitions/VerifyRequest'
-      tags:
-      - payloads
+    /client:
+        get:
+            operationId: ClientsList
+            responses:
+                "200":
+                    description: ClientListResponse
+                    schema:
+                        $ref: '#/definitions/ClientListResponse'
+            summary: Returns AgentID if it's configured
+            tags:
+                - client
+    /client/action/{action_id}:
+        delete:
+            operationId: actionReject
+            parameters:
+                - description: the id of the transaction that is received from the feed
+                  in: path
+                  name: action_id
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: GenericResponse
+                    schema:
+                        $ref: '#/definitions/GenericResponse'
+            summary: Reject a transaction
+            tags:
+                - action
+        put:
+            operationId: actionApprove
+            parameters:
+                - description: the id of the transaction that is received from the feed
+                  in: path
+                  name: action_id
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: GenericResponse
+                    schema:
+                        $ref: '#/definitions/GenericResponse'
+            summary: Approve a transaction
+            tags:
+                - action
+    /client/feed:
+        post:
+            operationId: ClientFeed
+            produces:
+                - application/json
+            responses:
+                "200":
+                    description: ClientFeedResponse
+                    schema:
+                        $ref: '#/definitions/ClientFeedResponse'
+            schemes:
+                - ws
+                - wss
+            summary: Get approval requests Feed (via websocket) from Qredo Backend
+            tags:
+                - client
+    /client/register:
+        post:
+            operationId: RegisterAgent
+            parameters:
+                - in: body
+                  name: Body
+                  schema:
+                    $ref: '#/definitions/ClientRegisterRequest'
+            responses:
+                "200":
+                    description: ClientFullRegisterResponse
+                    schema:
+                        $ref: '#/definitions/ClientFullRegisterResponse'
+            summary: Register a new agent
+            tags:
+                - client
+    /healthcheck/config:
+        get:
+            operationId: HealthcheckConfig
+            responses:
+                "200":
+                    description: ConfigResponse
+                    schema:
+                        $ref: '#/definitions/ConfigResponse'
+            summary: Check application configuration.
+            tags:
+                - healthcheck
+    /healthcheck/status:
+        get:
+            operationId: HealthcheckStatus
+            responses:
+                "200":
+                    description: HealthCheckStatusResponse
+                    schema:
+                        $ref: '#/definitions/HealthCheckStatusResponse'
+            summary: Check application status.
+            tags:
+                - healthcheck
+    /healthcheck/version:
+        get:
+            operationId: HealthcheckVersion
+            responses:
+                "200":
+                    description: VersionResponse
+                    schema:
+                        $ref: '#/definitions/VersionResponse'
+            summary: Check application version.
+            tags:
+                - healthcheck
+schemes:
+    - http
+    - https
 swagger: "2.0"

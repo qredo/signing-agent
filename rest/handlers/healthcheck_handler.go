@@ -30,9 +30,13 @@ func NewHealthCheckHandler(source hub.SourceStats, version *version.Version, con
 
 // HealthCheckVersion
 //
-// swagger:route GET /healthcheck/version
+// swagger:route GET /healthcheck/version healthcheck HealthcheckVersion
 //
 // Check application version.
+//
+// Responses:
+//
+//	200: VersionResponse
 func (h *HealthCheckHandler) HealthCheckVersion(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 	response := h.version
@@ -41,9 +45,13 @@ func (h *HealthCheckHandler) HealthCheckVersion(_ *defs.RequestContext, w http.R
 
 // HealthCheckConfig
 //
-// swagger:route GET /healthcheck/config
+// swagger:route GET /healthcheck/config healthcheck HealthcheckConfig
 //
 // Check application configuration.
+//
+// Responses:
+//
+//	200: ConfigResponse
 func (h *HealthCheckHandler) HealthCheckConfig(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 	response := h.config
@@ -52,9 +60,13 @@ func (h *HealthCheckHandler) HealthCheckConfig(_ *defs.RequestContext, w http.Re
 
 // HealthCheckStatus
 //
-// swagger:route GET /healthcheck/status
+// swagger:route GET /healthcheck/status healthcheck HealthcheckStatus
 //
 // Check application status.
+//
+// Responses:
+//
+//	200: HealthCheckStatusResponse
 func (h *HealthCheckHandler) HealthCheckStatus(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 
