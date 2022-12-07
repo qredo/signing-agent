@@ -125,13 +125,13 @@ func (h *signingAgent) ClientRegisterFinish(req *api.ClientRegisterFinishRequest
 	}, nil
 }
 
-// ClientsList - Signing Agent can be only one
-func (h *signingAgent) ClientsList() ([]string, error) {
+// GetAgentID - returns the signing agent ID if registered, empty if not
+func (h *signingAgent) GetAgentID() string {
 	agentID := h.store.GetSystemAgentID()
 	if len(agentID) > 0 {
-		return []string{agentID}, nil
+		return agentID
 	} else {
-		return []string{}, nil
+		return ""
 	}
 }
 

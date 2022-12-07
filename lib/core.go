@@ -14,8 +14,8 @@ type SigningAgentClient interface {
 	ClientRegister(name string) (*api.ClientRegisterResponse, error)
 	// ClientRegisterFinish concludes the agent registration process
 	ClientRegisterFinish(req *api.ClientRegisterFinishRequest, ref string) (*api.ClientRegisterFinishResponse, error)
-	// ClientsList is not currently implemented
-	ClientsList() ([]string, error)
+	// GetAgentID returns the agent id if registered
+	GetAgentID() string
 
 	// ActionApprove signs actionID and sends it for approval to the Qredo backend
 	ActionApprove(actionID string) error

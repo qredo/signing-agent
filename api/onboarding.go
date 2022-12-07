@@ -104,3 +104,8 @@ type ClientFullRegisterResponse struct {
 	AgentID string `json:"agentId"`
 	FeedURL string `json:"feedUrl"`
 }
+
+// swagger:model GetAgentIDResponse
+type GetAgentIDResponse struct {
+	AgentID string `json:"agentID"`
+}

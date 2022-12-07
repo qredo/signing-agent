@@ -30,7 +30,7 @@ const (
 	PathHealthCheckConfig  = "/healthcheck/config"
 	PathHealthCheckStatus  = "/healthcheck/status"
 	PathClientFullRegister = "/register"
-	PathClientsList        = "/client"
+	PathClient             = "/client"
 	PathAction             = "/client/action/{action_id}"
 	PathClientFeed         = "/client/feed"
 )
@@ -101,7 +101,7 @@ func (r *Router) SetHandlers() http.Handler {
 		{PathHealthCheckConfig, http.MethodGet, r.healthCheckHandler.HealthCheckConfig},
 		{PathHealthCheckStatus, http.MethodGet, r.healthCheckHandler.HealthCheckStatus},
 		{PathClientFullRegister, http.MethodPost, r.signingAgentHandler.RegisterAgent},
-		{PathClientsList, http.MethodGet, r.signingAgentHandler.ClientsList},
+		{PathClient, http.MethodGet, r.signingAgentHandler.GetAgentID},
 		{PathAction, http.MethodPut, r.actionHandler.ActionApprove},
 		{PathAction, http.MethodDelete, r.actionHandler.ActionReject},
 		{PathClientFeed, defs.MethodWebsocket, r.signingAgentHandler.ClientFeed},

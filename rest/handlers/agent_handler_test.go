@@ -473,10 +473,10 @@ func TestSigningAgentHandler_ClientFeed_registers_client(t *testing.T) {
 	assert.True(t, mockFeedClient.ListenCalled)
 }
 
-func TestSigningAgentHandler_ClientsList(t *testing.T) {
+func TestSigningAgentHandler_GetAgentID(t *testing.T) {
 	//Arrange
 	mockCore := &lib.MockSigningAgentClient{
-		NextClientsList: []string{"client 1", "client2"},
+		NextAgentID: "client 1",
 	}
 	handler := &SigningAgentHandler{
 		core: mockCore,
@@ -485,7 +485,7 @@ func TestSigningAgentHandler_ClientsList(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	//Act
-	response, err := handler.ClientsList(nil, rr, req)
+	response, err := handler.GetAgentID(nil, rr, req)
 
 	//Assert
 	assert.Nil(t, err)
@@ -493,8 +493,8 @@ func TestSigningAgentHandler_ClientsList(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
 
-	assert.True(t, mockCore.ClientsListCalled)
+	assert.True(t, mockCore.GetAgentIDCalled)
 	data, _ := json.Marshal(response)
 
-	assert.Equal(t, "[\"client 1\",\"client2\"]", string(data))
+	assert.Equal(t, "{\"agentID\":\"client 1\"}", string(data))
 }
