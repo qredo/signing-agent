@@ -79,9 +79,9 @@ func (h *SigningAgentHandler) StopAgent() {
 
 // RegisterAgent
 //
-// swagger:route POST /client/register RegisterAgent
+// swagger:route POST /client/register client RegisterAgent
 //
-// Client registration process (3 steps in one)
+// # Register a new agent
 //
 // Responses:
 //
@@ -103,9 +103,17 @@ func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.Respo
 
 // ClientFeed
 //
-// swagger:route POST /client/feed  ClientFeed
+// swagger:route POST /client/feed client ClientFeed
 //
-// Get approval requests Feed (via websocket) from Qredo Backend
+// # Get approval requests Feed (via websocket) from Qredo Backend
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: ws, wss
+//
+// Responses:
+// 200: ClientFeedResponse
 func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	hubRunning := h.feedHub.IsRunning()
 
@@ -131,13 +139,13 @@ func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.Response
 
 // ClientsList
 //
-// swagger:route GET /client ClientsList
+// swagger:route GET /client client ClientsList
 //
-// # Return AgentID if it's configured
+// # Returns AgentID if it's configured
 //
 // Responses:
 //
-//	200: []string
+//	200: ClientListResponse
 func (h *SigningAgentHandler) ClientsList(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 	return h.core.ClientsList()

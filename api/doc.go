@@ -1,25 +1,60 @@
+// Package classification Qredo Signing Agent V2
+//
+// Qredo Signing Agent service interacts with [Partner API](https://developers.qredo.com/partner-api/api/swagger/) to register a Signing Agent to automate approvals according to your custody policy. <br/>
+// Authentication and encryption are required; set up your [API key and secret in the Qredo Web App](https://developers.qredo.com/signing-agent/v2-signing-agent/get-started/). <br/>
+//
+// Version: 0.1.0
+// Contact: Qredo API Services<support@qredo.com> https://www.qredo.com
+// Schemes: http, https
+// Host: localhost:8007
+// BasePath: /api/v1
+// License: APACHE 2.0 https://www.apache.org/licenses/LICENSE-2.0
+// swagger:meta
 package api
 
-// swagger:parameters clientRegisterInit
+// swagger:parameters RegisterAgent
 type DOCClientRegisterRequest struct {
 	// in:body
 	Body ClientRegisterRequest
 }
 
-// swagger:parameters clientRegisterFinish
-type DOCRegisterFinishRequest struct {
-	// in:body
-	Body ClientRegisterFinishRequest
+// swagger:model ClientListResponse
+type DOCClientListResponse []string
+
+// swagger:model ClientFeedResponse
+type DOCClientFeedResponse struct {
+	// The ID of the transaction
+	// example: 2IXwq4klvWbnPf1YaAc1XD85jJX
+	ID string `json:"id"`
+
+	// The ID of the agent
+	// example: 98cTMMSPrDdcDDVU8idhuJGK2U1P4vmQcsp8wnED8pPR
+	CoreClientID string `json:"coreClientID"`
+
+	// The type of the transaction
+	// example: ApproveWithdraw
+	Type string `json:"type"`
+
+	// The status of the transaction
+	// example: pending
+	Status string `json:"status"`
+
+	// The time that the transaction was started, utc unix time
+	// example: 1670341423
+	Timestamp int64 `json:"timestamp"`
+
+	// The time that the transaction will expire, utc unix time
+	// example: 1676184187
+	ExpireTime int64 `json:"expireTime"`
 }
 
-// swagger:parameters payloadSign
-type DOCSignRequest struct {
-	// in:body
-	Body SignRequest
-}
+// swagger:model GenericResponse
+type DOCGenericResponse struct {
+	// The result code of the request
+	// example: 200
+	Code int
 
-// swagger:parameters signatureVerify
-type DOCVerifyRequest struct {
-	// in:body
-	Body VerifyRequest
+	// The result message of the request
+	// example: OK
+	Msg string
 }

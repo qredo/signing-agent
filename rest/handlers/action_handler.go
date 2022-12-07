@@ -22,9 +22,19 @@ func NewActionHandler(actionManager autoapprover.ActionManager) *ActionHandler {
 
 // ActionApprove
 //
-// swagger:route PUT /client/action/{action_id}  actions actionApprove
+// swagger:route PUT /client/action/{action_id} action actionApprove
 //
-// Approve action
+// # Approve a transaction
+//
+//		Parameters:
+//		  + name: action_id
+//		    in: path
+//		    description: the id of the transaction that is received from the feed
+//		    required: true
+//		    type: string
+//
+//	 Responses:
+//	   200: GenericResponse
 func (h *ActionHandler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	actionID = strings.TrimSpace(actionID)
@@ -37,9 +47,19 @@ func (h *ActionHandler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWri
 
 // ActionReject
 //
-// swagger:route DELETE /client/action/{action_id}  actions actionReject
+// swagger:route DELETE /client/action/{action_id} action actionReject
 //
-// Reject action
+// # Reject a transaction
+//
+//		Parameters:
+//		  + name: action_id
+//		    in: path
+//		    description: the id of the transaction that is received from the feed
+//		    required: true
+//		    type: string
+//
+//	 Responses:
+//	   200: GenericResponse
 func (h *ActionHandler) ActionReject(_ *defs.RequestContext, _ http.ResponseWriter, r *http.Request) (interface{}, error) {
 	actionID := mux.Vars(r)["action_id"]
 	actionID = strings.TrimSpace(actionID)
