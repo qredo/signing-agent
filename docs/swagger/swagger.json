@@ -27,12 +27,12 @@
           "client"
         ],
         "summary": "Returns AgentID if it's configured",
-        "operationId": "ClientsList",
+        "operationId": "GetAgentID",
         "responses": {
           "200": {
-            "description": "ClientListResponse",
+            "description": "GetAgentIDResponse",
             "schema": {
-              "$ref": "#/definitions/ClientListResponse"
+              "$ref": "#/definitions/GetAgentIDResponse"
             }
           }
         }
@@ -279,12 +279,6 @@
         }
       }
     },
-    "ClientListResponse": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
     "ClientRegisterRequest": {
       "type": "object",
       "properties": {
@@ -344,6 +338,14 @@
           "description": "The result message of the request",
           "type": "string",
           "example": "OK"
+        }
+      }
+    },
+    "GetAgentIDResponse": {
+      "type": "object",
+      "properties": {
+        "agentID": {
+          "type": "string"
         }
       }
     },

@@ -9,7 +9,7 @@ type MockSigningAgentClient struct {
 	ClientInitCalled           bool
 	ClientRegisterFinishCalled bool
 	ActionApproveCalled        bool
-	ClientsListCalled          bool
+	GetAgentIDCalled           bool
 	ActionRejectCalled         bool
 	Counter                    int
 	NextError                  error
@@ -29,7 +29,6 @@ type MockSigningAgentClient struct {
 	Last64PrivateKey           string
 	LastActionId               string
 	LastRejectActionId         string
-	NextClientsList            []string
 }
 
 func NewMockSigningAgentClient(agentId string) *MockSigningAgentClient {
@@ -59,10 +58,10 @@ func (m *MockSigningAgentClient) ClientRegisterFinish(req *api.ClientRegisterFin
 	return m.NextRegisterFinishResponse, m.NextRegisterFinishError
 }
 
-func (m *MockSigningAgentClient) ClientsList() ([]string, error) {
-	m.ClientsListCalled = true
+func (m *MockSigningAgentClient) GetAgentID() string {
+	m.GetAgentIDCalled = true
 
-	return m.NextClientsList, nil
+	return m.NextAgentID
 }
 
 func (m *MockSigningAgentClient) ActionApprove(actionID string) error {

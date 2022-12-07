@@ -226,11 +226,11 @@ func registrationTests(e *httpexpect.Expect, payload *api.ClientRegisterRequest)
 
 	// GET: /client should return the same agentID
 	testAccountCode = registrationResponse.Object().Value("agentId").Raw().(string)
-	response := e.GET(rest.WrapPathPrefix(rest.PathClientsList)).
+	response := e.GET(rest.WrapPathPrefix(rest.PathClient)).
 		Expect().
 		Status(http.StatusOK)
-	response.JSON().Array().NotEmpty()
-	response.JSON().Array().First().Equal(testAccountCode)
+	response.JSON().Object().NotEmpty()
+	response.JSON().Object().Value("agentID").String().Equal(testAccountCode)
 
 	// Register an existing client should result in an error.
 	registrationResponse = e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).

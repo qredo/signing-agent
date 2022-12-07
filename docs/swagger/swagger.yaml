@@ -63,10 +63,6 @@ definitions:
             feedUrl:
                 type: string
         type: object
-    ClientListResponse:
-        items:
-            type: string
-        type: array
     ClientRegisterRequest:
         properties:
             apikey:
@@ -109,6 +105,11 @@ definitions:
             Msg:
                 description: The result message of the request
                 example: OK
+                type: string
+        type: object
+    GetAgentIDResponse:
+        properties:
+            agentID:
                 type: string
         type: object
     HealthCheckStatusResponse:
@@ -257,12 +258,12 @@ info:
 paths:
     /client:
         get:
-            operationId: ClientsList
+            operationId: GetAgentID
             responses:
                 "200":
-                    description: ClientListResponse
+                    description: GetAgentIDResponse
                     schema:
-                        $ref: '#/definitions/ClientListResponse'
+                        $ref: '#/definitions/GetAgentIDResponse'
             summary: Returns AgentID if it's configured
             tags:
                 - client

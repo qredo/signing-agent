@@ -161,12 +161,10 @@ func TestClient(t *testing.T) {
 		})
 
 	t.Run(
-		"ClientsList",
+		"GetAgentID",
 		func(t *testing.T) {
-			var agentsIDList []string
-			agentsIDList, err = core.ClientsList()
-			assert.NoError(t, err)
-			assert.Equal(t, []string{initResponse.AccountCode}, agentsIDList)
+			agentID := core.GetAgentID()
+			assert.Equal(t, initResponse.AccountCode, agentID)
 		})
 
 	t.Run(
@@ -176,9 +174,7 @@ func TestClient(t *testing.T) {
 			_ = core.SetSystemAgentID(agentID)
 			assert.Equal(t, core.GetSystemAgentID(), agentID)
 
-			var agentsIDList []string
-			agentsIDList, err = core.ClientsList()
-			assert.NoError(t, err)
-			assert.Equal(t, []string{agentID}, agentsIDList)
+			res := core.GetAgentID()
+			assert.Equal(t, agentID, res)
 		})
 }

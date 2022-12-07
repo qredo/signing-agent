@@ -108,11 +108,12 @@ func TestRegisterNewSigningAgent(t *testing.T) {
 	agentID := registrationResponse.Object().Value("agentId").Raw().(string)
 
 	// GET: /client should return the same agentID
-	response := e.GET(rest.WrapPathPrefix(rest.PathClientsList)).
+	response := e.GET(rest.WrapPathPrefix(rest.PathClient)).
 		Expect().
 		Status(http.StatusOK)
-	response.JSON().Array().NotEmpty()
-	response.JSON().Array().First().Equal(agentID)
+	response.JSON().Object().NotEmpty()
+	response.JSON().Object().Value("agentID").String().NotEmpty()
+	response.JSON().Object().Value("agentID").String().Equal(agentID)
 }
 
 // TestRegisterExistingAgentDeny checks attempting to register fails with a known message.
