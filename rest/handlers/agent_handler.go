@@ -141,7 +141,7 @@ func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.Response
 //
 // swagger:route GET /client client GetAgentID
 //
-// # Returns AgentID if it's configured
+// # Returns `agentID` if it's configured
 //
 // Responses:
 //
