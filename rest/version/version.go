@@ -3,9 +3,9 @@ package version
 
 // swagger:model VersionResponse
 type Version struct {
-	BuildVersion string `json:"BuildVersion"`
-	BuildType    string `json:"BuildType"`
-	BuildDate    string `json:"BuildDate"`
+	BuildVersion string `json:"buildVersion"`
+	BuildType    string `json:"buildType"`
+	BuildDate    string `json:"buildDate"`
 }
 
 func DefaultVersion() *Version {

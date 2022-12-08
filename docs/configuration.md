@@ -2,38 +2,37 @@
 
 ```yaml
 base:
-  qredo_api: https://play-api.qredo.network/api/v1/p
-  http_scheme: https
+  qredoAPI: https://play-api.qredo.network/api/v1/p
   pin: 0
-auto_approval:
+autoApproval:
   enabled: false
-  retry_interval_max_sec: 300
-  retry_interval_sec: 5
+  retryIntervalMaxSec: 300
+  retryIntervalSec: 5
 websocket:
-  qredo_websocket: wss://play-api.qredo.network/api/v1/p/coreclient/feed
-  reconnect_timeout_sec: 300
-  reconnect_interval_sec: 5
-  ping_period_sec: 5
-  pong_wait_sec: 10
-  write_wait_sec: 10
-  read_buffer_size: 512
-  write_buffer_size: 1024
+  qredoWebsocket: wss://play-api.qredo.network/api/v1/p/coreclient/feed
+  reconnectTimeoutSec: 300
+  reconnectIntervalSec: 5
+  pingPeriodSec: 5
+  pongWaitSec: 10
+  writeWaitSec: 10
+  readBufferSize: 512
+  writeBufferSize: 1024
 http:
   addr: 0.0.0.0:8007
-  cors_allow_origins:
+  CORSAllowOrigins:
     - '*'
-  log_all_requests: false
-  tls:
+  logAllRequests: false
+  TLS:
     enabled: true
-    cert_file: tls/domain.crt
-    key_file: tls/domain.key  
+    certFile: tls/domain.crt
+    keyFile: tls/domain.key  
 logging:
   format: text
   level: debug
-load_balancing:
+loadBalancing:
   enable: false
-  on_lock_error_timeout_ms: 300
-  action_id_expiration_sec: 6
+  onLockErrorTimeoutMs: 300
+  actionIDExpirationSec: 6
   redis:
     host: localhost
     port: 6379
@@ -45,43 +44,42 @@ store:
   oci:
     compartment: ocid1.tenancy.oc1...
     vault: ocid1.vault.oc1...
-    secret_encryption_key: ocid1.key.oc1...
-    config_secret: signing_agent_config
+    secretEncryptionKey: ocid1.key.oc1...
+    configSecret: signing_agent_config
   aws:
     region: aws-region-...
-    config_secret: secrets_manager_secret...  
+    configSecret: secrets_manager_secret...  
 ```
 
 ## Base
 
-- **qredo_api:** the url of the api you want to use
-- **http_scheme:** the scheme to use for the api connection, ex. http or https
+- **qredoAPI:** the url of the api you want to use
 - **pin:** the pin number to use to provide a zero knowledge proof token for communication with the partner api
 
 ## Auto approval
 - **enabled:** activate the automatic approval of every transaction that is received
-- **retry_interval_max_sec:** the approve action maximum interval in seconds
-- **retry_interval_sec:** the approve action retry interval in seconds
+- **retryIntervalMaxSec:** the maximum time in which the signing agent retries to approve an action. After that it’s considered as a failure 
+- **retryIntervalSec:** the interval in which the signing agent is attempting to approve an action. It will retry until the retry_interval_max_sec is reached
 
 ## Websocket
-- **qredo_websocket:** the url of the websocket feed you want to use
-- **reconnect_timeout_sec:** the reconnect timeout in seconds
-- **reconnect_interval_sec:** the reconnect interval in seconds
-- **ping_period_sec:** the ping period for the ping handler in seconds
-- **pong_wait_sec:** the pong wait for the pong handler in seconds
-- **write_wait_sec:** the write wait in seconds
-- **read_buffer_size:** the websocket upgrader read buffer size in bytes
-- **write_buffer_size:** the websocket upgrader write buffer size in bytes
+- **qredoWebsocket:** the url of the websocket feed you want to use
+- **reconnectTimeoutSec:** the reconnect timeout in seconds
+- **reconnectIntervalSec:** the reconnect interval in seconds
+- **pingPeriodSec:** the ping period for the ping handler in seconds
+- **pongWaitSec:** the pong wait for the pong handler in seconds
+- **writeWaitSec:** the write wait in seconds
+- **readBufferSize:** the websocket upgrader read buffer size in bytes
+- **writeBufferSize:** the websocket upgrader write buffer size in bytes
 
 ## HTTP
 
-- **addr:** the bind address and port the build in api endpoints
-- **cors_allow_origins:** the value the the Access-Control-Allow-Origin of the responses of the build in api
-- **log_all_requests:** log all incoming requests to the build in api
-- **tls:**
+- **addr:** the address and port the service runs on [the bind address and port the build in api endpoints]
+- **CORSAllowOrigins:** the value the the Access-Control-Allow-Origin of the responses of the build in api
+- **logAllRequests:** log all incoming requests to the build in api
+- **TLS**
   - **enabled:** wether or not you want to enable tls on the server side
-  - **cert_file:** path to the cert file you want to use
-  - **key_file:** path to the key file you want to use
+  - **certFile:** path to the cert file you want to use
+  - **keyFile:** path to the key file you want to use
 
 
 ## Logging
@@ -92,8 +90,8 @@ store:
 ## Load balancing
 
 - **enable:** enables the load-balancing logic
-- **on_lock_error_timeout_ms:** on lock timeout in milliseconds
-- **action_id_expiration_sec:** expiration of action_id variable in Redis in seconds
+- **onLockErrorTimeoutMs:** on lock timeout in milliseconds
+- **actionIDExpirationSec:** expiration of action_id variable in Redis in seconds
 - **redis:**
   - **host:** Redis host
   - **port:** Redis port
@@ -107,8 +105,8 @@ store:
 - **oci:** the oracle cloud configuration to store the private keys in an oracle vault
   - **compartment:** the oidc where the vault and encryption key reside
   - **vault:** the oidc of the vault where the secret will be stored
-  - **secret_encryption_key:** the encryption key used for both the secret and the data inside the secret
-  - **config_secret:** the name of secret that will be used to store the data
+  - **secretEncryptionKey:** the encryption key used for both the secret and the data inside the secret
+  - **configSecret:** the name of secret that will be used to store the data
 - **aws:** the amazon cloud configuration to store the private keys in amazon secrets manager
   - **region:** the AWS region where the secret is stored
-  - **config_secret:** the name of the AWS Secrets Manager secret containing the encrypted data
+  - **configSecret:** the name of the AWS Secrets Manager secret containing the encrypted data

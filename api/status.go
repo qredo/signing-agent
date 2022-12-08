@@ -2,10 +2,10 @@ package api
 
 // swagger:model WebsocketStatus
 type WebsocketStatus struct {
-	ReadyState       string `json:"ReadyState"`
-	RemoteFeedUrl    string `json:"RemoteFeedUrl"`
-	LocalFeedUrl     string `json:"LocalFeedUrl"`
-	ConnectedClients uint32 `json:"ConnectedClients"`
+	ReadyState       string `json:"readyState"`
+	RemoteFeedUrl    string `json:"remoteFeedURL"`
+	LocalFeedUrl     string `json:"localFeedURL"`
+	ConnectedClients uint32 `json:"connectedClients"`
 }
 
 func NewWebsocketStatus(readyState, remoteFeedUrl, localFeedUrl string, connectedClients int) WebsocketStatus {
@@ -20,5 +20,5 @@ func NewWebsocketStatus(readyState, remoteFeedUrl, localFeedUrl string, connecte
 
 // swagger:model HealthCheckStatusResponse
 type HealthCheckStatusResponse struct {
-	WebsocketStatus WebsocketStatus `json:"WebSocket"`
+	WebsocketStatus WebsocketStatus `json:"websocket"`
 }

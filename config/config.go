@@ -9,85 +9,85 @@ import (
 
 // swagger:model ConfigResponse
 type Config struct {
-	Base          Base          `yaml:"base"`
-	HTTP          HttpSettings  `yaml:"http"`
-	Logging       Logging       `yaml:"logging"`
-	LoadBalancing LoadBalancing `yaml:"load_balancing"`
-	Store         Store         `yaml:"store"`
-	AutoApprove   AutoApprove   `yaml:"auto_approval"`
-	Websocket     WebSocketConf `yaml:"websocket"`
+	Base          Base          `yaml:"base" json:"base"`
+	HTTP          HttpSettings  `yaml:"http" json:"http"`
+	Logging       Logging       `yaml:"logging" json:"logging"`
+	LoadBalancing LoadBalancing `yaml:"loadBalancing" json:"loadBalancing"`
+	Store         Store         `yaml:"store" json:"store"`
+	AutoApprove   AutoApprove   `yaml:"autoApproval" json:"autoApproval"`
+	Websocket     WebSocketConf `yaml:"websocket" json:"websocket"`
 }
 
 type Base struct {
-	PIN      int    `yaml:"pin"`
-	QredoAPI string `yaml:"qredo_api"`
+	PIN      int    `yaml:"pin" json:"pin"`
+	QredoAPI string `yaml:"qredoAPI" json:"qredoAPI"`
 }
 
 type TLSConfig struct {
-	Enabled  bool   `yaml:"enabled"`
-	CertFile string `yaml:"cert_file"`
-	KeyFile  string `yaml:"key_file"`
+	Enabled  bool   `yaml:"enabled" json:"enabled"`
+	CertFile string `yaml:"certFile" json:"certFile"`
+	KeyFile  string `yaml:"keyFile" json:"keyFile"`
 }
 
 type AutoApprove struct {
-	Enabled          bool `yaml:"enabled"`
-	RetryIntervalMax int  `yaml:"retry_interval_max_sec"`
-	RetryInterval    int  `yaml:"retry_interval_sec"`
+	Enabled          bool `yaml:"enabled" json:"enabled"`
+	RetryIntervalMax int  `yaml:"retryIntervalMaxSec" json:"retryIntervalMaxSec"`
+	RetryInterval    int  `yaml:"retryIntervalSec" json:"retryIntervalSec"`
 }
 type WebSocketConf struct {
-	QredoWebsocket    string `yaml:"qredo_websocket"`
-	ReconnectTimeOut  int    `yaml:"reconnect_timeout_sec"`
-	ReconnectInterval int    `yaml:"reconnect_interval_sec"`
-	PingPeriod        int    `yaml:"ping_period_sec"`
-	PongWait          int    `yaml:"pong_wait_sec"`
-	WriteWait         int    `yaml:"write_wait_sec"`
-	ReadBufferSize    int    `yaml:"read_buffer_size"`
-	WriteBufferSize   int    `yaml:"write_buffer_size"`
+	QredoWebsocket    string `yaml:"qredoWebsocket" json:"qredoWebsocket"`
+	ReconnectTimeOut  int    `yaml:"reconnectTimeoutSec" json:"reconnectTimeoutSec"`
+	ReconnectInterval int    `yaml:"reconnectIntervalSec" json:"reconnectIntervalSec"`
+	PingPeriod        int    `yaml:"pingPeriodSec" json:"pingPeriodSec"`
+	PongWait          int    `yaml:"pongWaitSec" json:"pongWaitSec"`
+	WriteWait         int    `yaml:"writeWaitSec" json:"writeWaitSec"`
+	ReadBufferSize    int    `yaml:"readBufferSize" json:"readBufferSize"`
+	WriteBufferSize   int    `yaml:"writeBufferSize" json:"writeBufferSize"`
 }
 type Store struct {
-	Type       string    `default:"file" yaml:"type"`
-	FileConfig string    `yaml:"file"`
-	OciConfig  OciConfig `yaml:"oci"`
-	AwsConfig  AWSConfig `yaml:"aws"`
+	Type       string    `default:"file" yaml:"type" json:"type"`
+	FileConfig string    `yaml:"file" json:"file"`
+	OciConfig  OciConfig `yaml:"oci" json:"oci"`
+	AwsConfig  AWSConfig `yaml:"aws" json:"aws"`
 }
 
 type OciConfig struct {
-	Compartment         string `yaml:"compartment"`
-	Vault               string `yaml:"vault"`
-	SecretEncryptionKey string `yaml:"secret_encryption_key"`
-	ConfigSecret        string `yaml:"config_secret"`
+	Compartment         string `yaml:"compartment" json:"compartment"`
+	Vault               string `yaml:"vault" json:"vault"`
+	SecretEncryptionKey string `yaml:"secretEncryptionKey" json:"secretEncryptionKey"`
+	ConfigSecret        string `yaml:"configSecret" json:"configSecret"`
 }
 
 // AWSConfig based signing-agent config. Used when Base StoreType is aws.
 type AWSConfig struct {
-	Region     string `yaml:"region"`
-	SecretName string `yaml:"config_secret"`
+	Region     string `yaml:"region" json:"region"`
+	SecretName string `yaml:"configSecret" json:"configSecret"`
 }
 
 type HttpSettings struct {
-	Addr             string    `yaml:"addr"`
-	CORSAllowOrigins []string  `yaml:"cors_allow_origins"`
-	LogAllRequests   bool      `yaml:"log_all_requests"`
-	TLS              TLSConfig `yaml:"tls"`
+	Addr             string    `yaml:"addr" json:"addr"`
+	CORSAllowOrigins []string  `yaml:"CORSAllowOrigins" json:"CORSAllowOrigins"`
+	LogAllRequests   bool      `yaml:"logAllRequests" json:"logAllRequests"`
+	TLS              TLSConfig `yaml:"TLS" json:"TLS"`
 }
 
 type Logging struct {
-	Format string `yaml:"format"`
-	Level  string `yaml:"level"`
+	Format string `yaml:"format" json:"format"`
+	Level  string `yaml:"level" json:"level"`
 }
 
 type LoadBalancing struct {
-	Enable                bool        `yaml:"enable"`
-	OnLockErrorTimeOutMs  int         `yaml:"on_lock_error_timeout_ms"`
-	ActionIDExpirationSec int         `yaml:"action_id_expiration_sec"`
-	RedisConfig           RedisConfig `yaml:"redis"`
+	Enable                bool        `yaml:"enable" json:"enable"`
+	OnLockErrorTimeOutMs  int         `yaml:"onLockErrorTimeoutMs" json:"onLockErrorTimeoutMs"`
+	ActionIDExpirationSec int         `yaml:"actionIDExpirationSec" json:"actionIDExpirationSec"`
+	RedisConfig           RedisConfig `yaml:"redis" json:"redis"`
 }
 
 type RedisConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Password string `yaml:"password"`
-	DB       int    `yaml:"db"`
+	Host     string `yaml:"host" json:"host"`
+	Port     int    `yaml:"port" json:"port"`
+	Password string `yaml:"password" json:"password"`
+	DB       int    `yaml:"db" json:"db"`
 }
 
 // Default creates configuration with default values.

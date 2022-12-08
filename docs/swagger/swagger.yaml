@@ -2,29 +2,29 @@ basePath: /api/v1
 definitions:
     AWSConfig:
         properties:
-            Region:
+            configSecret:
                 type: string
-            SecretName:
+            region:
                 type: string
         title: AWSConfig based signing-agent config. Used when Base StoreType is aws.
         type: object
     AutoApprove:
         properties:
-            Enabled:
+            enabled:
                 type: boolean
-            RetryInterval:
+            retryIntervalMaxSec:
                 format: int64
                 type: integer
-            RetryIntervalMax:
+            retryIntervalSec:
                 format: int64
                 type: integer
         type: object
     Base:
         properties:
-            PIN:
+            pin:
                 format: int64
                 type: integer
-            QredoAPI:
+            qredoAPI:
                 type: string
         type: object
     ClientFeedResponse:
@@ -58,18 +58,18 @@ definitions:
         type: object
     ClientFullRegisterResponse:
         properties:
-            agentId:
+            agentID:
                 type: string
-            feedUrl:
+            feedURL:
                 type: string
         type: object
     ClientRegisterRequest:
         properties:
-            apikey:
+            APIKey:
                 description: The api key for the partner api
                 example: eyJrZXkiOiJHM0Fo... (truncated)
                 type: string
-            base64privatekey:
+            base64PrivateKey:
                 description: The base64 encoded private key pem of which the public key has been registered in the partner api
                 example: LS0tLS1CRUdJTiBS... (truncated)
                 type: string
@@ -80,19 +80,19 @@ definitions:
         type: object
     ConfigResponse:
         properties:
-            AutoApprove:
+            autoApproval:
                 $ref: '#/definitions/AutoApprove'
-            Base:
+            base:
                 $ref: '#/definitions/Base'
-            HTTP:
+            http:
                 $ref: '#/definitions/HttpSettings'
-            LoadBalancing:
+            loadBalancing:
                 $ref: '#/definitions/LoadBalancing'
-            Logging:
+            logging:
                 $ref: '#/definitions/Logging'
-            Store:
+            store:
                 $ref: '#/definitions/Store'
-            Websocket:
+            websocket:
                 $ref: '#/definitions/WebSocketConf'
         type: object
     GenericResponse:
@@ -114,131 +114,131 @@ definitions:
         type: object
     HealthCheckStatusResponse:
         properties:
-            WebSocket:
+            websocket:
                 $ref: '#/definitions/WebsocketStatus'
         type: object
     HttpSettings:
         properties:
-            Addr:
-                type: string
             CORSAllowOrigins:
                 items:
                     type: string
                 type: array
-            LogAllRequests:
-                type: boolean
             TLS:
                 $ref: '#/definitions/TLSConfig'
+            addr:
+                type: string
+            logAllRequests:
+                type: boolean
         type: object
     LoadBalancing:
         properties:
-            ActionIDExpirationSec:
+            actionIDExpirationSec:
                 format: int64
                 type: integer
-            Enable:
+            enable:
                 type: boolean
-            OnLockErrorTimeOutMs:
+            onLockErrorTimeoutMs:
                 format: int64
                 type: integer
-            RedisConfig:
+            redis:
                 $ref: '#/definitions/RedisConfig'
         type: object
     Logging:
         properties:
-            Format:
+            format:
                 type: string
-            Level:
+            level:
                 type: string
         type: object
     OciConfig:
         properties:
-            Compartment:
+            compartment:
                 type: string
-            ConfigSecret:
+            configSecret:
                 type: string
-            SecretEncryptionKey:
+            secretEncryptionKey:
                 type: string
-            Vault:
+            vault:
                 type: string
         type: object
     RedisConfig:
         properties:
-            DB:
+            db:
                 format: int64
                 type: integer
-            Host:
+            host:
                 type: string
-            Password:
+            password:
                 type: string
-            Port:
+            port:
                 format: int64
                 type: integer
         type: object
     Store:
         properties:
-            AwsConfig:
+            aws:
                 $ref: '#/definitions/AWSConfig'
-            FileConfig:
+            file:
                 type: string
-            OciConfig:
+            oci:
                 $ref: '#/definitions/OciConfig'
-            Type:
+            type:
                 type: string
         type: object
     TLSConfig:
         properties:
-            CertFile:
+            certFile:
                 type: string
-            Enabled:
+            enabled:
                 type: boolean
-            KeyFile:
+            keyFile:
                 type: string
         type: object
     VersionResponse:
         properties:
-            BuildDate:
+            buildDate:
                 type: string
-            BuildType:
+            buildType:
                 type: string
-            BuildVersion:
+            buildVersion:
                 type: string
         type: object
     WebSocketConf:
         properties:
-            PingPeriod:
+            pingPeriodSec:
                 format: int64
                 type: integer
-            PongWait:
+            pongWaitSec:
                 format: int64
                 type: integer
-            QredoWebsocket:
+            qredoWebsocket:
                 type: string
-            ReadBufferSize:
+            readBufferSize:
                 format: int64
                 type: integer
-            ReconnectInterval:
+            reconnectIntervalSec:
                 format: int64
                 type: integer
-            ReconnectTimeOut:
+            reconnectTimeoutSec:
                 format: int64
                 type: integer
-            WriteBufferSize:
+            writeBufferSize:
                 format: int64
                 type: integer
-            WriteWait:
+            writeWaitSec:
                 format: int64
                 type: integer
         type: object
     WebsocketStatus:
         properties:
-            ConnectedClients:
+            connectedClients:
                 format: uint32
                 type: integer
-            LocalFeedUrl:
+            localFeedURL:
                 type: string
-            ReadyState:
+            readyState:
                 type: string
-            RemoteFeedUrl:
+            remoteFeedURL:
                 type: string
         type: object
 host: localhost:8007
@@ -301,7 +301,7 @@ paths:
             tags:
                 - action
     /client/feed:
-        post:
+        get:
             operationId: ClientFeed
             produces:
                 - application/json

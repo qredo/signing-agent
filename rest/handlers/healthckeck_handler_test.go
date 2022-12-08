@@ -94,7 +94,7 @@ func TestHealthCheckHandler_HealthCheckVersion(t *testing.T) {
 	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
 
 	data, _ := json.Marshal(response)
-	assert.Equal(t, "{\"BuildVersion\":\"some build version\",\"BuildType\":\"some build type\",\"BuildDate\":\"some build date\"}", string(data))
+	assert.Equal(t, "{\"buildVersion\":\"some build version\",\"buildType\":\"some build type\",\"buildDate\":\"some build date\"}", string(data))
 }
 
 func TestHealthCheckHandler_HealthCheckConfig(t *testing.T) {

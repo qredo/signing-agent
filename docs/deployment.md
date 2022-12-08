@@ -93,9 +93,9 @@ The version healthcheck endpoint expects a `GET` request, and it responds with a
 
 ```json
 {
-    "BuildVersion": "101c354",
-    "BuildType": "dev",
-    "BuildDate": "Fri Oct 7 12:53:12 UTC 2022"
+    "buildVersion": "101c354",
+    "buildType": "dev",
+    "buildDate": "Fri Oct 7 12:53:12 UTC 2022"
 }
 ```
 
@@ -105,14 +105,17 @@ The config healthcheck endpoint accepts a `GET` request, and it responds with an
 
 ```json
 {
-    "Base": {
-        "QredoAPI":"https://play-api.qredo.network/api/v1/p",
-        "AutoApprove":false
+    "base": {
+        "qredoAPI":"https://play-api.qredo.network/api/v1/p",
         ...
     },
-    "HTTP": {
-        "Addr":"0.0.0.0:8007",
+    "http": {
+        "addr":"0.0.0.0:8007",
         "CORSAllowOrigins":["*"],
+        ...
+    },
+    "autoApproval": {
+        "enabled": false,
         ...
     },
     ...
@@ -125,11 +128,11 @@ The status healthcheck endpoint accepts a `GET` request, and it responds with an
 
 ```json
 {
-    "WebSocket": {
-        "ReadyState":"CLOSED",
-        "RemoteFeedUrl": "wss://play-api.qredo.network/api/v1/p/coreclient/feed",
-        "LocalFeedUrl":"ws://0.0.0.0:8007/api/v1/client/feed",
-        "ConnectedClients": 2
+    "websocket": {
+        "readyState":"CLOSED",
+        "remoteFeedURL": "wss://play-api.qredo.network/api/v1/p/coreclient/feed",
+        "localFeedURL":"ws://0.0.0.0:8007/api/v1/client/feed",
+        "connectedClients": 2
     }
 }
 ```
