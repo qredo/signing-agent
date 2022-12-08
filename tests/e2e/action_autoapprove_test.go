@@ -88,7 +88,7 @@ func TestActionAutoApprove(t *testing.T) {
 		WithJSON(payload).
 		Expect().
 		Status(http.StatusOK).JSON()
-	agentID := registrationResponse.Object().Value("agentId").Raw().(string)
+	agentID := registrationResponse.Object().Value("agentID").Raw().(string)
 	assert.NotEqual(t, "", agentID)
 
 	time.Sleep(2 * time.Second)

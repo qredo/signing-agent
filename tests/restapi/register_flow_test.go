@@ -221,11 +221,11 @@ func registrationTests(e *httpexpect.Expect, payload *api.ClientRegisterRequest)
 		Status(http.StatusOK).JSON()
 
 	registrationResponse.Object().NotEmpty()
-	registrationResponse.Object().Value("agentId").String().Equal("5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn")
-	registrationResponse.Object().Value("feedUrl").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
+	registrationResponse.Object().Value("agentID").String().Equal("5zPWqLZaPqAaNenjyzWy5rcaGm4PuT1bfP74GgrzFUJn")
+	registrationResponse.Object().Value("feedURL").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
 
 	// GET: /client should return the same agentID
-	testAccountCode = registrationResponse.Object().Value("agentId").Raw().(string)
+	testAccountCode = registrationResponse.Object().Value("agentID").Raw().(string)
 	response := e.GET(rest.WrapPathPrefix(rest.PathClient)).
 		Expect().
 		Status(http.StatusOK)
@@ -248,10 +248,10 @@ func healthcheckVersionTests(e *httpexpect.Expect) {
 		Expect().
 		Status(http.StatusOK).JSON()
 	hcVersion.Object().NotEmpty()
-	hcVersion.Object().Keys().ContainsOnly("BuildVersion", "BuildType", "BuildDate")
-	hcVersion.Object().ValueEqual("BuildVersion", TestBuildVersion)
-	hcVersion.Object().ValueEqual("BuildType", TestBuildType)
-	hcVersion.Object().ValueEqual("BuildDate", TestBuildDate)
+	hcVersion.Object().Keys().ContainsOnly("buildVersion", "buildType", "buildDate")
+	hcVersion.Object().ValueEqual("buildVersion", TestBuildVersion)
+	hcVersion.Object().ValueEqual("buildType", TestBuildType)
+	hcVersion.Object().ValueEqual("buildDate", TestBuildDate)
 }
 
 // healthCheckConfigTests checks the healthcheck config endpoint (/healthcheck/config).
@@ -260,50 +260,50 @@ func healthCheckConfigTests(e *httpexpect.Expect) {
 		Expect().
 		Status(http.StatusOK).JSON()
 
-	hcConfig.Object().Keys().Contains("Logging")
-	logCfg := hcConfig.Object().Value("Logging").Object()
-	logCfg.Value("Format").String().Equal("json")
-	logCfg.Value("Level").String().Equal("debug")
+	hcConfig.Object().Keys().Contains("logging")
+	logCfg := hcConfig.Object().Value("logging").Object()
+	logCfg.Value("format").String().Equal("json")
+	logCfg.Value("level").String().Equal("debug")
 
-	hcConfig.Object().Keys().Contains("Base")
-	baseCfg := hcConfig.Object().Value("Base").Object()
-	baseCfg.Value("PIN").Equal(0)
-	baseCfg.Value("QredoAPI").NotNull()
+	hcConfig.Object().Keys().Contains("base")
+	baseCfg := hcConfig.Object().Value("base").Object()
+	baseCfg.Value("pin").Equal(0)
+	baseCfg.Value("qredoAPI").NotNull()
 
-	hcConfig.Object().Keys().Contains("AutoApprove")
-	autoApprove := hcConfig.Object().Value("AutoApprove").Object()
-	autoApprove.Value("Enabled").Equal(true)
-	autoApprove.Value("RetryIntervalMax").Equal(300)
-	autoApprove.Value("RetryInterval").Equal(5)
+	hcConfig.Object().Keys().Contains("autoApproval")
+	autoApprove := hcConfig.Object().Value("autoApproval").Object()
+	autoApprove.Value("enabled").Equal(true)
+	autoApprove.Value("retryIntervalMaxSec").Equal(300)
+	autoApprove.Value("retryIntervalSec").Equal(5)
 
-	hcConfig.Object().Keys().Contains("Websocket")
-	websocket := hcConfig.Object().Value("Websocket").Object()
-	websocket.Value("ReconnectTimeOut").Equal(200)
-	websocket.Value("ReconnectInterval").Equal(15)
+	hcConfig.Object().Keys().Contains("websocket")
+	websocket := hcConfig.Object().Value("websocket").Object()
+	websocket.Value("reconnectTimeoutSec").Equal(200)
+	websocket.Value("reconnectIntervalSec").Equal(15)
 
-	hcConfig.Object().Keys().Contains("Store")
-	storeCfg := hcConfig.Object().Value("Store").Object()
-	storeCfg.Value("Type").Equal("file")
-	storeCfg.Value("FileConfig").Equal(TestDataDBStoreFilePath)
+	hcConfig.Object().Keys().Contains("store")
+	storeCfg := hcConfig.Object().Value("store").Object()
+	storeCfg.Value("type").Equal("file")
+	storeCfg.Value("file").Equal(TestDataDBStoreFilePath)
 
-	hcConfig.Object().Keys().Contains("HTTP")
-	httpCfg := hcConfig.Object().Value("HTTP").Object()
-	httpCfg.Value("Addr").String().Equal("127.0.0.1:8007")
+	hcConfig.Object().Keys().Contains("http")
+	httpCfg := hcConfig.Object().Value("http").Object()
+	httpCfg.Value("addr").String().Equal("127.0.0.1:8007")
 	httpCfg.Value("CORSAllowOrigins").Array().Element(0).String().Equal("*")
-	httpCfg.Value("LogAllRequests").Equal(false)
+	httpCfg.Value("logAllRequests").Equal(false)
 
-	hcConfig.Object().Keys().Contains("LoadBalancing")
-	lbConfig := hcConfig.Object().Value("LoadBalancing").Object()
-	lbConfig.Value("Enable").Equal(false)
-	lbConfig.Value("OnLockErrorTimeOutMs").Equal(300)
-	lbConfig.Value("ActionIDExpirationSec").Equal(6)
+	hcConfig.Object().Keys().Contains("loadBalancing")
+	lbConfig := hcConfig.Object().Value("loadBalancing").Object()
+	lbConfig.Value("enable").Equal(false)
+	lbConfig.Value("onLockErrorTimeoutMs").Equal(300)
+	lbConfig.Value("actionIDExpirationSec").Equal(6)
 
-	lbConfig.Keys().Contains("RedisConfig")
-	redisConfig := lbConfig.Value("RedisConfig").Object()
-	redisConfig.Value("Host").Equal("redis")
-	redisConfig.Value("Port").Equal(6379)
-	redisConfig.Value("Password").Equal("")
-	redisConfig.Value("DB").Equal(0)
+	lbConfig.Keys().Contains("redis")
+	redisConfig := lbConfig.Value("redis").Object()
+	redisConfig.Value("host").Equal("redis")
+	redisConfig.Value("port").Equal(6379)
+	redisConfig.Value("password").Equal("")
+	redisConfig.Value("db").Equal(0)
 }
 
 // healthCheckStatusTests checks the healthcheck status endpoint (/healthcheck/status).
@@ -312,12 +312,12 @@ func healthcheckStatusTests(e *httpexpect.Expect, websocketUrl string, wsstatus 
 		Expect().
 		Status(http.StatusOK).JSON()
 	hcStatus.Object().NotEmpty()
-	hcStatus.Object().Keys().ContainsOnly("WebSocket")
-	webSocket := hcStatus.Object().Value("WebSocket").Object()
-	webSocket.Value("ReadyState").String().Equal(wsstatus)
-	webSocket.Value("RemoteFeedUrl").String().Equal(websocketUrl)
-	webSocket.Value("LocalFeedUrl").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
-	webSocket.Value("ConnectedClients").Equal(connectedClients)
+	hcStatus.Object().Keys().ContainsOnly("websocket")
+	webSocket := hcStatus.Object().Value("websocket").Object()
+	webSocket.Value("readyState").String().Equal(wsstatus)
+	webSocket.Value("remoteFeedURL").String().Equal(websocketUrl)
+	webSocket.Value("localFeedURL").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
+	webSocket.Value("connectedClients").Equal(connectedClients)
 }
 
 // clientActionTest tests the action endpoints (/client/action/{action_id}.

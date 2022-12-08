@@ -89,7 +89,7 @@
       }
     },
     "/client/feed": {
-      "post": {
+      "get": {
         "produces": [
           "application/json"
         ],
@@ -195,10 +195,10 @@
       "type": "object",
       "title": "AWSConfig based signing-agent config. Used when Base StoreType is aws.",
       "properties": {
-        "Region": {
+        "configSecret": {
           "type": "string"
         },
-        "SecretName": {
+        "region": {
           "type": "string"
         }
       }
@@ -206,14 +206,14 @@
     "AutoApprove": {
       "type": "object",
       "properties": {
-        "Enabled": {
+        "enabled": {
           "type": "boolean"
         },
-        "RetryInterval": {
+        "retryIntervalMaxSec": {
           "type": "integer",
           "format": "int64"
         },
-        "RetryIntervalMax": {
+        "retryIntervalSec": {
           "type": "integer",
           "format": "int64"
         }
@@ -222,11 +222,11 @@
     "Base": {
       "type": "object",
       "properties": {
-        "PIN": {
+        "pin": {
           "type": "integer",
           "format": "int64"
         },
-        "QredoAPI": {
+        "qredoAPI": {
           "type": "string"
         }
       }
@@ -271,10 +271,10 @@
     "ClientFullRegisterResponse": {
       "type": "object",
       "properties": {
-        "agentId": {
+        "agentID": {
           "type": "string"
         },
-        "feedUrl": {
+        "feedURL": {
           "type": "string"
         }
       }
@@ -282,12 +282,12 @@
     "ClientRegisterRequest": {
       "type": "object",
       "properties": {
-        "apikey": {
+        "APIKey": {
           "description": "The api key for the partner api",
           "type": "string",
           "example": "eyJrZXkiOiJHM0Fo... (truncated)"
         },
-        "base64privatekey": {
+        "base64PrivateKey": {
           "description": "The base64 encoded private key pem of which the public key has been registered in the partner api",
           "type": "string",
           "example": "LS0tLS1CRUdJTiBS... (truncated)"
@@ -302,25 +302,25 @@
     "ConfigResponse": {
       "type": "object",
       "properties": {
-        "AutoApprove": {
+        "autoApproval": {
           "$ref": "#/definitions/AutoApprove"
         },
-        "Base": {
+        "base": {
           "$ref": "#/definitions/Base"
         },
-        "HTTP": {
+        "http": {
           "$ref": "#/definitions/HttpSettings"
         },
-        "LoadBalancing": {
+        "loadBalancing": {
           "$ref": "#/definitions/LoadBalancing"
         },
-        "Logging": {
+        "logging": {
           "$ref": "#/definitions/Logging"
         },
-        "Store": {
+        "store": {
           "$ref": "#/definitions/Store"
         },
-        "Websocket": {
+        "websocket": {
           "$ref": "#/definitions/WebSocketConf"
         }
       }
@@ -344,15 +344,15 @@
     "GetAgentIDResponse": {
       "type": "object",
       "properties": {
-        "agentID": {
-          "type": "string"
+        "Body": {
+          "$ref": "#/definitions/GetAgentIDResponse"
         }
       }
     },
     "HealthCheckStatusResponse": {
       "type": "object",
       "properties": {
-        "WebSocket": {
+        "websocket": {
           "$ref": "#/definitions/WebsocketStatus"
         }
       }
@@ -360,38 +360,38 @@
     "HttpSettings": {
       "type": "object",
       "properties": {
-        "Addr": {
-          "type": "string"
-        },
         "CORSAllowOrigins": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "LogAllRequests": {
-          "type": "boolean"
-        },
         "TLS": {
           "$ref": "#/definitions/TLSConfig"
+        },
+        "addr": {
+          "type": "string"
+        },
+        "logAllRequests": {
+          "type": "boolean"
         }
       }
     },
     "LoadBalancing": {
       "type": "object",
       "properties": {
-        "ActionIDExpirationSec": {
+        "actionIDExpirationSec": {
           "type": "integer",
           "format": "int64"
         },
-        "Enable": {
+        "enable": {
           "type": "boolean"
         },
-        "OnLockErrorTimeOutMs": {
+        "onLockErrorTimeoutMs": {
           "type": "integer",
           "format": "int64"
         },
-        "RedisConfig": {
+        "redis": {
           "$ref": "#/definitions/RedisConfig"
         }
       }
@@ -399,10 +399,10 @@
     "Logging": {
       "type": "object",
       "properties": {
-        "Format": {
+        "format": {
           "type": "string"
         },
-        "Level": {
+        "level": {
           "type": "string"
         }
       }
@@ -410,16 +410,16 @@
     "OciConfig": {
       "type": "object",
       "properties": {
-        "Compartment": {
+        "compartment": {
           "type": "string"
         },
-        "ConfigSecret": {
+        "configSecret": {
           "type": "string"
         },
-        "SecretEncryptionKey": {
+        "secretEncryptionKey": {
           "type": "string"
         },
-        "Vault": {
+        "vault": {
           "type": "string"
         }
       }
@@ -427,17 +427,17 @@
     "RedisConfig": {
       "type": "object",
       "properties": {
-        "DB": {
+        "db": {
           "type": "integer",
           "format": "int64"
         },
-        "Host": {
+        "host": {
           "type": "string"
         },
-        "Password": {
+        "password": {
           "type": "string"
         },
-        "Port": {
+        "port": {
           "type": "integer",
           "format": "int64"
         }
@@ -446,16 +446,16 @@
     "Store": {
       "type": "object",
       "properties": {
-        "AwsConfig": {
+        "aws": {
           "$ref": "#/definitions/AWSConfig"
         },
-        "FileConfig": {
+        "file": {
           "type": "string"
         },
-        "OciConfig": {
+        "oci": {
           "$ref": "#/definitions/OciConfig"
         },
-        "Type": {
+        "type": {
           "type": "string"
         }
       }
@@ -463,13 +463,13 @@
     "TLSConfig": {
       "type": "object",
       "properties": {
-        "CertFile": {
+        "certFile": {
           "type": "string"
         },
-        "Enabled": {
+        "enabled": {
           "type": "boolean"
         },
-        "KeyFile": {
+        "keyFile": {
           "type": "string"
         }
       }
@@ -477,13 +477,13 @@
     "VersionResponse": {
       "type": "object",
       "properties": {
-        "BuildDate": {
+        "buildDate": {
           "type": "string"
         },
-        "BuildType": {
+        "buildType": {
           "type": "string"
         },
-        "BuildVersion": {
+        "buildVersion": {
           "type": "string"
         }
       }
@@ -491,34 +491,34 @@
     "WebSocketConf": {
       "type": "object",
       "properties": {
-        "PingPeriod": {
+        "pingPeriodSec": {
           "type": "integer",
           "format": "int64"
         },
-        "PongWait": {
+        "pongWaitSec": {
           "type": "integer",
           "format": "int64"
         },
-        "QredoWebsocket": {
+        "qredoWebsocket": {
           "type": "string"
         },
-        "ReadBufferSize": {
+        "readBufferSize": {
           "type": "integer",
           "format": "int64"
         },
-        "ReconnectInterval": {
+        "reconnectIntervalSec": {
           "type": "integer",
           "format": "int64"
         },
-        "ReconnectTimeOut": {
+        "reconnectTimeoutSec": {
           "type": "integer",
           "format": "int64"
         },
-        "WriteBufferSize": {
+        "writeBufferSize": {
           "type": "integer",
           "format": "int64"
         },
-        "WriteWait": {
+        "writeWaitSec": {
           "type": "integer",
           "format": "int64"
         }
@@ -527,17 +527,17 @@
     "WebsocketStatus": {
       "type": "object",
       "properties": {
-        "ConnectedClients": {
+        "connectedClients": {
           "type": "integer",
           "format": "uint32"
         },
-        "LocalFeedUrl": {
+        "localFeedURL": {
           "type": "string"
         },
-        "ReadyState": {
+        "readyState": {
           "type": "string"
         },
-        "RemoteFeedUrl": {
+        "remoteFeedURL": {
           "type": "string"
         }
       }

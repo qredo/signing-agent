@@ -103,7 +103,7 @@ func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.Respo
 
 // ClientFeed
 //
-// swagger:route POST /client/feed client ClientFeed
+// swagger:route GET /client/feed client ClientFeed
 //
 // # Get approval requests Feed (via websocket) from Qredo Backend
 //

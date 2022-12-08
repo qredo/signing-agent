@@ -1,35 +1,35 @@
 base:
-  qredo_api: https://play-api.qredo.network/api/v1/p
+  qredoAPI: https://play-api.qredo.network/api/v1/p
   pin: 0
-auto_approval:
+autoApproval:
   enabled: false
-  retry_interval_max_sec: 300
-  retry_interval_sec: 5
+  retryIntervalMaxSec: 300
+  retryIntervalSec: 5
 websocket:
-  qredo_websocket: wss://play-api.qredo.network/api/v1/p/coreclient/feed
-  reconnect_timeout_sec: 300
-  reconnect_interval_sec: 5
-  ping_period_sec: 5
-  pong_wait_sec: 10
-  write_wait_sec: 10
-  read_buffer_size: 512
-  write_buffer_size: 1024
+  qredoWebsocket: wss://play-api.qredo.network/api/v1/p/coreclient/feed
+  reconnectTimeoutSec: 300
+  reconnectIntervalSec: 5
+  pingPeriodSec: 5
+  pongWaitSec: 10
+  writeWaitSec: 10
+  readBufferSize: 512
+  writeBufferSize: 1024
 http:
   addr: 0.0.0.0:8007
-  cors_allow_origins:
+  CORSAllowOrigins:
     - '*'
-  log_all_requests: false
-  tls:
+  logAllRequests: false
+  TLS:
     enabled: true
-    cert_file: tls/domain.crt
-    key_file: tls/domain.key
+    certFile: tls/domain.crt
+    keyFile: tls/domain.key
 logging:
   format: text
   level: debug
-load_balancing:
+loadBalancing:
   enable: false
-  on_lock_error_timeout_ms: 300
-  action_id_expiration_sec: 6
+  onLockErrorTimeoutMs: 300
+  actionIDExpirationSec: 6
   redis:
     host: redis
     port: 6379
@@ -41,10 +41,10 @@ store:
   oci:
     compartment: ocid1.tenancy.oc1...
     vault: ocid1.vault.oc1...
-    secret_encryption_key: ocid1.key.oc1...
-    config_secret: signing_agent_config
+    secretEncryptionKey: ocid1.key.oc1...
+    configSecret: signing_agent_config
   aws:
     region: aws-region-...
-    config_secret: secrets_manager_secret...
+    configSecret: secrets_manager_secret...
   az: ""
   # ...

@@ -103,9 +103,9 @@ func TestRegisterNewSigningAgent(t *testing.T) {
 		Status(http.StatusOK).JSON()
 
 	registrationResponse.Object().NotEmpty()
-	registrationResponse.Object().Value("agentId").String().NotEmpty()
-	registrationResponse.Object().Value("feedUrl").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
-	agentID := registrationResponse.Object().Value("agentId").Raw().(string)
+	registrationResponse.Object().Value("agentID").String().NotEmpty()
+	registrationResponse.Object().Value("feedURL").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
+	agentID := registrationResponse.Object().Value("agentID").Raw().(string)
 
 	// GET: /client should return the same agentID
 	response := e.GET(rest.WrapPathPrefix(rest.PathClient)).

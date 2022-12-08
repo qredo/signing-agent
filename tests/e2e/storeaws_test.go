@@ -22,7 +22,7 @@ func createAWSConfig() *config.Config {
 
 	var testCfg struct {
 		Region     string `yaml:"region"`
-		SecretName string `yaml:"config_secret"`
+		SecretName string `yaml:"configSecret"`
 	}
 	err = yaml.Unmarshal(f, &testCfg)
 	if err != nil {

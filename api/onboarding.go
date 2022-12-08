@@ -18,11 +18,11 @@ type ClientRegisterRequest struct {
 
 	// The api key for the partner api
 	// example: eyJrZXkiOiJHM0Fo... (truncated)
-	APIKey string `json:"apikey"`
+	APIKey string `json:"APIKey"`
 
 	// The base64 encoded private key pem of which the public key has been registered in the partner api
 	// example: LS0tLS1CRUdJTiBS... (truncated)
-	Base64PrivateKey string `json:"base64privatekey"`
+	Base64PrivateKey string `json:"base64PrivateKey"`
 }
 
 func (r *ClientRegisterRequest) Validate() error {
@@ -34,9 +34,9 @@ func (r *ClientRegisterRequest) Validate() error {
 	case r.Name == "" || len(r.Name) > maxStringFieldSize:
 		return errors.New("name")
 	case r.APIKey == "" || len(r.APIKey) > maxStringFieldSize:
-		return errors.New("apikey")
+		return errors.New("apiKey")
 	case r.Base64PrivateKey == "" || len(r.Base64PrivateKey) > maxBase64FieldSize:
-		return errors.New("base64privatekey")
+		return errors.New("base64PrivateKey")
 	default:
 		return nil
 	}
@@ -101,8 +101,8 @@ type QredoRegisterInitResponse struct {
 
 // swagger:model ClientFullRegisterResponse
 type ClientFullRegisterResponse struct {
-	AgentID string `json:"agentId"`
-	FeedURL string `json:"feedUrl"`
+	AgentID string `json:"agentID"`
+	FeedURL string `json:"feedURL"`
 }
 
 // swagger:model GetAgentIDResponse
