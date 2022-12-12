@@ -32,7 +32,7 @@ func NewHealthCheckHandler(source hub.SourceStats, version *version.Version, con
 //
 // swagger:route GET /healthcheck/version healthcheck HealthcheckVersion
 //
-// Check application version.
+// # Check application version
 //
 // Responses:
 //
@@ -47,7 +47,7 @@ func (h *HealthCheckHandler) HealthCheckVersion(_ *defs.RequestContext, w http.R
 //
 // swagger:route GET /healthcheck/config healthcheck HealthcheckConfig
 //
-// Check application configuration.
+// # Check application configuration
 //
 // Responses:
 //
@@ -62,7 +62,7 @@ func (h *HealthCheckHandler) HealthCheckConfig(_ *defs.RequestContext, w http.Re
 //
 // swagger:route GET /healthcheck/status healthcheck HealthcheckStatus
 //
-// Check application status.
+// # Check application status
 //
 // Responses:
 //

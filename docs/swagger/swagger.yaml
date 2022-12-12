@@ -6,7 +6,7 @@ definitions:
                 type: string
             region:
                 type: string
-        title: AWSConfig based signing-agent config. Used when Base StoreType is aws.
+        title: 'AWSConfig-based Signing Agent config: used when Base `store` `type` is `aws`.'
         type: object
     AutoApprove:
         properties:
@@ -66,11 +66,11 @@ definitions:
     ClientRegisterRequest:
         properties:
             APIKey:
-                description: The api key for the partner api
+                description: The API key for the partner API
                 example: eyJrZXkiOiJHM0Fo... (truncated)
                 type: string
             base64PrivateKey:
-                description: The base64 encoded private key pem of which the public key has been registered in the partner api
+                description: The Base64-encoded private key pem of which the public key has been registered in the Partner API
                 example: LS0tLS1CRUdJTiBS... (truncated)
                 type: string
             name:
@@ -109,8 +109,8 @@ definitions:
         type: object
     GetAgentIDResponse:
         properties:
-            agentID:
-                type: string
+            Body:
+                $ref: '#/definitions/GetAgentIDResponse'
         type: object
     HealthCheckStatusResponse:
         properties:
@@ -248,7 +248,7 @@ info:
         name: Qredo API Services
         url: https://www.qredo.com
     description: |-
-        Qredo Signing Agent service interacts with [Partner API](https://developers.qredo.com/partner-api/api/swagger/) to register a Signing Agent to automate approvals according to your custody policy. <br/>
+        The Qredo Signing Agent service interacts with [Partner API](https://developers.qredo.com/partner-api/api/swagger/) to register a Signing Agent to automate approvals according to your custody policy. <br/>
         Authentication and encryption are required; set up your [API key and secret in the Qredo Web App](https://developers.qredo.com/signing-agent/v2-signing-agent/get-started/). <br/>
     license:
         name: APACHE 2.0
@@ -264,14 +264,14 @@ paths:
                     description: GetAgentIDResponse
                     schema:
                         $ref: '#/definitions/GetAgentIDResponse'
-            summary: Returns AgentID if it's configured
+            summary: Returns `agentID` if it's configured
             tags:
                 - client
     /client/action/{action_id}:
         delete:
             operationId: actionReject
             parameters:
-                - description: the id of the transaction that is received from the feed
+                - description: the ID of the transaction that is received from the feed
                   in: path
                   name: action_id
                   required: true
@@ -287,7 +287,7 @@ paths:
         put:
             operationId: actionApprove
             parameters:
-                - description: the id of the transaction that is received from the feed
+                - description: the ID of the transaction that is received from the feed
                   in: path
                   name: action_id
                   required: true
@@ -340,7 +340,7 @@ paths:
                     description: ConfigResponse
                     schema:
                         $ref: '#/definitions/ConfigResponse'
-            summary: Check application configuration.
+            summary: Check application configuration
             tags:
                 - healthcheck
     /healthcheck/status:
@@ -351,7 +351,7 @@ paths:
                     description: HealthCheckStatusResponse
                     schema:
                         $ref: '#/definitions/HealthCheckStatusResponse'
-            summary: Check application status.
+            summary: Check application status
             tags:
                 - healthcheck
     /healthcheck/version:
@@ -362,7 +362,7 @@ paths:
                     description: VersionResponse
                     schema:
                         $ref: '#/definitions/VersionResponse'
-            summary: Check application version.
+            summary: Check application version
             tags:
                 - healthcheck
 schemes:

@@ -5,7 +5,7 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Qredo Signing Agent service interacts with [Partner API](https://developers.qredo.com/partner-api/api/swagger/) to register a Signing Agent to automate approvals according to your custody policy. \u003cbr/\u003e\nAuthentication and encryption are required; set up your [API key and secret in the Qredo Web App](https://developers.qredo.com/signing-agent/v2-signing-agent/get-started/). \u003cbr/\u003e",
+    "description": "The Qredo Signing Agent service interacts with [Partner API](https://developers.qredo.com/partner-api/api/swagger/) to register a Signing Agent to automate approvals according to your custody policy. \u003cbr/\u003e\nAuthentication and encryption are required; set up your [API key and secret in the Qredo Web App](https://developers.qredo.com/signing-agent/v2-signing-agent/get-started/). \u003cbr/\u003e",
     "title": "Qredo Signing Agent V2",
     "contact": {
       "name": "Qredo API Services",
@@ -26,7 +26,7 @@
         "tags": [
           "client"
         ],
-        "summary": "Returns AgentID if it's configured",
+        "summary": "Returns `agentID` if it's configured",
         "operationId": "GetAgentID",
         "responses": {
           "200": {
@@ -48,7 +48,7 @@
         "parameters": [
           {
             "type": "string",
-            "description": "the id of the transaction that is received from the feed",
+            "description": "the ID of the transaction that is received from the feed",
             "name": "action_id",
             "in": "path",
             "required": true
@@ -72,7 +72,7 @@
         "parameters": [
           {
             "type": "string",
-            "description": "the id of the transaction that is received from the feed",
+            "description": "the ID of the transaction that is received from the feed",
             "name": "action_id",
             "in": "path",
             "required": true
@@ -143,7 +143,7 @@
         "tags": [
           "healthcheck"
         ],
-        "summary": "Check application configuration.",
+        "summary": "Check application configuration",
         "operationId": "HealthcheckConfig",
         "responses": {
           "200": {
@@ -160,7 +160,7 @@
         "tags": [
           "healthcheck"
         ],
-        "summary": "Check application status.",
+        "summary": "Check application status",
         "operationId": "HealthcheckStatus",
         "responses": {
           "200": {
@@ -177,7 +177,7 @@
         "tags": [
           "healthcheck"
         ],
-        "summary": "Check application version.",
+        "summary": "Check application version",
         "operationId": "HealthcheckVersion",
         "responses": {
           "200": {
@@ -193,7 +193,7 @@
   "definitions": {
     "AWSConfig": {
       "type": "object",
-      "title": "AWSConfig based signing-agent config. Used when Base StoreType is aws.",
+      "title": "AWSConfig-based Signing Agent config: used when Base `store` `type` is `aws`.",
       "properties": {
         "configSecret": {
           "type": "string"
@@ -283,12 +283,12 @@
       "type": "object",
       "properties": {
         "APIKey": {
-          "description": "The api key for the partner api",
+          "description": "The API key for the partner API",
           "type": "string",
           "example": "eyJrZXkiOiJHM0Fo... (truncated)"
         },
         "base64PrivateKey": {
-          "description": "The base64 encoded private key pem of which the public key has been registered in the partner api",
+          "description": "The Base64-encoded private key pem of which the public key has been registered in the Partner API",
           "type": "string",
           "example": "LS0tLS1CRUdJTiBS... (truncated)"
         },
