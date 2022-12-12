@@ -59,7 +59,7 @@ store:
 ## Auto approval
 - **enabled:** activate the automatic approval of every transaction that is received
 - **retryIntervalMaxSec:** the maximum time in which the signing agent retries to approve an action. After that it’s considered as a failure 
-- **retryIntervalSec:** the interval in which the signing agent is attempting to approve an action. It will retry until the retry_interval_max_sec is reached
+- **retryIntervalSec:** the interval in which the signing agent is attempting to approve an action. It will retry until the retryIntervalMaxSec is reached
 
 ## Websocket
 - **qredoWebsocket:** the url of the websocket feed you want to use
@@ -91,7 +91,7 @@ store:
 
 - **enable:** enables the load-balancing logic
 - **onLockErrorTimeoutMs:** on lock timeout in milliseconds
-- **actionIDExpirationSec:** expiration of action_id variable in Redis in seconds
+- **actionIDExpirationSec:** expiration of actionID variable in Redis in seconds
 - **redis:**
   - **host:** Redis host
   - **port:** Redis port

@@ -25,14 +25,13 @@ runs just unit test.
 will run the restAPI test.
 
 ### End-to-end test (e2e)
-In order to run the e2e test, the APIKEY and BASE64PKEY (the base64 of the private.pem file) for a Qeedo account to test
-against are needed.  Ensure both the APIKEY and BASE64PKEY are set in the environment before running the e2e test.
+In order to run the e2e test, the APIKEY and BASE64PKEY (the base64 of the private.pem file) for a Qredo account to test against are needed. Ensure both the APIKEY and BASE64PKEY are set in the environment before running the e2e test.
 The following are required for the e2e test:
 
-| Varible     | Descrition                                         |
+| Variable     | Description                                         |
 |-------------|----------------------------------------------------|
-| APIKEY      | The api key for the Qredo account to test against  |
-| BASE64PKEY  | The base64 encoded RSA private key for the account |
+| APIKEY      | The API key for the Qredo account to test against  |
+| BASE64PKEY  | The Base64-encoded RSA private key for the account |
 
 These should be set before the running the e2e test. And then:
 ```shell

@@ -16,11 +16,11 @@ type ClientRegisterRequest struct {
 	// example: test-agent
 	Name string `json:"name"`
 
-	// The api key for the partner api
+	// The API key for the partner API
 	// example: eyJrZXkiOiJHM0Fo... (truncated)
 	APIKey string `json:"APIKey"`
 
-	// The base64 encoded private key pem of which the public key has been registered in the partner api
+	// The Base64-encoded private key pem of which the public key has been registered in the Partner API
 	// example: LS0tLS1CRUdJTiBS... (truncated)
 	Base64PrivateKey string `json:"base64PrivateKey"`
 }
@@ -34,7 +34,7 @@ func (r *ClientRegisterRequest) Validate() error {
 	case r.Name == "" || len(r.Name) > maxStringFieldSize:
 		return errors.New("name")
 	case r.APIKey == "" || len(r.APIKey) > maxStringFieldSize:
-		return errors.New("apiKey")
+		return errors.New("APIKey")
 	case r.Base64PrivateKey == "" || len(r.Base64PrivateKey) > maxBase64FieldSize:
 		return errors.New("base64PrivateKey")
 	default:

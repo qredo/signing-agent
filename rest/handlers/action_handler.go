@@ -29,7 +29,7 @@ func NewActionHandler(actionManager autoapprover.ActionManager) *ActionHandler {
 //		Parameters:
 //		  + name: action_id
 //		    in: path
-//		    description: the id of the transaction that is received from the feed
+//		    description: the ID of the transaction that is received from the feed
 //		    required: true
 //		    type: string
 //
@@ -54,7 +54,7 @@ func (h *ActionHandler) ActionApprove(_ *defs.RequestContext, _ http.ResponseWri
 //		Parameters:
 //		  + name: action_id
 //		    in: path
-//		    description: the id of the transaction that is received from the feed
+//		    description: the ID of the transaction that is received from the feed
 //		    required: true
 //		    type: string
 //
