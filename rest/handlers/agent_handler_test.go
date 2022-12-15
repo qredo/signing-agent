@@ -473,19 +473,20 @@ func TestSigningAgentHandler_ClientFeed_registers_client(t *testing.T) {
 	assert.True(t, mockFeedClient.ListenCalled)
 }
 
-func TestSigningAgentHandler_GetAgentID(t *testing.T) {
+func TestSigningAgentHandler_GetClient(t *testing.T) {
 	//Arrange
 	mockCore := &lib.MockSigningAgentClient{
 		NextAgentID: "client 1",
 	}
 	handler := &SigningAgentHandler{
-		core: mockCore,
+		core:      mockCore,
+		localFeed: "feed/path",
 	}
 	req, _ := http.NewRequest("GET", "/path", nil)
 	rr := httptest.NewRecorder()
 
 	//Act
-	response, err := handler.GetAgentID(nil, rr, req)
+	response, err := handler.GetClient(nil, rr, req)
 
 	//Assert
 	assert.Nil(t, err)
@@ -496,5 +497,5 @@ func TestSigningAgentHandler_GetAgentID(t *testing.T) {
 	assert.True(t, mockCore.GetAgentIDCalled)
 	data, _ := json.Marshal(response)
 
-	assert.Equal(t, "{\"agentID\":\"client 1\"}", string(data))
+	assert.Equal(t, "{\"agentID\":\"client 1\",\"feedURL\":\"feed/path\"}", string(data))
 }

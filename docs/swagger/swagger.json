@@ -27,12 +27,12 @@
           "client"
         ],
         "summary": "Returns `agentID` if it's configured",
-        "operationId": "GetAgentID",
+        "operationId": "GetClient",
         "responses": {
           "200": {
-            "description": "GetAgentIDResponse",
+            "description": "GetClientResponse",
             "schema": {
-              "$ref": "#/definitions/GetAgentIDResponse"
+              "$ref": "#/definitions/GetClientResponse"
             }
           }
         }
@@ -341,11 +341,11 @@
         }
       }
     },
-    "GetAgentIDResponse": {
+    "GetClientResponse": {
       "type": "object",
       "properties": {
         "Body": {
-          "$ref": "#/definitions/GetAgentIDResponse"
+          "$ref": "#/definitions/GetClientResponse"
         }
       }
     },
