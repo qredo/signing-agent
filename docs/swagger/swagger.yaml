@@ -107,10 +107,12 @@ definitions:
                 example: OK
                 type: string
         type: object
-    GetAgentIDResponse:
+    GetClientResponse:
         properties:
-            Body:
-                $ref: '#/definitions/GetAgentIDResponse'
+            agentID:
+                type: string
+            feedURL:
+                type: string
         type: object
     HealthCheckStatusResponse:
         properties:
@@ -258,12 +260,12 @@ info:
 paths:
     /client:
         get:
-            operationId: GetAgentID
+            operationId: GetClient
             responses:
                 "200":
-                    description: GetAgentIDResponse
+                    description: GetClientResponse
                     schema:
-                        $ref: '#/definitions/GetAgentIDResponse'
+                        $ref: '#/definitions/GetClientResponse'
             summary: Returns `agentID` if it's configured
             tags:
                 - client

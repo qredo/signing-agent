@@ -18,10 +18,10 @@ type DOCClientRegisterRequest struct {
 	Body ClientRegisterRequest
 }
 
-// swagger:model GetAgentIDResponse
-type DOCGetAgentIDResponse struct {
+// swagger:model GetClientResponse
+type DOCGetClientResponse struct {
 	// in:body
-	Body GetAgentIDResponse
+	Body GetClientResponse
 }
 
 // swagger:model ClientFeedResponse

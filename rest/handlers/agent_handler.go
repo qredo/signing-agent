@@ -137,19 +137,20 @@ func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.Response
 	return nil, nil
 }
 
-// GetAgentID
+// GetClient
 //
-// swagger:route GET /client client GetAgentID
+// swagger:route GET /client client GetClient
 //
 // # Returns `agentID` if it's configured
 //
 // Responses:
 //
-//	200: GetAgentIDResponse
-func (h *SigningAgentHandler) GetAgentID(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
+//	200: GetClientResponse
+func (h *SigningAgentHandler) GetClient(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
-	response := api.GetAgentIDResponse{
+	response := api.GetClientResponse{
 		AgentID: h.core.GetAgentID(),
+		FeedURL: h.localFeed,
 	}
 	return response, nil
 }
