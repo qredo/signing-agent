@@ -4,21 +4,20 @@
 
 ## Introduction
 
-The Signing Agent is an agent that can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application. We recommend deploying the service on premise, on the customer’s infrastructure. We also recommend that every Signing Agent instance be used to manage a unique agent ID, and that multiple instances be deployed (preferably on different cloud infrastructures) in order to meet a multiple signer threshold such as 2 or 3 out of 5. The Signing Agent uses a dedicated subset of the Qredo Server APIs, called the Partner API, to perform its functions. It can also be used to create a programmable approver service that listens to incoming approval requests over Websockets, and is then able to perform automated custody.
+The Signing Agent is an agent that can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application. We recommend deploying the service on premise, on your own infrastructure. We also recommend that every Signing Agent instance be used to manage a unique agent ID, and that multiple instances be deployed (preferably on different cloud infrastructures) in order to meet a multiple signer threshold such as 2 or 3 out of 5. The Signing Agent uses a dedicated subset of the Qredo Server APIs, called the Partner API, to perform its functions. It can also be used to create a programmable approver service that listens to incoming approval requests over Websockets to perform automated custody.
 
-In a nutshell, it works just like the phone app but without the human element. The server acts just like a human approver, which means that it *approves* all transaction types that move assets to and from a Qredo wallet:
+In a nutshell, Signing Agent works just like the Qredo Mobile App but without the human element. The server acts just like a human approver, which means that it *approves* all transaction requests and [transactions that move assets out of a Qredo wallet](https://developers.qredo.com/concepts/transfers/).
 
-- **transfer** - (also transfer out) a transaction between wallets that both reside on the Qredo Network: a L2 to L2 transaction.
-- **withdrawal** - a transaction where assets in a Qredo wallet move to a wallet outside the Qredo Network (BTC, ETH, etc.): a L2 to L1 transaction).
-- **atomic swap** - a transfer out transaction where you offer a certain amount of an asset in exchange for a (transfer in) certain amount of another asset. (e.g. exchange 100000000 ETH qweis for 735601 satoshis). Both parties that participate have a transfer out transaction that undergoes custody with their approvers. This transaction type is discussed in more detail in the [Atomic swaps](https://developers.qredo.com/partner-api/how-tos/atomic-swap/) section of the Qredo documentation portal.
 
 ## Cloud-based storage for secrets
 
-An alternative to storing the signing-agent configuration on-premises in a file, is to use secure cloud-based storage. The following cloud-based solutions are supported.
+An alternative to storing the Signing Agent configuration on-premises in a file is to use secure cloud-based storage. The following cloud-based solutions are supported.
 
 ### Oracle Cloud Vault Storage
 
-In the YAML configuration file:
+In order to use Oracle Cloud Vault storage, update your configuration storage setting, i.e. set the `store` `type` to `oci` in the [YAML configuration file](https://developers.qredo.com/signing-agent/v2-signing-agent/configure/).
+
+For example, your YAML config should look something like the following:
 
 ```yaml
 
@@ -31,19 +30,21 @@ store:
   ...
 ```
 
-- Setup an API key on Oracle Cloud
+- Set up an API key on Oracle Cloud
 - Download the config file for the api key, fill in the correct private key path
 - Either put the file in its default location of ~/.oci/config or
   put it in a custom location and set env var OCI_CONFIG_FILE to the full path including the filename
 - Create a vault and copy the OCID to the config file for the vault setting
 - Create an encryption key (AES or RSA) in the vault, copy it's OCID to the config secretEncryptionKey setting
 - Copy the compartment OCID from the compartment where the vault was created
-- Set a secret name where the signing agent will store its configuration and keys
-- Start the signing agent and register an agent using the API
+- Set a secret name where the Signing Agent will store its configuration and keys
+- Start the Signing Agent and register an agent using the API
 
 ### AWS Cloud Secrets Manager Storage
 
-In order to use AWS for configuration storage, set the `storage_type` to `aws` and provide the AWS Region and the name of the Secrets Manager secret. For example, your YAML config should look something like the following:
+In order to use AWS for configuration storage, update your configuration storage setting, i.e.  set the `storage_type` to `aws` and provide the AWS Region and the name of the Secrets Manager secret in the [YAML configuration file](https://developers.qredo.com/signing-agent/v2-signing-agent/configure/). 
+
+For example, your YAML config should look something like the following:
 
 ```yaml
 store:
@@ -53,7 +54,7 @@ store:
   ...
 ```
 
-The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be setup in advance. To do this, on the AWS console:
+The Secrets Manager secret (i.e. `signAgentConfig` in this example) needs to be set up in advance. To do this, on the AWS console:
 
 1. Create a KMS customer-managed key to be used to encrypt the Secrets Manager secret
 2. Create the Secrets Manager secret, naming it and including the KMS key from step 1
@@ -63,14 +64,11 @@ The Secrets Manager secret (i.e., `signAgentConfig` in this example) needs to be
    - Name the secret and optionally add a description
 3. Update the Signing Agent's configuration file with the AWS region and secret name
 
-Start the Signing Agent and register the agent using the API. (Note: starting the Agent converts the secret's type
-from plaintext to binary.)
+Start the Signing Agent and register the agent using the API. 
 
-**Note:** the Signing Agent needs access to AWS credentials in order to use AWS' Secrets Manager.  How you do this is
-dependent on your requirements (for instance, the use of AWS access keys or an AWS credentials file, etc.) but, importantly, 
-if running the Signing Agent in a docker container, the AWS credentials need to be available to the Agent running in the
-container.  This would require passing the AWS credential data to docker at startup.  As an example, AWS access keys can be 
-passed as environment variables:
+> Starting the Agent converts the secret's type from plaintext to binary.
+
+**Note:** the Signing Agent needs access to AWS credentials in order to use AWS' Secrets Manager. How you do this is dependent on your requirements (for instance, the use of AWS access keys or an AWS credentials file, etc.) but, importantly, if running the Signing Agent in a docker container, the AWS credentials need to be available to the Agent running in the container. This requires passing the AWS credential data to docker at startup. As an example, AWS access keys can be passed as environment variables:
 ```shell
 > docker run -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ...
 ```
@@ -82,16 +80,16 @@ Specifics are best discussed with your cloud services admin department.
 
 ## Using Signing Agent as a Service
 
-As mentioned above, the Signing Agent is a standalone component of the Qredo ecosystem. Everyone who intends to run an Signing Agent must first register it on the Qredo network. Below is a step-by-step explanation of the registration process, which involves the *PartnerAPP* (e.g. your app), the *signing-agent-service* (e.g. Signing Agent running on your infrastructure), and *QredoBE* (e.g. our Qredo back-end).
+As mentioned above, the Signing Agent is a standalone component of the Qredo ecosystem. Everyone who intends to run an Signing Agent must first register it on the Qredo network. Below is a step-by-step explanation of the registration process, which involves the *PartnerApp* (i.e. your App), the *signing-agent-service* (e.g. Signing Agent running on your infrastructure), and *QredoBE* (e.g. our Qredo backend).
 
 ```mermaid
 sequenceDiagram
 autonumber
-  PartnerAPP->>signing-agent-service:POST /register {"name":"...","APIKey":"...","Base64PrivateKey":"..."}
+  PartnerApp->>signing-agent-service:POST /register {"name":"...","APIKey":"...","Base64PrivateKey":"..."}
   signing-agent-service->>signing-agent-service: Generate BLS and EC Keys
   signing-agent-service->>QredoBE: Register agent with Qredo Chain
   QredoBE->>signing-agent-service: {agentId, feedURL, other data} 
-  signing-agent-service->>PartnerAPP: {agentId, feedURL}
+  signing-agent-service->>PartnerApp: {agentId, feedURL}
 ```
 
 1. The *PartnerApp* triggers the registration process by providing its client name, parther APIKey and Base64PrivateKey  to the *signing-agent-service*.
@@ -102,7 +100,7 @@ autonumber
 
 All the data above is currently stored on premises in a file by the signing-agent-service, and since some of it (ClientSecret, EC & BLS private keys) is quite sensitive it needs to be running in a secure environment.
 
-**Note:** an always up to date API documentation can be accessed within the [Github repo](https://github.com/qredo/signing-agent/blob/master/docs/swagger/swagger.yaml).
+> Up-to-date API documentation can be accessed within this [repo](https://github.com/qredo/signing-agent/blob/master/docs/swagger/swagger.yaml).
 
 ## API
 
@@ -136,25 +134,25 @@ There are times when the Signing Agent benefits from being tightly coupled with 
 ```mermaid
 sequenceDiagram
   autonumber
-  PartnerAPP->>PartnerAPP:ClientRegister('client_name')
+  PartnerApp->>PartnerApp:ClientRegister('client_name')
   
   rect rgb(200, 150, 255)
-  note right of PartnerAPP: inside the Signing Agent lib
-  PartnerAPP->>PartnerAPP: Generate BLS and EC Keys
+  note right of PartnerApp: inside the Signing Agent lib
+  PartnerApp->>PartnerApp: Generate BLS and EC Keys
   end
 
-  PartnerAPP->>QredoBE: ClientInit(reqDataInit, RefID, APIKey, Base64PrivateKey) reqDataInit: {name, BLS & EC PubKeys}
+  PartnerApp->>QredoBE: ClientInit(reqDataInit, RefID, APIKey, Base64PrivateKey) reqDataInit: {name, BLS & EC PubKeys}
   QredoBE->>QredoBE: Create New MFA ID, New IDDoc
-  QredoBE->>PartnerAPP:{ClientSecret, ClientID, unsigned IDDoc, AccountCode}
-  PartnerAPP->>PartnerAPP: ClientRegisterFinish(ClientSercert, ID, unsigned IDDoc, AccountCode)
+  QredoBE->>PartnerApp:{ClientSecret, ClientID, unsigned IDDoc, AccountCode}
+  PartnerApp->>PartnerApp: ClientRegisterFinish(ClientSercert, ID, unsigned IDDoc, AccountCode)
   rect rgb(200, 150, 255)
-  note right of PartnerAPP: inside the Signing Agent lib
-  PartnerAPP->>PartnerAPP: Store ClientSercert, ID, AccountCode
-  PartnerAPP->>PartnerAPP: Sign IDDoc
-  PartnerAPP->>QredoBE: POST /p/coreclient/finish { IDdoc Signature }
+  note right of PartnerApp: inside the Signing Agent lib
+  PartnerApp->>PartnerApp: Store ClientSercert, ID, AccountCode
+  PartnerApp->>PartnerApp: Sign IDDoc
+  PartnerApp->>QredoBE: POST /p/coreclient/finish { IDdoc Signature }
   end
   QredoBE->>QredoBE: Save IDDoc in qredochain
-  QredoBE->>PartnerAPP: {feedURL}
+  QredoBE->>PartnerApp: {feedURL}
 ```
 
 ## Approving a transaction
@@ -167,17 +165,20 @@ Prerequisites:
 Steps:
 
 1. A websocket connection to the *Qredo BE* is opened for said `agentID`
-2. *PartnerAPP* is constantly monitoring for new actions to be handled
+2. *PartnerApp* is constantly monitoring for new actions to be handled
 3. A new transfer is initiated
 4. The *Qredo BE* returns the transaction id: `tx_id`
 5. Shortly after, a new action is received through the websocket with `action_id` equal to the `tx_id` for the transfer.
 6. Initiate new action
-7. The *PartnerAPP* requests from the *Qredo BE* details for the action
+7. The *PartnerApp* requests from the *Qredo BE* details for the action
 8. *Qredo BE* returns action details incl. the payload (list of messages)
 9. Sign payload (for the new action)
-10. The *PartnerAPP* decides to approve the transactions, thus sending the payload to the signing-agent with a `PUT` request. (`DELETE` is for reject)
+10. The *PartnerApp* decides to approve the transactions, thus sending the payload to the Signing Agent with a:
 
-After that sequence, the transaction should be complete.
+- `PUT` request for accet
+- `DELETE` for reject
+
+After that sequence, the transaction flow is complete.
 
 ## Using the library to approve a transaction
 
@@ -186,19 +187,19 @@ sequenceDiagram
   autonumber
 
   par
-  PartnerAPP->>QredoBE: WEBSOCKET /coreclient/feed
-  PartnerAPP->>PartnerAPP: monitor for new actions
+  PartnerApp->>QredoBE: WEBSOCKET /coreclient/feed
+  PartnerApp->>PartnerApp: monitor for new actions
   end
-  PartnerAPP->>QredoBE:POST /company/{company_id}/transfer
-  QredoBE->>PartnerAPP: tx_id
-  QredoBE->>PartnerAPP: {via websocket } action_id(==tx_id), type, status
-  PartnerAPP->>PartnerAPP: ActionApprove(actionID)
+  PartnerApp->>QredoBE:POST /company/{company_id}/transfer
+  QredoBE->>PartnerApp: tx_id
+  QredoBE->>PartnerApp: {via websocket } action_id(==tx_id), type, status
+  PartnerApp->>PartnerApp: ActionApprove(actionID)
   rect rgb(200, 150, 255)
-  note right of PartnerAPP: inside the Signing Agent lib
-  PartnerAPP->>QredoBE: GET /coreclient/action/{action_id}
-  QredoBE->>PartnerAPP: action details incl. list of messages
-  PartnerAPP->>PartnerAPP: signing those messages
-  PartnerAPP->>QredoBE: PUT /coreclient/action/{action_id} send signed messages to BE
+  note right of PartnerApp: inside the Signing Agent lib
+  PartnerApp->>QredoBE: GET /coreclient/action/{action_id}
+  QredoBE->>PartnerApp: action details incl. list of messages
+  PartnerApp->>PartnerApp: signing those messages
+  PartnerApp->>QredoBE: PUT /coreclient/action/{action_id} send signed messages to BE
 
   end
 ```

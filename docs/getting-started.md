@@ -1,22 +1,22 @@
 # Doc for Partners
 
-This guide is meant to walk you through all the steps necessary to integrate a 3rd party App (which from now on we’ll refer to as the **PartnerApp**) with the Signing Agent and our Partner API.
+This guide walks you through all the steps necessary to integrate a 3rd party App (which from now on we’ll refer to as the **PartnerApp**) with the Signing Agent and our [Partner API](https://developers.qredo.com/partner-api/getting-started/).
 
 # Creating a Qredo account to obtain the API key
 
-If you haven’t done so, please follow the following guide to first create an account on the Play environment, so you can test the Signing Agent in our sandbox environment before using it in production.
+If you haven’t done so, please follow the guide to first create an account on the test environment, so you can test the Signing Agent in our sandbox environment before using it in production.
 
-## Creating an account on the Play environment
+## Creating an account on the sandbox environment
 
-The first step is to visit the Play environment app at [https://play.qredo.network/](https://play.qredo.network/). This is a special purpose sandbox environment that you can use for testing, without fear of breaking anything.
+The first step is to visit the sandbox environment App at [https://sandbox.qredo.network/]( https://sandbox.qredo.network). This is a special purpose sandbox environment that you can use for testing, without fear of breaking anything.
 
 ![Screenshot 2022-08-11 at 14.50.38.png](img/Screenshot_2022-08-11_at_14.50.38.png)
 
-Once on that page, click the “Join Qredo” button at the bottom and you’ll be taken to the signup page. If you want to avoid having to install the phone app, you can use an email address in the format `user@domain` without a TLD (e.g. .com or .net).
+Once on that page, click the “Join Qredo” button at the bottom and you’ll be taken to the signup page. If you want to avoid having to install the phone App, you can use an email address in the format `user@domain` without a TLD (e.g. .com or .net).
 
 ![Screenshot 2022-08-10 at 18.10.25.png](img/Screenshot_2022-08-10_at_18.10.25.png)
 
-Next, click Continue to go through the other steps until you reach “Validate your email address”. To obtain the validation code, you need to use the mock email service provided by the [Qredo Mobile Demo app](https://mobile.qredo.net/#). Open the app in your browser and click on the “Check email” button.
+Next, click Continue to go through the other steps until you reach “Validate your email address”. To obtain the validation code, you need to use the mock email service provided by the [Qredo Mobile Demo App](https://mobile.qredo.net/#). Open the App in your browser and click on the “Check email” button.
 
 ![Screenshot 2022-08-11 at 14.19.48.png](img/Screenshot_2022-08-11_at_14.19.48.png)
 
@@ -28,11 +28,11 @@ Then please copy the OTC code to the registration form and click Continue. Next,
 
 ![Screenshot 2022-08-11 at 14.23.54.png](img/Screenshot_2022-08-11_at_14.23.54.png)
 
-Next, we’re going to mock the mobile app pairing, again with the help of our [Qredo Mobile Demo app](https://mobile.qredo.net/#) that you used before for email validation. First, with your mobile phone,  take a close-up picture of the QR code displayed in the form.
+Next, we’re going to mock the Mobile App pairing, again with the help of our [Qredo Mobile Demo App](https://mobile.qredo.net/#) that you used before for email validation. First, with your mobile phone,  take a close-up picture of the QR code displayed in the form.
 
 ![Screenshot 2022-08-11 at 14.28.25.png](img/Screenshot_2022-08-11_at_14.28.25.png)
 
-Go to the [Qredo Mobile Demo app](https://mobile.qredo.net/#) now and click on “Scan QR code”. Allow the browser access to your camera, and point the phone with the picture of the QR code to face your computer camera.
+Go to the [Qredo Mobile Demo App](https://mobile.qredo.net/#) now and click on “Scan QR code”. Allow the browser access to your camera, and point the phone with the picture of the QR code to face your computer camera.
 
 ![Screenshot 2022-08-11 at 14.30.08.png](img/Screenshot_2022-08-11_at_14.30.08.png)
 
@@ -50,7 +50,7 @@ Signing into your account is straightforward. Just type in the email address you
 
 ![Screenshot 2022-08-11 at 14.39.59.png](img/Screenshot_2022-08-11_at_14.39.59.png)
 
-You will see a screen asking you to authenticate with your mobile app. In our case, we’re going to mock it again by using our [Qredo Mobile Demo app](https://mobile.qredo.net/#). 
+You will see a screen asking you to authenticate with your Mobile App. In our case, we’re going to mock it again by using our [Qredo Mobile Demo App](https://mobile.qredo.net/#). 
 
 ![Screenshot 2022-08-11 at 14.41.03.png](img/Screenshot_2022-08-11_at_14.41.03.png)
 
@@ -74,7 +74,7 @@ Next you have to set up the Play sandbox to generate API keys for the Partner AP
 
 ![Screenshot 2022-06-09 at 14.26.30.png](img/Screenshot_2022-06-09_at_14.26.30.png)
 
-Now, the Qredo Back End is ready to accept API requests.
+Now, the Qredo backend is ready to accept API requests.
 
 # Deploying the Docker image
 
@@ -144,8 +144,7 @@ You can now continue with testing of the Docker image.
 
 # Registering the Signing Agent Service
 
-When everything is set up properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) you can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/` but that 
-should be changed to the address and port of the signing service you started above.  (Most likely this will be: `http://localhost:8007`.)
+When everything is set up properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) you can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/` but that should be changed to the address and port of the signing service you started above. (Most likely this will be: `http://localhost:8007`.)
 
 The PartnerApp triggers the registration process by providing an agent name, partner api key and private.pem represented by base64 string to the Signing Agent service. You don't have to remember the `agentId` value, because You can call `GET https://agent.example.org/api/v1/client` endpoint to get it.
 
@@ -166,7 +165,7 @@ curl -X 'POST' \
 }
 ```
 
-Once the Signing Agent registration process is complete, we can now proceed to creating a company through the Partner API, effectively enabling us to then have a fund and wallets.
+Once the Signing Agent registration process is complete, we can now proceed to creating a company through the Partner API, effectively enabling us to then have a Fund and Wallets.
 
 # Create a company
 

@@ -1,11 +1,11 @@
 
 # Registration process (step-by-step explanation)
 
-Below is a step-by-step explanation of the registration process, which involves the *PartnerAPP* (e.g. Banco Hipotecario Partner Application), the *signing-agent-service* (e.g. Signing Agent running on Banco Hipotecario’s infrastructure), and *QredoBE* (e.g. our Qredo back-end).
+Below is a step-by-step explanation of the registration process, which involves the *PartnerApp* (e.g. Banco Hipotecario Partner Application), the *signing-agent-service* (e.g. Signing Agent running on Banco Hipotecario’s infrastructure), and *QredoBE* (e.g. our Qredo back-end).
 
 ```mermaid
 sequenceDiagram
-participant PA as BH PartnerAPP
+participant PA as BH PartnerApp
 participant AA as BH Signing Agent
 participant Q as QredoBE
 autonumber
