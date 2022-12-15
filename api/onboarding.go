@@ -99,14 +99,24 @@ type QredoRegisterInitResponse struct {
 	Timestamp    int64  `json:"timestamp"`
 }
 
-// swagger:model ClientFullRegisterResponse
-type ClientFullRegisterResponse struct {
+// swagger:model AgentRegisterResponse
+type AgentRegisterResponse struct {
+	// The ID of the agent
+	// example: 98cTMMSPrDdcDDVU8idhuJGK2U1P4vmQcsp8wnED8pPR
 	AgentID string `json:"agentID"`
+
+	// The feed websocket URL
+	// example: http://localhost:8007/api/v1/client/feed
 	FeedURL string `json:"feedURL"`
 }
 
 // swagger:model GetClientResponse
 type GetClientResponse struct {
+	// The ID of the agent
+	// example: 98cTMMSPrDdcDDVU8idhuJGK2U1P4vmQcsp8wnED8pPR
 	AgentID string `json:"agentID"`
+
+	// The feed websocket URL
+	// example: http://localhost:8007/api/v1/client/feed
 	FeedURL string `json:"feedURL"`
 }

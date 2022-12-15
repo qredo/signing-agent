@@ -114,6 +114,8 @@ func TestRegisterNewSigningAgent(t *testing.T) {
 	response.JSON().Object().NotEmpty()
 	response.JSON().Object().Value("agentID").String().NotEmpty()
 	response.JSON().Object().Value("agentID").String().Equal(agentID)
+	response.JSON().Object().Value("feedURL").String().NotEmpty()
+	response.JSON().Object().Value("feedURL").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
 }
 
 // TestRegisterExistingAgentDeny checks attempting to register fails with a known message.

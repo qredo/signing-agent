@@ -96,15 +96,15 @@ store:
   - **host:** Redis host
   - **port:** Redis port
   - **password:** Redis password
-  - **db:** Redis database name
+  - **db:** Redis database to be selected after connecting to the server
 
 ## Store
 
 - **type:** the type of store to use to store the private key information for the signing agent, ex. file, oci, aws
 - **file:** the path to the storage file when file store is used
 - **oci:** the oracle cloud configuration to store the private keys in an oracle vault
-  - **compartment:** the oidc where the vault and encryption key reside
-  - **vault:** the oidc of the vault where the secret will be stored
+  - **compartment:** the OCID where the vault and encryption key reside
+  - **vault:** the OCID of the vault where the secret will be stored
   - **secretEncryptionKey:** the encryption key used for both the secret and the data inside the secret
   - **configSecret:** the name of secret that will be used to store the data
 - **aws:** the amazon cloud configuration to store the private keys in amazon secrets manager

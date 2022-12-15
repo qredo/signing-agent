@@ -174,7 +174,7 @@ func TestRestAPIs(t *testing.T) {
 		RetryIntervalMax: 300,
 		RetryInterval:    5,
 	}
-	cfg.Websocket = config.WebSocketConf{
+	cfg.Websocket = config.WebSocketConfig{
 		ReconnectTimeOut:  200,
 		ReconnectInterval: 15,
 		QredoWebsocket:    "wss://play-api.qredo.network/api/v1/p/coreclient/feed",
@@ -231,6 +231,7 @@ func registrationTests(e *httpexpect.Expect, payload *api.ClientRegisterRequest)
 		Status(http.StatusOK)
 	response.JSON().Object().NotEmpty()
 	response.JSON().Object().Value("agentID").String().Equal(testAccountCode)
+	response.JSON().Object().Value("feedURL").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
 
 	// Register an existing client should result in an error.
 	registrationResponse = e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).

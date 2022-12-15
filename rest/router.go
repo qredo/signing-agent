@@ -220,7 +220,7 @@ func (r *Router) printRoutes(router *mux.Router) {
 }
 
 // genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
-func genWSQredoCoreClientFeedURL(config *config.WebSocketConf) string {
+func genWSQredoCoreClientFeedURL(config *config.WebSocketConfig) string {
 	return config.QredoWebsocket
 }
 

@@ -16,17 +16,21 @@
       "name": "APACHE 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "0.1.0"
+    "version": "1.0.0"
   },
   "host": "localhost:8007",
   "basePath": "/api/v1",
   "paths": {
     "/client": {
       "get": {
+        "description": "This endpoint retrieves the `agentID` and `feedURL` if an agent is registered.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "client"
         ],
-        "summary": "Returns `agentID` if it's configured",
+        "summary": "Get information about the registered agent",
         "operationId": "GetClient",
         "responses": {
           "200": {
@@ -40,11 +44,15 @@
     },
     "/client/action/{action_id}": {
       "put": {
+        "description": "This endpoint approves a transaction based on the transaction ID, `action_id`, passed.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "action"
         ],
         "summary": "Approve a transaction",
-        "operationId": "actionApprove",
+        "operationId": "ActionApprove",
         "parameters": [
           {
             "type": "string",
@@ -64,6 +72,10 @@
         }
       },
       "delete": {
+        "description": "This endpoint rejects a transaction based on the transaction ID, `action_id`, passed.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "action"
         ],
@@ -90,6 +102,7 @@
     },
     "/client/feed": {
       "get": {
+        "description": "This endpoint feeds approval requests coming from the Qredo Backend to the agent.",
         "produces": [
           "application/json"
         ],
@@ -112,34 +125,12 @@
         }
       }
     },
-    "/client/register": {
-      "post": {
-        "tags": [
-          "client"
-        ],
-        "summary": "Register a new agent",
-        "operationId": "RegisterAgent",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/ClientRegisterRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ClientFullRegisterResponse",
-            "schema": {
-              "$ref": "#/definitions/ClientFullRegisterResponse"
-            }
-          }
-        }
-      }
-    },
     "/healthcheck/config": {
       "get": {
+        "description": "This endpoint returns the application configuration.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "healthcheck"
         ],
@@ -157,6 +148,10 @@
     },
     "/healthcheck/status": {
       "get": {
+        "description": "This endpoint returns the application status.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "healthcheck"
         ],
@@ -164,9 +159,9 @@
         "operationId": "HealthcheckStatus",
         "responses": {
           "200": {
-            "description": "HealthCheckStatusResponse",
+            "description": "StatusResponse",
             "schema": {
-              "$ref": "#/definitions/HealthCheckStatusResponse"
+              "$ref": "#/definitions/StatusResponse"
             }
           }
         }
@@ -174,16 +169,53 @@
     },
     "/healthcheck/version": {
       "get": {
+        "description": "This endpoint returns information about the application version.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "healthcheck"
         ],
         "summary": "Check application version",
-        "operationId": "HealthcheckVersion",
+        "operationId": "HealthCheckVersion",
         "responses": {
           "200": {
             "description": "VersionResponse",
             "schema": {
               "$ref": "#/definitions/VersionResponse"
+            }
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "description": "This will register the agent only if there is none already registered.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "client"
+        ],
+        "summary": "Register a new agent",
+        "operationId": "RegisterAgent",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ClientRegisterRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AgentRegisterResponse",
+            "schema": {
+              "$ref": "#/definitions/AgentRegisterResponse"
             }
           }
         }
@@ -196,10 +228,29 @@
       "title": "AWSConfig-based Signing Agent config: used when Base `store` `type` is `aws`.",
       "properties": {
         "configSecret": {
-          "type": "string"
+          "description": "The name of the AWS Secrets Manager secret containing the encrypted data",
+          "type": "string",
+          "example": "secrets_manager_secret"
         },
         "region": {
-          "type": "string"
+          "description": "The AWS region where the secret is stored",
+          "type": "string",
+          "example": "eu-west-3"
+        }
+      }
+    },
+    "AgentRegisterResponse": {
+      "type": "object",
+      "properties": {
+        "agentID": {
+          "description": "The ID of the agent",
+          "type": "string",
+          "example": "98cTMMSPrDdcDDVU8idhuJGK2U1P4vmQcsp8wnED8pPR"
+        },
+        "feedURL": {
+          "description": "The feed websocket URL",
+          "type": "string",
+          "example": "http://localhost:8007/api/v1/client/feed"
         }
       }
     },
@@ -207,15 +258,21 @@
       "type": "object",
       "properties": {
         "enabled": {
-          "type": "boolean"
+          "description": "Activate the automatic approval of every transaction that is received",
+          "type": "boolean",
+          "example": true
         },
         "retryIntervalMaxSec": {
+          "description": "The maximum time in which the signing agent retries to approve an action. After that, it’s considered as a failure",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 300
         },
         "retryIntervalSec": {
+          "description": "The interval in which the Signing Agent is attempting to approve an action. It will retry until the `retryIntervalMaxSec` is reached",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 5
         }
       }
     },
@@ -223,11 +280,15 @@
       "type": "object",
       "properties": {
         "pin": {
+          "description": "The pin number to use to provide a zero knowledge proof token for communication with the Partner API",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 123456
         },
         "qredoAPI": {
-          "type": "string"
+          "description": "The URL of the Qredo API",
+          "type": "string",
+          "example": "https://sandbox-api.qredo.network"
         }
       }
     },
@@ -265,17 +326,6 @@
           "description": "The type of the transaction",
           "type": "string",
           "example": "ApproveWithdraw"
-        }
-      }
-    },
-    "ClientFullRegisterResponse": {
-      "type": "object",
-      "properties": {
-        "agentID": {
-          "type": "string"
-        },
-        "feedURL": {
-          "type": "string"
         }
       }
     },
@@ -321,7 +371,7 @@
           "$ref": "#/definitions/Store"
         },
         "websocket": {
-          "$ref": "#/definitions/WebSocketConf"
+          "$ref": "#/definitions/WebSocketConfig"
         }
       }
     },
@@ -344,16 +394,15 @@
     "GetClientResponse": {
       "type": "object",
       "properties": {
-        "Body": {
-          "$ref": "#/definitions/GetClientResponse"
-        }
-      }
-    },
-    "HealthCheckStatusResponse": {
-      "type": "object",
-      "properties": {
-        "websocket": {
-          "$ref": "#/definitions/WebsocketStatus"
+        "agentID": {
+          "description": "The ID of the agent",
+          "type": "string",
+          "example": "98cTMMSPrDdcDDVU8idhuJGK2U1P4vmQcsp8wnED8pPR"
+        },
+        "feedURL": {
+          "description": "The feed websocket URL",
+          "type": "string",
+          "example": "http://localhost:8007/api/v1/client/feed"
         }
       }
     },
@@ -361,19 +410,25 @@
       "type": "object",
       "properties": {
         "CORSAllowOrigins": {
+          "description": "The value of the Access-Control-Allow-Origin of the responses of the build in API",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "example": "'*'"
         },
         "TLS": {
           "$ref": "#/definitions/TLSConfig"
         },
         "addr": {
-          "type": "string"
+          "description": "The address and port the service runs on [the bind address and port the build in API endpoints]",
+          "type": "string",
+          "example": "0.0.0.0:8007"
         },
         "logAllRequests": {
-          "type": "boolean"
+          "description": "Log all incoming requests to the build in API",
+          "type": "boolean",
+          "example": true
         }
       }
     },
@@ -381,15 +436,21 @@
       "type": "object",
       "properties": {
         "actionIDExpirationSec": {
+          "description": "The expiration of actionID variable in Redis in seconds",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 6
         },
         "enable": {
-          "type": "boolean"
+          "description": "Enables the load-balancing logic",
+          "type": "boolean",
+          "example": true
         },
         "onLockErrorTimeoutMs": {
+          "description": "The on lock timeout in milliseconds",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 300
         },
         "redis": {
           "$ref": "#/definitions/RedisConfig"
@@ -400,46 +461,86 @@
       "type": "object",
       "properties": {
         "format": {
-          "type": "string"
+          "description": "The format of the logging",
+          "type": "string",
+          "enum": [
+            "text",
+            " json"
+          ],
+          "example": "json"
         },
         "level": {
-          "type": "string"
+          "description": "The level of the logging",
+          "type": "string",
+          "enum": [
+            "info",
+            " warn",
+            " error",
+            " debug"
+          ],
+          "example": "debug"
         }
       }
     },
     "OciConfig": {
       "type": "object",
+      "title": "OciConfig-based Signing Agent config: used when Base `store` `type` is `oci`.",
       "properties": {
         "compartment": {
-          "type": "string"
+          "description": "The OCID where the vault and encryption key reside",
+          "type": "string",
+          "example": "ocid1.tenancy.oc1..."
         },
         "configSecret": {
-          "type": "string"
+          "description": "The name of secret that will be used to store the data",
+          "type": "string",
+          "example": "automated_approver_config"
         },
         "secretEncryptionKey": {
-          "type": "string"
+          "description": "The encryption key used for both the secret and the data inside the secret",
+          "type": "string",
+          "example": "ocid1.key.oc1..."
         },
         "vault": {
-          "type": "string"
+          "description": "The OCID of the vault where the secret will be stored",
+          "type": "string",
+          "example": "ocid1.vault.oc1..."
         }
       }
     },
     "RedisConfig": {
       "type": "object",
+      "title": "RedisConfig-based Signing Agent config: used when LoadBalancing `enable` is `true`.",
       "properties": {
         "db": {
+          "description": "Redis database to be selected after connecting to the server",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 0
         },
         "host": {
-          "type": "string"
+          "description": "The Redis host",
+          "type": "string",
+          "example": "redis"
         },
         "password": {
-          "type": "string"
+          "description": "The Redis password",
+          "type": "string",
+          "example": "just a password"
         },
         "port": {
+          "description": "The Redis port",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 6379
+        }
+      }
+    },
+    "StatusResponse": {
+      "type": "object",
+      "properties": {
+        "websocket": {
+          "$ref": "#/definitions/WebsocketStatus"
         }
       }
     },
@@ -450,13 +551,22 @@
           "$ref": "#/definitions/AWSConfig"
         },
         "file": {
-          "type": "string"
+          "description": "The path to the storage file when `file` store is used",
+          "type": "string",
+          "example": "/volume/ccstore.db"
         },
         "oci": {
           "$ref": "#/definitions/OciConfig"
         },
         "type": {
-          "type": "string"
+          "description": "The type of store to use to store the private key information for the Signing Agent",
+          "type": "string",
+          "enum": [
+            "file",
+            " oci",
+            " aws"
+          ],
+          "example": "file"
         }
       }
     },
@@ -464,13 +574,19 @@
       "type": "object",
       "properties": {
         "certFile": {
-          "type": "string"
+          "description": "The cert file to use for the TLS server",
+          "type": "string",
+          "example": "tls/domain.crt"
         },
         "enabled": {
-          "type": "boolean"
+          "description": "Enable TLS for the internal HTTP server",
+          "type": "boolean",
+          "example": true
         },
         "keyFile": {
-          "type": "string"
+          "description": "The key file to use for the TLS server",
+          "type": "string",
+          "example": "tls/domain.key"
         }
       }
     },
@@ -478,49 +594,71 @@
       "type": "object",
       "properties": {
         "buildDate": {
-          "type": "string"
+          "description": "The application build date",
+          "type": "string",
+          "example": "2022-12-01"
         },
         "buildType": {
-          "type": "string"
+          "description": "The application build type",
+          "type": "string",
+          "example": "dev"
         },
         "buildVersion": {
-          "type": "string"
+          "description": "The application build version",
+          "type": "string",
+          "example": "v1.0.0"
         }
       }
     },
-    "WebSocketConf": {
+    "WebSocketConfig": {
       "type": "object",
       "properties": {
         "pingPeriodSec": {
+          "description": "The ping period for the ping handler in seconds",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 5
         },
         "pongWaitSec": {
+          "description": "The pong wait for the pong handler in seconds",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 10
         },
         "qredoWebsocket": {
-          "type": "string"
+          "description": "The URL of the Qredo websocket feed",
+          "type": "string",
+          "example": "wss://play-api.qredo.network/api/v1/p/coreclient/feed"
         },
         "readBufferSize": {
+          "description": "The websocket upgrader read buffer size in bytes",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 512
         },
         "reconnectIntervalSec": {
+          "description": "The reconnect interval in seconds",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 5
         },
         "reconnectTimeoutSec": {
+          "description": "The reconnect timeout in seconds",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 300
         },
         "writeBufferSize": {
+          "description": "The websocket upgrader write buffer size in bytes",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 1024
         },
         "writeWaitSec": {
+          "description": "The write wait in seconds",
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "example": 10
         }
       }
     },
@@ -528,17 +666,30 @@
       "type": "object",
       "properties": {
         "connectedClients": {
+          "description": "The number of connected feed clients",
           "type": "integer",
-          "format": "uint32"
+          "format": "uint32",
+          "example": 2
         },
         "localFeedURL": {
-          "type": "string"
+          "description": "The local feed websocket URL",
+          "type": "string",
+          "example": "http://localhost:8007/api/v1/client/feed"
         },
         "readyState": {
-          "type": "string"
+          "description": "The state of the websocket connection with the server",
+          "type": "string",
+          "enum": [
+            "OPEN",
+            " CLOSED",
+            " CONNECTING"
+          ],
+          "example": "OPEN"
         },
         "remoteFeedURL": {
-          "type": "string"
+          "description": "The server websocket URL",
+          "type": "string",
+          "example": "wss://play-api.qredo.network/api/v1/p/coreclient/feed,"
         }
       }
     }

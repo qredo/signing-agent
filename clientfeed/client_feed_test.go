@@ -18,7 +18,7 @@ import (
 
 func TestClientFeedImpl_GetFeedClient(t *testing.T) {
 	//Arrange
-	sut := NewClientFeed(nil, nil, nil, &config.WebSocketConf{})
+	sut := NewClientFeed(nil, nil, nil, &config.WebSocketConfig{})
 
 	//Act
 	res := sut.GetFeedClient()
@@ -38,7 +38,7 @@ func TestClientFeedImpl_Start_unregisters_the_client(t *testing.T) {
 	unregister := func(client *hub.FeedClient) {
 		lastUnregisteredClient = client
 	}
-	sut := NewClientFeed(mockConn, util.NewTestLogger(), unregister, &config.WebSocketConf{
+	sut := NewClientFeed(mockConn, util.NewTestLogger(), unregister, &config.WebSocketConfig{
 		PingPeriod: 2,
 		PongWait:   2,
 		WriteWait:  2,
