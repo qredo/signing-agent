@@ -30,9 +30,14 @@ func NewHealthCheckHandler(source hub.SourceStats, version *version.Version, con
 
 // HealthCheckVersion
 //
-// swagger:route GET /healthcheck/version healthcheck HealthcheckVersion
+// swagger:route GET /healthcheck/version healthcheck HealthCheckVersion
 //
 // # Check application version
+//
+// This endpoint returns information about the application version.
+//
+// Produces:
+//   - application/json
 //
 // Responses:
 //
@@ -49,6 +54,11 @@ func (h *HealthCheckHandler) HealthCheckVersion(_ *defs.RequestContext, w http.R
 //
 // # Check application configuration
 //
+// This endpoint returns the application configuration.
+//
+// Produces:
+//   - application/json
+//
 // Responses:
 //
 //	200: ConfigResponse
@@ -64,9 +74,14 @@ func (h *HealthCheckHandler) HealthCheckConfig(_ *defs.RequestContext, w http.Re
 //
 // # Check application status
 //
+// This endpoint returns the application status.
+//
+// Produces:
+//   - application/json
+//
 // Responses:
 //
-//	200: HealthCheckStatusResponse
+//	200: StatusResponse
 func (h *HealthCheckHandler) HealthCheckStatus(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 

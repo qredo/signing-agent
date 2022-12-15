@@ -295,7 +295,7 @@ func TestSigningAgentHandler_RegisterAgent_returns_response(t *testing.T) {
 	assert.NotNil(t, response)
 	assert.True(t, mock_core.ClientRegisterFinishCalled)
 
-	res, ok := response.(api.ClientFullRegisterResponse)
+	res, ok := response.(api.AgentRegisterResponse)
 	assert.True(t, ok)
 	assert.NotNil(t, res)
 	assert.Equal(t, "account code", res.AgentID)
@@ -446,14 +446,14 @@ func TestSigningAgentHandler_ClientFeed_registers_client(t *testing.T) {
 	mockFeedClient := &mockClientFeed{
 		NextFeedClient: &feedClient,
 	}
-	newClientfunc := func(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister clientfeed.UnregisterFunc, config *config.WebSocketConf) clientfeed.ClientFeed {
+	newClientfunc := func(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister clientfeed.UnregisterFunc, config *config.WebSocketConfig) clientfeed.ClientFeed {
 		return mockFeedClient
 	}
 	handler := &SigningAgentHandler{
 		feedHub:           mockHub,
 		log:               testLog,
 		upgrader:          mockUpgrader,
-		websocketConfig:   &config.WebSocketConf{},
+		websocketConfig:   &config.WebSocketConfig{},
 		newClientFeedFunc: newClientfunc,
 	}
 

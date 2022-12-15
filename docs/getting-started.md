@@ -147,7 +147,7 @@ You can now continue with testing of the Docker image.
 When everything is set up properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) you can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/` but that 
 should be changed to the address and port of the signing service you started above.  (Most likely this will be: `http://localhost:8007`.)
 
-The PartnerApp triggers the registration process by providing an agent name, partner api key and private.pem represented by base64 string to the Signing Agent service. You don't have to remember the `agentId` value, because You can call `GET https://agent.example.org/api/v1/client` endpoint to get it.
+The PartnerApp triggers the registration process by providing an agent name, partner api key and private.pem represented by base64 string to the Signing Agent service. You don't have to remember the `agentID` value, because You can call `GET https://agent.example.org/api/v1/client` endpoint to get it.
 
 ```bash
 **Request**:
@@ -161,8 +161,8 @@ curl -X 'POST' \
 **Response**:
 
 {
-	"agentId":"CBApocs97bS7SgE21Ht5xRHFWRbcrH9AMZHgsoUd2gpp",
-	"feedUrl":"ws://localhost:8007/api/v1/client/feed"
+	"agentID":"CBApocs97bS7SgE21Ht5xRHFWRbcrH9AMZHgsoUd2gpp",
+	"feedURL":"ws://localhost:8007/api/v1/client/feed"
 }
 ```
 
@@ -219,7 +219,7 @@ curl -X 'POST' \
 
 # Create a fund with a wallet and corresponding policies
 
-Here we are explicitly creating a new fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-GOERLI* wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentId` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#funds).
+Here we are explicitly creating a new fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-GOERLI* wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentID` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/api-reference/api-reference/#funds).
 
 ```bash
 **Request:**

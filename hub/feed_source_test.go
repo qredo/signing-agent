@@ -23,7 +23,7 @@ func TestWebsocketSource_Connect_retries_on_fail_to_get__ZKPOnePass(t *testing.T
 	mock_core := &lib.MockSigningAgentClient{
 		NextError: errors.New("some error"),
 	}
-	sut := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	sut := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConfig{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := sut.Connect()
@@ -46,7 +46,7 @@ func TestWebsocketSource_Connects(t *testing.T) {
 	mock_core := &lib.MockSigningAgentClient{
 		NextZKPOnePass: []byte("zkp"),
 	}
-	sut := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	sut := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConfig{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := sut.Connect()
@@ -71,7 +71,7 @@ func TestWebsocketSource_retries_on_dial_error(t *testing.T) {
 	mock_core := &lib.MockSigningAgentClient{
 		NextZKPOnePass: []byte("zkp"),
 	}
-	conn := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	conn := NewWebsocketSource(mock_dialer, "feed", util.NewTestLogger(), mock_core, &config.WebSocketConfig{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := conn.Connect()
@@ -88,7 +88,7 @@ func TestWebsocketSource_retries_on_dial_error(t *testing.T) {
 
 func TestWebsocketSource_GetFeedUrl(t *testing.T) {
 	//Arrange
-	sut := NewWebsocketSource(nil, "feed", nil, nil, &config.WebSocketConf{ReconnectTimeOut: 6, ReconnectInterval: 2})
+	sut := NewWebsocketSource(nil, "feed", nil, nil, &config.WebSocketConfig{ReconnectTimeOut: 6, ReconnectInterval: 2})
 
 	//Act
 	res := sut.GetFeedUrl()

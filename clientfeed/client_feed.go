@@ -39,7 +39,7 @@ type clientFeedImpl struct {
 
 // NewClientFeed returns a new ClientFeed which is an instance of ClientFeedImpl initialized with the provided parameters
 // ClientFeed has an external FeedClient which means it can unregister itself from the feed hub to stop receiving data
-func NewClientFeed(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister UnregisterFunc, config *config.WebSocketConf) ClientFeed {
+func NewClientFeed(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister UnregisterFunc, config *config.WebSocketConfig) ClientFeed {
 	return &clientFeedImpl{
 		FeedClient: hub.NewFeedClient(false),
 		conn:       conn,

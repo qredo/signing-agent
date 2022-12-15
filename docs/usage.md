@@ -90,15 +90,15 @@ autonumber
   PartnerAPP->>signing-agent-service:POST /register {"name":"...","APIKey":"...","Base64PrivateKey":"..."}
   signing-agent-service->>signing-agent-service: Generate BLS and EC Keys
   signing-agent-service->>QredoBE: Register agent with Qredo Chain
-  QredoBE->>signing-agent-service: {agentId, feedURL, other data} 
-  signing-agent-service->>PartnerAPP: {agentId, feedURL}
+  QredoBE->>signing-agent-service: {agentID, feedURL, other data} 
+  signing-agent-service->>PartnerAPP: {agentID, feedURL}
 ```
 
 1. The *PartnerApp* triggers the registration process by providing its client name, parther APIKey and Base64PrivateKey  to the *signing-agent-service*.
 2. *signing-agent-service* generates BLS and EC keys.
 3. The *signing-agent-service* can now register itself to the partner API on the *QredoBE*, by sending the `client name`, `BLS`, and `EC` public keys. The *QredoBE* is returning ClientID, CLientSecret that will be responsible for authentication.
-4. The `agentId` and a `feedURL` is returned by the *QredoBE* to the *signing-agent-service*. This feed is used by the *signing-agent-service* to keep a communication channel open with the *QredoBE*.
-5. The `agentId` and a `feedURL` is also passed along to the *PartnerApp* so that the latter can monitor for new actions that need to be approved in case the service is not configured for auto-approval.
+4. The `agentID` and a `feedURL` is returned by the *QredoBE* to the *signing-agent-service*. This feed is used by the *signing-agent-service* to keep a communication channel open with the *QredoBE*.
+5. The `agentID` and a `feedURL` is also passed along to the *PartnerApp* so that the latter can monitor for new actions that need to be approved in case the service is not configured for auto-approval.
 
 All the data above is currently stored on premises in a file by the signing-agent-service, and since some of it (ClientSecret, EC & BLS private keys) is quite sensitive it needs to be running in a secure environment.
 
@@ -118,12 +118,12 @@ Request:
 }
 ```
 
-Response (clientRegisterResponse):
+Response (AgentRegisterResponse):
 
 ```json
 {
-  "agentId": "string",
-  "feedUrl": "string"
+  "agentID": "string",
+  "feedURL": "string"
 }
 ```
 
