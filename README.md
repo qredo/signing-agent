@@ -1,8 +1,17 @@
-# Signing Agent
+# Welcome to Qredo's Signing Agent
 
-The Signing Agent is an agent that can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application.
 
-More details on how to use the Signing Agent can be found in `/docs`.
+## What is Signing Agent?
+
+Signing Agent is a programatic member of your Qredo custody group. It enables you to setup automated approval for transactions from a Qredo wallet. To understand how to set up a Qredo Wallet with a Signing Agent integration [see the docs](https://developers.qredo.com/signing-agent/).
+
+The Signing Agent service provided here can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application.
+
+More details on how to use the Signing Agent can be found in [`/docs`](/docs).
+
+## Who maintains Signing Agent?
+
+The Qredo development team is responsible for maintaining the Signing Agent. If you have issues or feedback, please create an issue and the team will support you.
 
 ## How to build
 ```shell
@@ -38,3 +47,5 @@ These should be set before the running the e2e test. And then:
 > make e2etest
 ```
 to run the e2e test.  
+
+

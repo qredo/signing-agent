@@ -58,8 +58,8 @@ store:
 
 ## Auto approval
 - **enabled:** activate the automatic approval of every transaction that is received
-- **retryIntervalMaxSec:** the maximum time in which the signing agent retries to approve an action. After that it’s considered as a failure 
-- **retryIntervalSec:** the interval in which the signing agent is attempting to approve an action. It will retry until the retryIntervalMaxSec is reached
+- **retryIntervalMaxSec:** the maximum time in which the Signing Agent retries to approve an action. After that it’s considered as a failure 
+- **retryIntervalSec:** the interval in which the Signing Agent is attempting to approve an action. It will retry until the retryIntervalMaxSec is reached
 
 ## Websocket
 - **qredoWebsocket:** the url of the websocket feed you want to use
@@ -100,7 +100,7 @@ store:
 
 ## Store
 
-- **type:** the type of store to use to store the private key information for the signing agent, ex. file, oci, aws
+- **type:** the type of store to use to store the private key information for the Signing Agent, ex. file, oci, aws
 - **file:** the path to the storage file when file store is used
 - **oci:** the oracle cloud configuration to store the private keys in an oracle vault
   - **compartment:** the OCID where the vault and encryption key reside

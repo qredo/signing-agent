@@ -1,14 +1,17 @@
-# Getting started - documentation for Partners
+# Get started
 
-This guide provides all the steps necessary to integrate a 3rd party App (referred to as the **PartnerApp**) with the Signing Agent and our Partner API.
+This guide walks you through all the steps necessary to integrate a 3rd party App (which from now on we’ll refer to as the **PartnerApp**) with the Signing Agent and our [Partner API](https://developers.qredo.com/partner-api/getting-started/).
 
-# Creating a Qredo account to obtain the API key
 
-If you haven’t done so, please follow the following guide to first create an account on the Play environment, so you can test the Signing Agent in our sandbox environment before using it in production.
+# Create a Qredo account to obtain the API key
 
-## Creating an account on the Play environment
+If you haven’t done so, please follow the guide to first create an account on the test environment, so you can test the Signing Agent in our sandbox environment before using it in production.
 
-The first step is to visit the Play environment app at [https://play.qredo.network/](https://play.qredo.network). This is a special-purpose sandbox environment that you can use for testing, without fear of breaking anything. Just click on the big “Join Qredo” button to get started.
+## Create an account on the sandbox environment
+
+The first step is to visit the sandbox environment App at [https://sandbox.qredo.network/]( https://sandbox.qredo.network). This is a special purpose environment that you can use for testing, without fear of breaking anything.
+
+> Click on the big “Join Qredo” button to get started.
 
 ![Screenshot 2022-11-09 at 17.13.43.png](img/Screenshot_2022-11-09_at_17.13.43.png)
 
@@ -18,7 +21,7 @@ Next, click Continue to go through the other steps until you reach “Pair your 
 
 ![Screenshot 2022-08-11 at 14.37.52.png](img/Screenshot_2022-08-11_at_14.37.52.png)
 
-And that’s it. You can now sign into the Play environment and start using the Web app.
+And that’s it. You can now sign into the sandbox environment and start using the Web App.
 
 ## Signing into the Play environment
 
@@ -26,7 +29,8 @@ Signing into your account is straightforward. Just type in the email address you
 
 ![Screenshot 2022-11-09 at 17.17.34.png](img/Screenshot_2022-11-09_at_17.17.34.png)
 
-You will see a screen asking you to authenticate with your mobile app, and at the same time you should receive a notification on your phone to authenticate (make sure app notifications are turned on).
+You will see a screen asking you to authenticate with your Mobile App. In our case, we’re going to mock it again by using our [Qredo Mobile Demo App](https://mobile.qredo.net/#). 
+
 
 ![Screenshot 2022-08-11 at 14.41.03.png](img/Screenshot_2022-08-11_at_14.41.03.png)
 
@@ -41,6 +45,8 @@ Follow the steps in the mobile app to approve the authentication request and you
 - Next, in the **Preferences** tab click on the toggle button to enable Testnet Assets (i.e., ETH-GOERLI and BTC-TESTNET).
 
 ![Screenshot 2022-11-09 at 17.29.05.png](img/Screenshot_2022-11-09_at_17.29.05.png)
+
+Now, the Qredo backend is ready to accept API requests.
 
 - Finally, you have to generate API keys for the Partner API and the Signing Agent:
     - Select the **API** tab.
@@ -107,7 +113,7 @@ Now you are ready to send Partner API requests.
 
 By this time, you should already have a Docker image for the Signing Agent. In order to be able to use it, you need to create a Docker volume (where config data lives) as well as a Docker container that uses the image.
 
-# Deploying the Signing Agent
+# Deploy the Signing Agent
 
 ### Create a Docker volume for storing config data
 
@@ -145,7 +151,7 @@ Please see [the configuration documentation](https://www.notion.so/Configuration
 
 # Registering the Signing Agent Service
 
-When everything is set up properly (Qredo account creation is complete, and the public key has been locally generated and uploaded through the Web interface), we can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/`.
+When everything is set up properly (Qredo account creation is complete and the public key has been locally generated an stored through the Web interface) you can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/` but that should be changed to the address and port of the signing service you started above. (Most likely this will be: `http://localhost:8007`.)
 
 The PartnerApp triggers the registration process by providing an agent name to the Signing Agent service. You will also need to provide the `API key` and the `Base64PrivateKey` you generated above.
 
@@ -171,11 +177,11 @@ curl -X 'POST' \
 }
 ```
 
-Once the Signing Agent registration process is complete, we can now proceed to creating a company through the Partner API, effectively enabling us to then have a fund and wallets.
+Once the Signing Agent registration process is complete, we can now proceed to creating a company through the Partner API, effectively enabling us to then have a Fund and Wallets.
 
 # Using the Partner API
 
-The Partner API will be used to set up and manage all the funds and wallets, as well as to create transactions. The official documentation page for the Partner API can be found at [https://developers.qredo.com/partner-api/getting-started/](https://developers.qredo.com/partner-api/getting-started/).
+The Partner API will be used to set up and manage all the Funds and Wallets, as well as to create transactions. The official documentation page for the Partner API can be found at [https://developers.qredo.com/partner-api/getting-started/](https://developers.qredo.com/partner-api/getting-started/).
 
 We also offer a Swagger page to help you understand how our API endpoints work — [https://play-swagger.qredo.network/#/](https://play-swagger.qredo.network/#/).
 
@@ -234,9 +240,9 @@ curl -X 'POST' \
 {"code":200,"msg":"OK"}
 ```
 
-## Create a fund with a wallet and corresponding policies
+## Create a Fund with a Wallet and corresponding policies
 
-Here we are explicitly creating a new fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-GOERLI* wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentID` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/quickstart/03-create-fund/).
+Here we are explicitly creating a new Fund, while at the same time defining the **withdraw** and **transaction** policies for it. We are also creating a new *ETH-GOERLI* Wallet with its own withdraw and transaction policies. The Play environment also supports *BTC-TESTNET*. The only member we are now adding to all the policies is the Signing Agent (using the `agentID` we received during the registration step). Please make sure to store the `fund_id` you receive in the response, since you will need it later. More details for this particular request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/quickstart/03-create-fund/).
 
 ```bash
 **Request:**
@@ -292,9 +298,9 @@ curl -X 'POST' \
 }
 ```
 
-## Discover wallet address and deposit testnet assets to the wallet
+## Discover Wallet address and deposit testnet assets to the Wallet
 
-Since we have created a fund with an ETH-GOERLI asset type (Goerli testnet), we can now try to deposit some test ETH. To do that, first we need to find out the ETH address to which we need to send the assets. We’ll ask for the list of fund assets with their deposit addresses and current balances. Each fund contains one or more deposit addresses for the different types of assets. As you can see below, for this request we have supplied the `company_id` and `fund_id` we previously obtained in the API URL.
+Since we have created a Fund with an ETH-GOERLI asset type (Goerli testnet), we can now try to deposit some test ETH. To do that, first we need to find out the ETH address to which we need to send the assets. We’ll ask for the list of Fund assets with their deposit addresses and current balances. Each Fund contains one or more deposit addresses for the different types of assets. As you can see below, for this request we have supplied the `company_id` and `fund_id` we previously obtained in the API URL.
 
 ```bash
 **Request**:
@@ -324,7 +330,7 @@ You can now send Goerli ETH from any account to the above address — i.e. `0x9B
 
 ## Whitelist addresses for withdrawals (L1)
 
-Before we can withdraw assets on L1, we need to whitelist the external wallet address. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/quickstart/06-perform-withdrawal/#1-whitelist-a-withdrawal-address).
+Before we can withdraw assets on L1, we need to whitelist the external Wallet address. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/quickstart/06-perform-withdrawal/#1-whitelist-a-withdrawal-address).
 
 ```bash
 **Request:**
@@ -346,9 +352,9 @@ curl -X 'POST' \
 {"code":200,"msg":"OK"}
 ```
 
-## Discover wallet id from the created fund
+## Discover Wallet id from the created Fund
 
-Before we can initiate a transfer or withdrawal we need to find the wallet id, which can be retrieved from the fund details from the partner api:
+Before we can initiate a transfer or withdrawal we need to find the Wallet id, which can be retrieved from the Fund details from the partner api:
 
  
 
@@ -369,9 +375,9 @@ curl -X 'GET' \
 ...
 ```
 
-## L1 transaction (withdraw) to external wallet
+## L1 transaction (withdraw) to external Wallet
 
-Here we are requesting a withdrawal of 1000 gwei to an external wallet that we have previously whitelisted. We are providing the `company_id` as well as the `wallet_id` from which we are making the withdrawal. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/quickstart/06-perform-withdrawal/#2-submit-withdrawal-request).
+Here we are requesting a withdrawal of 1000 gwei to an external Wallet that we have previously whitelisted. We are providing the `company_id` as well as the `wallet_id` from which we are making the withdrawal. More details for this request can be found in the [official documentation for the PartnerAPI](https://developers.qredo.com/partner-api/quickstart/06-perform-withdrawal/#2-submit-withdrawal-request).
 
 ```bash
 **Request:**
