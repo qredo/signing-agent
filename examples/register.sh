@@ -7,8 +7,8 @@ curl -X 'POST' \
   -H 'Content-Type: application/json' \
   --data-binary @- << EOF
   {
-    "name": "$AGENT_NAME", 
-    "apikey": "$APIKEY", 
+    "name": "$AGENT_NAME",
+    "apikey": "$APIKEY",
     "base64privatekey": "$BASE64PKEY"
   }
 EOF

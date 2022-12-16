@@ -38,7 +38,7 @@ test-all:
 
 lint:
 	@echo "running lint"
-	golangci-lint run 
+	golangci-lint run
 
 swagger:
 	@docs/swagger-generate.sh

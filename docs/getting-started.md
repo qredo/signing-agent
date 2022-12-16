@@ -50,7 +50,7 @@ Signing into your account is straightforward. Just type in the email address you
 
 ![Screenshot 2022-08-11 at 14.39.59.png](img/Screenshot_2022-08-11_at_14.39.59.png)
 
-You will see a screen asking you to authenticate with your mobile app. In our case, we’re going to mock it again by using our [Qredo Mobile Demo app](https://mobile.qredo.net/#). 
+You will see a screen asking you to authenticate with your mobile app. In our case, we’re going to mock it again by using our [Qredo Mobile Demo app](https://mobile.qredo.net/#).
 
 ![Screenshot 2022-08-11 at 14.41.03.png](img/Screenshot_2022-08-11_at_14.41.03.png)
 
@@ -61,9 +61,9 @@ Click on the “Select user to authenticate” dropdown and select your user fro
 ## Obtaining the API key
 
 Before continuing with the guide, it is recommended you enable Testnet Assets. To do that, click your name in the top right corner and select “Profile Settings” from the popup.
-  
+
 ![Screenshot 2022-06-09 at 14.18.36.png](img/Screenshot_2022-06-09_at_14.18.36.png)
-    
+
 Next, select **Personal Account** and then the **Preferences** tab and enable **Testnet Assets** to use ETH-GOERLI and BTC-TESTNET.
 
 ![Screenshot 2022-06-09 at 14.24.23.png](img/Screenshot_2022-06-09_at_14.24.23.png)
@@ -121,7 +121,7 @@ Copy your `private.pem` file to the local `volume` folder you created above or k
 
 Copy your `Base64PrivateKey` token to the clipboard. You are going to use it as a part of payload data on registration endpoint.
 
-5. Upload the public.pem to the Partner API sandbox.  Go back to the (web) page where you generated the API key and click 
+5. Upload the public.pem to the Partner API sandbox.  Go back to the (web) page where you generated the API key and click
 **Add Public Key**.  Copy and paste in the contents of the public.pem generated above.
 
 ## Create Docker volume and run the image
@@ -144,7 +144,7 @@ You can now continue with testing of the Docker image.
 
 # Registering the Signing Agent Service
 
-When everything is set up properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) you can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/` but that 
+When everything is set up properly (Qredo account creation is complete and the public key has been locally generated and is stored through the Web interface) you can start using the Signing Agent service. For the following examples, we assume the Signing Agent service is running at `https://agent.example.org/` but that
 should be changed to the address and port of the signing service you started above.  (Most likely this will be: `http://localhost:8007`.)
 
 The PartnerApp triggers the registration process by providing an agent name, partner api key and private.pem represented by base64 string to the Signing Agent service. You don't have to remember the `agentID` value, because You can call `GET https://agent.example.org/api/v1/client` endpoint to get it.

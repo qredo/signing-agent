@@ -11,7 +11,7 @@ participant Q as QredoBE
 autonumber
   PA->>AA: POST /register {"name":"...","APIKey":"...","Base64PrivateKey":"..."}
   AA->>AA: Generate BLS and EC keys
-  AA->>AA: {BLSPublic, ECPublic, RefID}  
+  AA->>AA: {BLSPublic, ECPublic, RefID}
   AA->>Q: POST /p/client/init Body: {BLS & EC Public Keys}
   Q->>Q: Create new MFA ID, New IDdoc
   Q->>AA: {ID, AccountCode, ClientID, ClientSecret, unsigned IDdoc}
@@ -24,8 +24,8 @@ autonumber
 ```
 
 1. The *PartnerApp* triggers the registration process by providing its client name, parther APIKey and Base64PrivateKey  to the *signing-agent-service*.
-2. *signing-agent-service* generates BLS and EC keys. 
-3. *signing-agent-service* storage BLS and EC keys. 
+2. *signing-agent-service* generates BLS and EC keys.
+3. *signing-agent-service* storage BLS and EC keys.
 4. The *signing-agent-service* can now register itself to the partner API on the *QredoBE*, by sending the `client name`, `BLS`, and `EC` public keys.
 11. The `agentId` and a `feedURL` is returned by the *QredoBE* to the *signing-agent-service*. This feed is used by the *signing-agent-service* to keep a communication channel open with the *QredoBE*.
 12. The `agentId` and a `feedURL` is also passed along to the *PartnerApp* so that the latter can monitor for new actions that need to be approved in case the service is not configured for auto-approval.

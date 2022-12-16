@@ -37,4 +37,4 @@ These should be set before the running the e2e test. And then:
 ```shell
 > make e2etest
 ```
-to run the e2e test.  
+to run the e2e test.
