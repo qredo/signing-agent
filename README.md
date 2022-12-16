@@ -7,7 +7,7 @@ Signing Agent is a programatic member of your Qredo custody group. It enables yo
 
 The Signing Agent service provided here can operate as a standalone service (exposing a RESTful API to 3rd party applications), or as a library integrated into an application.
 
-More details on how to use the Signing Agent can be found in `/docs`.
+More details on how to use the Signing Agent can be found in [`/docs`](/docs).
 
 ## Who maintains Signing Agent?
 
