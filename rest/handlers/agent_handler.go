@@ -17,14 +17,14 @@ import (
 	"github.com/qredo/signing-agent/util"
 )
 
-type newClientFeedFunc func(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister clientfeed.UnregisterFunc, config *config.WebSocketConf) clientfeed.ClientFeed
+type newClientFeedFunc func(conn hub.WebsocketConnection, log *zap.SugaredLogger, unregister clientfeed.UnregisterFunc, config *config.WebSocketConfig) clientfeed.ClientFeed
 
 type SigningAgentHandler struct {
 	feedHub           hub.FeedHub
 	log               *zap.SugaredLogger
 	core              lib.SigningAgentClient
 	config            *config.AutoApprove
-	websocketConfig   *config.WebSocketConf
+	websocketConfig   *config.WebSocketConfig
 	localFeed         string
 	decode            func(interface{}, *http.Request) error
 	autoApprover      *autoapprover.AutoApprover
@@ -79,13 +79,21 @@ func (h *SigningAgentHandler) StopAgent() {
 
 // RegisterAgent
 //
-// swagger:route POST /client/register client RegisterAgent
+// swagger:route POST /register client RegisterAgent
 //
 // # Register a new agent
 //
+// This will register the agent only if there is none already registered.
+//
+// Consumes:
+//   - application/json
+//
+// Produces:
+//   - application/json
+//
 // Responses:
 //
-// 200: ClientFullRegisterResponse
+// 200: AgentRegisterResponse
 func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -106,6 +114,8 @@ func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.Respo
 // swagger:route GET /client/feed client ClientFeed
 //
 // # Get approval requests Feed (via websocket) from Qredo Backend
+//
+// This endpoint feeds approval requests coming from the Qredo Backend to the agent.
 //
 //	Produces:
 //	- application/json
@@ -137,19 +147,25 @@ func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.Response
 	return nil, nil
 }
 
-// GetAgentID
+// GetClient
 //
-// swagger:route GET /client client GetAgentID
+// swagger:route GET /client client GetClient
 //
-// # Returns `agentID` if it's configured
+// # Get information about the registered agent
+//
+// This endpoint retrieves the `agentID` and `feedURL` if an agent is registered.
+//
+// Produces:
+//   - application/json
 //
 // Responses:
 //
-//	200: GetAgentIDResponse
-func (h *SigningAgentHandler) GetAgentID(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
+//	200: GetClientResponse
+func (h *SigningAgentHandler) GetClient(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
 	w.Header().Set("Content-Type", "application/json")
-	response := api.GetAgentIDResponse{
+	response := api.GetClientResponse{
 		AgentID: h.core.GetAgentID(),
+		FeedURL: h.localFeed,
 	}
 	return response, nil
 }
@@ -186,7 +202,7 @@ func (h *SigningAgentHandler) register(r *http.Request) (interface{}, error) {
 		return nil, err
 	}
 
-	response := api.ClientFullRegisterResponse{
+	response := api.AgentRegisterResponse{
 		AgentID: initResults.AccountCode,
 		FeedURL: h.localFeed,
 	}

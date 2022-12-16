@@ -44,7 +44,7 @@ type websocketSource struct {
 }
 
 // NewWebsocketSource returns a Source object that's an instance of websocketSource
-func NewWebsocketSource(dialer WebsocketDialer, feedUrl string, log *zap.SugaredLogger, core lib.SigningAgentClient, config *config.WebSocketConf) Source {
+func NewWebsocketSource(dialer WebsocketDialer, feedUrl string, log *zap.SugaredLogger, core lib.SigningAgentClient, config *config.WebSocketConfig) Source {
 	return &websocketSource{
 		log:                  log,
 		core:                 core,

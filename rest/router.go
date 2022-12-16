@@ -101,7 +101,7 @@ func (r *Router) SetHandlers() http.Handler {
 		{PathHealthCheckConfig, http.MethodGet, r.healthCheckHandler.HealthCheckConfig},
 		{PathHealthCheckStatus, http.MethodGet, r.healthCheckHandler.HealthCheckStatus},
 		{PathClientFullRegister, http.MethodPost, r.signingAgentHandler.RegisterAgent},
-		{PathClient, http.MethodGet, r.signingAgentHandler.GetAgentID},
+		{PathClient, http.MethodGet, r.signingAgentHandler.GetClient},
 		{PathAction, http.MethodPut, r.actionHandler.ActionApprove},
 		{PathAction, http.MethodDelete, r.actionHandler.ActionReject},
 		{PathClientFeed, defs.MethodWebsocket, r.signingAgentHandler.ClientFeed},
@@ -220,7 +220,7 @@ func (r *Router) printRoutes(router *mux.Router) {
 }
 
 // genWSQredoCoreClientFeedURL assembles and returns the Qredo WS client feed URL as a string.
-func genWSQredoCoreClientFeedURL(config *config.WebSocketConf) string {
+func genWSQredoCoreClientFeedURL(config *config.WebSocketConfig) string {
 	return config.QredoWebsocket
 }
 
