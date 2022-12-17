@@ -41,9 +41,9 @@ PROJECT_DIR="$(cd "$(dirname "${0}")/.."; pwd)"
 	cd "$PROJECT_DIR"
 
   echo $OCI_RSA > "$(pwd)/oci_rsa.b64"
-  PEM_PATH="$(pwd)/oci_rsa.pem" 
+  PEM_PATH="$(pwd)/oci_rsa.pem"
   base64 -d "$(pwd)/oci_rsa.b64" > $PEM_PATH
-  
+
   mkdir -p /home/gitlab-runner/.oci
   sed "s~patch-me-oci-pem~$PEM_PATH~" "$OCI_CONFIG" > "/home/gitlab-runner/.oci/config"
 

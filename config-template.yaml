@@ -35,7 +35,7 @@ loadBalancing:
     port: 6379
     password: ""
     db: 0
-store: 
+store:
   type: file # oci/aws/az/file
   file: /volume/ccstore.db
   oci:

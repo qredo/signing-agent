@@ -67,9 +67,9 @@ Start the Signing Agent and register the agent using the API. (Note: starting th
 from plaintext to binary.)
 
 **Note:** the Signing Agent needs access to AWS credentials in order to use AWS' Secrets Manager.  How you do this is
-dependent on your requirements (for instance, the use of AWS access keys or an AWS credentials file, etc.) but, importantly, 
+dependent on your requirements (for instance, the use of AWS access keys or an AWS credentials file, etc.) but, importantly,
 if running the Signing Agent in a docker container, the AWS credentials need to be available to the Agent running in the
-container.  This would require passing the AWS credential data to docker at startup.  As an example, AWS access keys can be 
+container.  This would require passing the AWS credential data to docker at startup.  As an example, AWS access keys can be
 passed as environment variables:
 ```shell
 > docker run -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ...
@@ -90,7 +90,7 @@ autonumber
   PartnerAPP->>signing-agent-service:POST /register {"name":"...","APIKey":"...","Base64PrivateKey":"..."}
   signing-agent-service->>signing-agent-service: Generate BLS and EC Keys
   signing-agent-service->>QredoBE: Register agent with Qredo Chain
-  QredoBE->>signing-agent-service: {agentID, feedURL, other data} 
+  QredoBE->>signing-agent-service: {agentID, feedURL, other data}
   signing-agent-service->>PartnerAPP: {agentID, feedURL}
 ```
 
@@ -137,7 +137,7 @@ There are times when the Signing Agent benefits from being tightly coupled with 
 sequenceDiagram
   autonumber
   PartnerAPP->>PartnerAPP:ClientRegister('client_name')
-  
+
   rect rgb(200, 150, 255)
   note right of PartnerAPP: inside the Signing Agent lib
   PartnerAPP->>PartnerAPP: Generate BLS and EC Keys

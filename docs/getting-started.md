@@ -350,7 +350,7 @@ curl -X 'POST' \
 
 Before we can initiate a transfer or withdrawal we need to find the wallet id, which can be retrieved from the fund details from the partner api:
 
- 
+
 
 ```bash
 **Request:**
