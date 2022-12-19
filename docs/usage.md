@@ -1,3 +1,9 @@
+---
+comment: 
+proofedDate: noProof
+supportsVersion: v 1.0.0 SA
+---
+
 # Usage guide for the Signing Agent
 
 [TOC]
@@ -64,11 +70,11 @@ The Secrets Manager secret (i.e. `signAgentConfig` in this example) needs to be 
    - Name the secret and optionally add a description
 3. Update the Signing Agent's configuration file with the AWS region and secret name
 
-Start the Signing Agent and register the agent using the API. 
+Start the Signing Agent and register the agent using the API.
 
 > Starting the Agent converts the secret's type from plaintext to binary.
 
-**Note:** the Signing Agent needs access to AWS credentials in order to use AWS' Secrets Manager. How you do this is dependent on your requirements (for instance, the use of AWS access keys or an AWS credentials file, etc.) but, importantly, if running the Signing Agent in a docker container, the AWS credentials need to be available to the Agent running in the container. This requires passing the AWS credential data to docker at startup. As an example, AWS access keys can be passed as environment variables:
+**Note:** the Signing Agent needs access to AWS credentials in order to use AWS' Secrets Manager. How you do this is dependent on your requirements (for instance, the use of AWS access keys or an AWS credentials file, etc.) but, importantly, if running the Signing Agent in a Docker container, the AWS credentials need to be available to the Agent running in the container. This requires passing the AWS credential data to Docker at startup. As an example, AWS access keys can be passed as environment variables:
 ```shell
 > docker run -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ...
 ```
@@ -78,7 +84,7 @@ or, if using an AWS credential data contained in a local directory, something li
 ```
 Specifics are best discussed with your cloud services admin department.
 
-## Using Signing Agent as a Service
+## Use Signing Agent as a Service
 
 As mentioned above, the Signing Agent is a standalone component of the Qredo ecosystem. Everyone who intends to run an Signing Agent must first register it on the Qredo network. Below is a step-by-step explanation of the registration process, which involves the *PartnerApp* (i.e. your App), the *signing-agent-service* (e.g. Signing Agent running on your infrastructure), and *QredoBE* (e.g. our Qredo backend).
 
@@ -88,7 +94,7 @@ autonumber
   PartnerApp->>signing-agent-service:POST /register {"name":"...","APIKey":"...","Base64PrivateKey":"..."}
   signing-agent-service->>signing-agent-service: Generate BLS and EC Keys
   signing-agent-service->>QredoBE: Register agent with Qredo Chain
-  QredoBE->>signing-agent-service: {agentID, feedURL, other data} 
+  QredoBE->>signing-agent-service: {agentID, feedURL, other data}
   signing-agent-service->>PartnerApp: {agentID, feedURL}
 ```
 
@@ -125,7 +131,7 @@ Response (AgentRegisterResponse):
 }
 ```
 
-## Using Signing Agent as a Library
+## Use Signing Agent as a Library
 
 There are times when the Signing Agent benefits from being tightly coupled with an application or a service. In this case, it can be imported as a Go package directly into that application.
 
@@ -135,7 +141,7 @@ There are times when the Signing Agent benefits from being tightly coupled with 
 sequenceDiagram
   autonumber
   PartnerApp->>PartnerApp:ClientRegister('client_name')
-  
+
   rect rgb(200, 150, 255)
   note right of PartnerApp: inside the Signing Agent lib
   PartnerApp->>PartnerApp: Generate BLS and EC Keys
@@ -155,7 +161,7 @@ sequenceDiagram
   QredoBE->>PartnerApp: {feedURL}
 ```
 
-## Approving a transaction
+## Approve a transaction
 
 Prerequisites:
 
@@ -180,7 +186,7 @@ Steps:
 
 After that sequence, the transaction flow is complete.
 
-## Using the library to approve a transaction
+## Use the library to approve a transaction
 
 ```mermaid
 sequenceDiagram

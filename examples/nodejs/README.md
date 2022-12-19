@@ -6,7 +6,7 @@ Running Signing Agent as container:
 - copy the config template from the created container local: `docker cp temp_signing_agent:/signing-agent/config-template.yaml ./volume/config.yaml`
 - edit the config.yaml to your likings, see the configuration.md manual
 - delete the temporary container `docker rm temp_signing_agent`
-- start a signing-agent container with the volume folder mounted in and connected to the previously created network: 
+- start a signing-agent container with the volume folder mounted in and connected to the previously created network:
 ```
 docker run --detach \
  --name signing-agent \

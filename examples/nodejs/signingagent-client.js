@@ -81,20 +81,20 @@
                 this.#connectFeed()
                 reconnect_timeout = null
             }).bind(this)
-    
+
             socket.addEventListener("open", (event) => {
                 console.log("feed connected")
             })
-    
+
             socket.addEventListener("close", (event) => {
                 console.log("feed disconnected")
                 if (reconnect_timeout == null) {
                     reconnect_timeout = setTimeout(reconnect, 5000)
                 }
             })
-    
+
             socket.addEventListener("message", (event) => {
-                
+
                 if (typeof(this.#transaction_callback) == "function") {
                     let msg = JSON.parse(event.data)
 
@@ -143,17 +143,17 @@
             if (body != null) {
                 json_body = JSON.stringify(body)
             }
-    
+
             const req = {
-                method: method, 
-                mode: "cors", 
-                cache: "no-cache", 
-                credentials: "same-origin", 
+                method: method,
+                mode: "cors",
+                cache: "no-cache",
+                credentials: "same-origin",
                 headers: {
-                  "Content-Type": "application/json"                  
+                  "Content-Type": "application/json"
                 },
-                redirect: "follow", 
-                referrerPolicy: "no-referrer", 
+                redirect: "follow",
+                referrerPolicy: "no-referrer",
                 body: json_body
             }
 
@@ -162,7 +162,7 @@
                 console.error(response.status)
                 return null
             }
-    
+
             return await response.json()
         }
 
@@ -173,22 +173,22 @@
             }
 
             const req = {
-                method: method, 
-                mode: "cors", 
-                cache: "no-cache", 
-                credentials: "same-origin", 
+                method: method,
+                mode: "cors",
+                cache: "no-cache",
+                credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
                     "x-api-key": this.#api_key
                 },
-                redirect: "follow", 
-                referrerPolicy: "no-referrer", 
+                redirect: "follow",
+                referrerPolicy: "no-referrer",
                 body: json_body
             }
 
             const timestamp = Math.round(new Date().getTime() / 1000) + ""
             req.headers["x-timestamp"] = timestamp
-            
+
             let to_sign = ""
             to_sign += timestamp
             to_sign += url
@@ -203,7 +203,7 @@
             if (response.status != 200) {
                 return null
             }
-    
+
             return await response.json()
         }
 
@@ -211,7 +211,7 @@
             if (typeof(buffer) == "string") [
                 buffer = Buffer.from(buffer, "utf-8")
             ]
-    
+
             return btoa(String.fromCharCode(...new Uint8Array(buffer)))
         }
 
