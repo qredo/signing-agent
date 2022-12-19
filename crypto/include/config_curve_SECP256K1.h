@@ -41,7 +41,7 @@ under the License.
 #define SEXTIC_TWIST_SECP256K1 .
 #define SIGN_OF_X_SECP256K1 .
 
-#define ATE_BITS_SECP256K1 
+#define ATE_BITS_SECP256K1
 
 #endif
 

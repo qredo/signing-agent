@@ -1,4 +1,12 @@
+---
+comment: 
+proofedDate: noProof
+supportsVersion: v 1.0.0 SA
+---
+
 # YAML config file template
+
+> Note, in production you must use only one `store` method, i.e. `file`, `oci`, or `aws`.
 
 ```yaml
 base:
@@ -25,7 +33,7 @@ http:
   TLS:
     enabled: true
     certFile: tls/domain.crt
-    keyFile: tls/domain.key  
+    keyFile: tls/domain.key
 logging:
   format: text
   level: debug
@@ -38,8 +46,8 @@ loadBalancing:
     port: 6379
     password: ""
     db: 0
-store: 
-  type: file 
+store:
+  type: file
   file: /volume/ccstore.db
   oci:
     compartment: ocid1.tenancy.oc1...
@@ -48,7 +56,7 @@ store:
     configSecret: signing_agent_config
   aws:
     region: aws-region-...
-    configSecret: secrets_manager_secret...  
+    configSecret: secrets_manager_secret...
 ```
 
 ## Base
@@ -58,7 +66,7 @@ store:
 
 ## Auto approval
 - **enabled:** activate the automatic approval of every transaction that is received
-- **retryIntervalMaxSec:** the maximum time in which the Signing Agent retries to approve an action. After that it’s considered as a failure 
+- **retryIntervalMaxSec:** the maximum time in which the Signing Agent retries to approve an action. After that it’s considered as a failure
 - **retryIntervalSec:** the interval in which the Signing Agent is attempting to approve an action. It will retry until the retryIntervalMaxSec is reached
 
 ## Websocket

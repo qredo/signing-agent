@@ -1,3 +1,9 @@
+---
+comment: 
+proofedDate: noProof
+supportsVersion: v 1.0.0 SA
+---
+
 # Get started
 
 This guide walks you through all the steps necessary to integrate a 3rd party App (which from now on we’ll refer to as the **PartnerApp**) with the Signing Agent and our [Partner API](https://developers.qredo.com/partner-api/getting-started/).
@@ -29,7 +35,7 @@ Signing into your account is straightforward. Just type in the email address you
 
 ![Screenshot 2022-11-09 at 17.17.34.png](img/Screenshot_2022-11-09_at_17.17.34.png)
 
-You will see a screen asking you to authenticate with your Mobile App. In our case, we’re going to mock it again by using our [Qredo Mobile Demo App](https://mobile.qredo.net/#). 
+You will see a screen asking you to authenticate with your Mobile App. In our case, we’re going to mock it again by using our [Qredo Mobile Demo App](https://mobile.qredo.net/#).
 
 
 ![Screenshot 2022-08-11 at 14.41.03.png](img/Screenshot_2022-08-11_at_14.41.03.png)
@@ -113,7 +119,7 @@ Now you are ready to send Partner API requests.
 
 By this time, you should already have a Docker image for the Signing Agent. In order to be able to use it, you need to create a Docker volume (where config data lives) as well as a Docker container that uses the image.
 
-# Deploy the Signing Agent
+## Deploy the Signing Agent
 
 ### Create a Docker volume for storing config data
 
@@ -131,7 +137,7 @@ Next, you can create the Docker volume (please use full path):
 
 ### Run the Signing Agent image
 
-**Important!** before running the docker image, please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to your local `volume`.
+**Important!** before running the Docker image, please make sure to copy the `config.yaml` (YAML configuration) file provided with the image to your local `volume`.
 
 1. Import the Docker image you obtained from Qredo:
 
