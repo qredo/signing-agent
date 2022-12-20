@@ -17,15 +17,15 @@ test: unittest apitest
 
 unittest:
 	@echo "running unit tests"
-	go test ${UNITTESTS} -v -short=t
+	go test -race ${UNITTESTS} -v -short=t
 
 apitest:
 	@echo "running tests in ./tests/restapi"
-	go test ./tests/restapi -v -short=t
+	go test -race ./tests/restapi -v -short=t
 
 e2etest:
 	@echo "environment variable for APIKEY and BASE64PKEY are needed for e2e tests"
-	go test ./tests/e2e -v -short=t
+	go test -race ./tests/e2e -v -short=t
 
 update-packages:
 	@echo "updating all go packages"
