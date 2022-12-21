@@ -181,7 +181,7 @@ Steps:
 9. Sign payload (for the new action)
 10. The *PartnerApp* decides to approve the transactions, thus sending the payload to the Signing Agent with a:
 
-- `PUT` request for accet
+- `PUT` request for approve
 - `DELETE` for reject
 
 After that sequence, the transaction flow is complete.

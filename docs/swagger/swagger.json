@@ -64,9 +64,27 @@
         ],
         "responses": {
           "200": {
-            "description": "GenericResponse",
+            "description": "ActionResponse",
             "schema": {
-              "$ref": "#/definitions/GenericResponse"
+              "$ref": "#/definitions/ActionResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
             }
           }
         }
@@ -92,9 +110,27 @@
         ],
         "responses": {
           "200": {
-            "description": "GenericResponse",
+            "description": "ActionResponse",
             "schema": {
-              "$ref": "#/definitions/GenericResponse"
+              "$ref": "#/definitions/ActionResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
             }
           }
         }
@@ -217,6 +253,24 @@
             "schema": {
               "$ref": "#/definitions/AgentRegisterResponse"
             }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
           }
         }
       }
@@ -236,6 +290,24 @@
           "description": "The AWS region where the secret is stored",
           "type": "string",
           "example": "eu-west-3"
+        }
+      }
+    },
+    "ActionResponse": {
+      "type": "object",
+      "properties": {
+        "actionID": {
+          "description": "The ID of the transaction",
+          "type": "string",
+          "example": "2IXwq4klvWbnPf1YaAc1XD85jJX"
+        },
+        "status": {
+          "description": "The status of the transaction",
+          "type": "string",
+          "enum": [
+            "approved",
+            "rejected"
+          ]
         }
       }
     },
@@ -385,34 +457,27 @@
         }
       }
     },
-    "GenericResponse": {
+    "ErrorResponse": {
       "type": "object",
       "properties": {
         "Code": {
           "description": "The result code of the request",
           "type": "integer",
           "format": "int64",
-          "example": 200
+          "example": 404
         },
         "Msg": {
           "description": "The result message of the request",
           "type": "string",
-          "example": "OK"
+          "example": "Not found"
         }
       }
     },
     "GetClientResponse": {
       "type": "object",
       "properties": {
-        "agentID": {
-          "description": "The ID of the agent",
-          "type": "string",
-          "example": "98cTMMSPrDdcDDVU8idhuJGK2U1P4vmQcsp8wnED8pPR"
-        },
-        "feedURL": {
-          "description": "The feed websocket URL",
-          "type": "string",
-          "example": "http://localhost:8007/api/v1/client/feed"
+        "Body": {
+          "$ref": "#/definitions/GetClientResponse"
         }
       }
     },
