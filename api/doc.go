@@ -35,10 +35,12 @@ type DOCClientFeedResponse struct {
 	CoreClientID string `json:"coreClientID"`
 
 	// The type of the transaction
+	// enum: ApproveWithdraw, ApproveTransfer
 	// example: ApproveWithdraw
 	Type string `json:"type"`
 
 	// The status of the transaction
+	// enum: pending, expired, approved, rejected
 	// example: pending
 	Status string `json:"status"`
 
