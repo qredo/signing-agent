@@ -126,7 +126,6 @@ func TestSigningAgentHandler_RegisterAgent_already_registered(t *testing.T) {
 	//Assert
 	assert.Nil(t, response)
 	assert.True(t, mock_core.GetSystemAgentIDCalled)
-	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
 	assert.NotNil(t, err)
 
 	apiErr := err.(*defs.APIError)
@@ -492,7 +491,6 @@ func TestSigningAgentHandler_GetClient(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, http.StatusOK, rr.Code)
-	assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
 
 	assert.True(t, mockCore.GetAgentIDCalled)
 	data, _ := json.Marshal(response)
