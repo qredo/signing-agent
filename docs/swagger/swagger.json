@@ -314,6 +314,12 @@
         "status": {
           "description": "The status of the transaction",
           "type": "string",
+          "enum": [
+            "pending",
+            "expired",
+            "approved",
+            "rejected"
+          ],
           "example": "pending"
         },
         "timestamp": {
@@ -325,6 +331,10 @@
         "type": {
           "description": "The type of the transaction",
           "type": "string",
+          "enum": [
+            "ApproveWithdraw",
+            "ApproveTransfer"
+          ],
           "example": "ApproveWithdraw"
         }
       }

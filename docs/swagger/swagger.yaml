@@ -69,6 +69,11 @@ definitions:
                 type: string
             status:
                 description: The status of the transaction
+                enum:
+                    - pending
+                    - expired
+                    - approved
+                    - rejected
                 example: pending
                 type: string
             timestamp:
@@ -78,6 +83,9 @@ definitions:
                 type: integer
             type:
                 description: The type of the transaction
+                enum:
+                    - ApproveWithdraw
+                    - ApproveTransfer
                 example: ApproveWithdraw
                 type: string
         type: object
