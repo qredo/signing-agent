@@ -35,12 +35,12 @@ type DOCClientFeedResponse struct {
 	CoreClientID string `json:"coreClientID"`
 
 	// The type of the transaction
-	// enum: ApproveWithdraw, ApproveTransfer
+	// enum: ApproveWithdraw,ApproveTransfer
 	// example: ApproveWithdraw
 	Type string `json:"type"`
 
 	// The status of the transaction
-	// enum: pending, expired, approved, rejected
+	// enum: pending,expired,approved,rejected
 	// example: pending
 	Status string `json:"status"`
 
@@ -53,13 +53,13 @@ type DOCClientFeedResponse struct {
 	ExpireTime int64 `json:"expireTime"`
 }
 
-// swagger:model GenericResponse
-type DOCGenericResponse struct {
+// swagger:model ErrorResponse
+type DOCErrorResponse struct {
 	// The result code of the request
-	// example: 200
+	// example: 404
 	Code int
 
 	// The result message of the request
-	// example: OK
+	// example: Not found
 	Msg string
 }

@@ -12,6 +12,19 @@ definitions:
                 type: string
         title: 'AWSConfig-based Signing Agent config: used when Base `store` `type` is `aws`.'
         type: object
+    ActionResponse:
+        properties:
+            actionID:
+                description: The ID of the transaction
+                example: 2IXwq4klvWbnPf1YaAc1XD85jJX
+                type: string
+            status:
+                description: The status of the transaction
+                enum:
+                    - approved
+                    - rejected
+                type: string
+        type: object
     AgentRegisterResponse:
         properties:
             agentID:
@@ -121,16 +134,16 @@ definitions:
             websocket:
                 $ref: '#/definitions/WebSocketConfig'
         type: object
-    GenericResponse:
+    ErrorResponse:
         properties:
             Code:
                 description: The result code of the request
-                example: 200
+                example: 404
                 format: int64
                 type: integer
             Msg:
                 description: The result message of the request
-                example: OK
+                example: Not found
                 type: string
         type: object
     GetClientResponse:
@@ -400,9 +413,21 @@ paths:
                 - application/json
             responses:
                 "200":
-                    description: GenericResponse
+                    description: ActionResponse
                     schema:
-                        $ref: '#/definitions/GenericResponse'
+                        $ref: '#/definitions/ActionResponse'
+                "400":
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+                "404":
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+                "500":
+                    description: Internal error
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
             summary: Reject a transaction
             tags:
                 - action
@@ -419,9 +444,21 @@ paths:
                 - application/json
             responses:
                 "200":
-                    description: GenericResponse
+                    description: ActionResponse
                     schema:
-                        $ref: '#/definitions/GenericResponse'
+                        $ref: '#/definitions/ActionResponse'
+                "400":
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+                "404":
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+                "500":
+                    description: Internal error
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
             summary: Approve a transaction
             tags:
                 - action
@@ -502,6 +539,18 @@ paths:
                     description: AgentRegisterResponse
                     schema:
                         $ref: '#/definitions/AgentRegisterResponse'
+                "400":
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+                "404":
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+                "500":
+                    description: Internal error
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
             summary: Register a new agent
             tags:
                 - client

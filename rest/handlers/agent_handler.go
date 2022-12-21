@@ -94,6 +94,9 @@ func (h *SigningAgentHandler) StopAgent() {
 // Responses:
 //
 // 200: AgentRegisterResponse
+// 400: ErrorResponse description:Bad request
+// 404: ErrorResponse description:Not found
+// 500: ErrorResponse description:Internal error
 func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	if h.core.GetSystemAgentID() != "" {
 		return nil, defs.ErrBadRequest().WithDetail("AgentID already exist. You can not set new one.")
