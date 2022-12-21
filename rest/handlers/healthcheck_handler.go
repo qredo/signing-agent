@@ -43,9 +43,7 @@ func NewHealthCheckHandler(source hub.SourceStats, version *version.Version, con
 //
 //	200: VersionResponse
 func (h *HealthCheckHandler) HealthCheckVersion(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
-	response := h.version
-	return response, nil
+	return h.version, nil
 }
 
 // HealthCheckConfig
@@ -63,9 +61,7 @@ func (h *HealthCheckHandler) HealthCheckVersion(_ *defs.RequestContext, w http.R
 //
 //	200: ConfigResponse
 func (h *HealthCheckHandler) HealthCheckConfig(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
-	response := h.config
-	return response, nil
+	return h.config, nil
 }
 
 // HealthCheckStatus
@@ -83,8 +79,6 @@ func (h *HealthCheckHandler) HealthCheckConfig(_ *defs.RequestContext, w http.Re
 //
 //	200: StatusResponse
 func (h *HealthCheckHandler) HealthCheckStatus(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
-
 	readyState := h.source.GetReadyState()
 	sourceFeedUrl := h.source.GetFeedUrl()
 	connectedFeedClients := h.feedClients.GetExternalFeedClients()

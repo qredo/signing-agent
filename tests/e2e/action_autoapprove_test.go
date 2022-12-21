@@ -79,15 +79,17 @@ func TestActionAutoApprove(t *testing.T) {
 	// register agent
 	payload := &api.ClientRegisterRequest{
 		Name:             "Agent Test Name",
-		APIKey:           string(APIKey),
-		Base64PrivateKey: string(Base64PrivateKey),
+		APIKey:           APIKey,
+		Base64PrivateKey: Base64PrivateKey,
 	}
 
 	// register a new agent to use for the approval
-	registrationResponse := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
+	response := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
 		WithJSON(payload).
-		Expect().
-		Status(http.StatusOK).JSON()
+		Expect()
+	registrationResponse := response.Status(http.StatusOK).JSON()
+	response.Header("Content-Type").Equal("application/json")
+
 	agentID := registrationResponse.Object().Value("agentID").Raw().(string)
 	assert.NotEqual(t, "", agentID)
 

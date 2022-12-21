@@ -159,7 +159,6 @@ func WriteHTTPError(w http.ResponseWriter, r *http.Request, err error) {
 	}
 	context.Set(r, "error", apiErr)
 
-	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(apiErr.Code())
 	_, _ = w.Write(apiErr.JSON())
@@ -167,6 +166,8 @@ func WriteHTTPError(w http.ResponseWriter, r *http.Request, err error) {
 
 // FormatJSONResp encodes response as JSON and handle errors
 func FormatJSONResp(w http.ResponseWriter, r *http.Request, v interface{}, err error) {
+	w.Header().Set("Content-Type", "application/json")
+
 	if err != nil {
 		WriteHTTPError(w, r, err)
 		return
@@ -186,7 +187,6 @@ func FormatJSONResp(w http.ResponseWriter, r *http.Request, v interface{}, err e
 		WriteHTTPError(w, r, err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
 }
 
 // Stop closes the signing agent

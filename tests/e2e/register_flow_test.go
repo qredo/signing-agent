@@ -97,11 +97,10 @@ func TestRegisterNewSigningAgent(t *testing.T) {
 	}
 
 	// register the client and check against response against expected
-	registrationResponse := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
-		WithJSON(payload).
-		Expect().
-		Status(http.StatusOK).JSON()
+	register_response := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).WithJSON(payload).Expect()
+	registrationResponse := register_response.Status(http.StatusOK).JSON()
 
+	register_response.Header("Content-Type").Equal("application/json")
 	registrationResponse.Object().NotEmpty()
 	registrationResponse.Object().Value("agentID").String().NotEmpty()
 	registrationResponse.Object().Value("feedURL").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
@@ -116,6 +115,7 @@ func TestRegisterNewSigningAgent(t *testing.T) {
 	response.JSON().Object().Value("agentID").String().Equal(agentID)
 	response.JSON().Object().Value("feedURL").String().NotEmpty()
 	response.JSON().Object().Value("feedURL").String().Equal("ws://127.0.0.1:8007/api/v1/client/feed")
+	response.Header("Content-Type").Equal("application/json")
 }
 
 // TestRegisterExistingAgentDeny checks attempting to register fails with a known message.
@@ -144,10 +144,9 @@ func TestRegisterExistingAgentDeny(t *testing.T) {
 		Status(http.StatusOK).JSON()
 
 	// registering again should result in an error
-	registrationResponse := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).
-		WithJSON(payload).
-		Expect().
-		Status(http.StatusBadRequest).JSON()
+	response := e.POST(rest.WrapPathPrefix(rest.PathClientFullRegister)).WithJSON(payload).Expect()
+	registrationResponse := response.Status(http.StatusBadRequest).JSON()
 	registrationResponse.Object().NotEmpty()
 	registrationResponse.Object().Value("Detail").String().Equal("AgentID already exist. You can not set new one.")
+	response.Header("Content-Type").Equal("application/json")
 }

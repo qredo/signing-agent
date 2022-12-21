@@ -95,8 +95,6 @@ func (h *SigningAgentHandler) StopAgent() {
 //
 // 200: AgentRegisterResponse
 func (h *SigningAgentHandler) RegisterAgent(_ *defs.RequestContext, w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
-
 	if h.core.GetSystemAgentID() != "" {
 		return nil, defs.ErrBadRequest().WithDetail("AgentID already exist. You can not set new one.")
 	}
@@ -162,7 +160,6 @@ func (h *SigningAgentHandler) ClientFeed(_ *defs.RequestContext, w http.Response
 //
 //	200: GetClientResponse
 func (h *SigningAgentHandler) GetClient(_ *defs.RequestContext, w http.ResponseWriter, _ *http.Request) (interface{}, error) {
-	w.Header().Set("Content-Type", "application/json")
 	response := api.GetClientResponse{
 		AgentID: h.core.GetAgentID(),
 		FeedURL: h.localFeed,
